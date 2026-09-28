@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { DesignComponents } from "@/components/organisms/design-components";
 import { DesignFoundations } from "@/components/organisms/design-showcase";
 import { id } from "@/content/id";
 
@@ -17,6 +18,7 @@ export default function DesignPage() {
         <p className="text-muted-foreground">{id.design.subtitle}</p>
       </header>
       <DesignFoundations />
+      <DesignComponents />
     </main>
   );
 }
