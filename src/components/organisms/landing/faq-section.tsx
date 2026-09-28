@@ -14,12 +14,14 @@ export function FaqSection() {
   return (
     <section id={LANDING_ANCHORS.faq} className="scroll-mt-20">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-24">
-        <Eyebrow>{copy.eyebrow}</Eyebrow>
-        <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
+        <div className="reveal">
+          <Eyebrow>{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
+        </div>
         <div className="mt-8 divide-y border-y">
           {copy.items.map((item) => (
-            <details key={item.q} className="group">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+            <details key={item.q} className="group reveal">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-lg font-semibold transition-colors duration-150 hover:text-primary [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <ChevronDownIcon
                   aria-hidden

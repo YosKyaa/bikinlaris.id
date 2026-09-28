@@ -13,10 +13,20 @@ interface AreaScoreBarProps {
   color: SectionColor;
   redCount: number;
   hardest?: boolean;
+  /** Grow the bar from zero when mounted (landing demo). Off under reduced motion. */
+  animate?: boolean;
 }
 
 /** Section name, word status, bar and one-sentence detail. Score is secondary to the words. */
-export function AreaScoreBar({ label, score, max, color, redCount, hardest }: AreaScoreBarProps) {
+export function AreaScoreBar({
+  label,
+  score,
+  max,
+  color,
+  redCount,
+  hardest,
+  animate = false,
+}: AreaScoreBarProps) {
   const percent = max > 0 ? Math.round((score / max) * 100) : 0;
   return (
     <div className="space-y-2">
@@ -35,7 +45,11 @@ export function AreaScoreBar({ label, score, max, color, redCount, hardest }: Ar
         className="h-2 overflow-hidden rounded-full bg-muted"
       >
         <div
-          className={cn("h-full rounded-full", BAR_COLOR[color])}
+          className={cn(
+            "h-full origin-left rounded-full",
+            BAR_COLOR[color],
+            animate && "animate-bar-grow",
+          )}
           style={{ width: `${Math.max(percent, 2)}%` }}
         />
       </div>

@@ -17,14 +17,14 @@ export function CredibilitySection() {
   return (
     <section className="bg-brand-deep text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-        <div>
+        <div className="reveal">
           <Eyebrow tone="inverse">{copy.eyebrow}</Eyebrow>
           <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
           <p className="mt-4 text-lg text-brand-deep-muted">{copy.body}</p>
         </div>
         <ul className="grid content-center gap-6 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
           {facts.map((fact) => (
-            <li key={fact.label} className="border-t border-white/20 pt-4">
+            <li key={fact.label} className="reveal border-t border-white/20 pt-4">
               <span
                 className={
                   fact.highlight

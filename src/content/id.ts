@@ -102,6 +102,26 @@ export const id = {
       // [KONFIRMASI] Durasi dan pendampingan.
       microcopy: `Sekitar ${DURATION_MINUTES} menit, dibantu pendamping. Jawaban tersimpan, jadi bisa dilanjut nanti.`,
       previewLabel: "Contoh halaman SOP dari paket",
+      previewHint: "Coba ketuk kotaknya, begini cara mencoret tiap hari.",
+      tick: (task: string, day: string, done: boolean) =>
+        `${task}, ${day}: ${done ? "sudah dicoret" : "belum dicoret"}`,
+    },
+    tryIt: {
+      eyebrow: "Coba dulu",
+      title: "Tiga pertanyaan, hasilnya langsung terlihat",
+      body: (total: number) =>
+        `Ini contoh dari ${total} pertanyaan cek usaha. Jawaban di sini tidak disimpan.`,
+      resultTitle: "Yang terlihat dari jawaban Anda",
+      resultEmpty: "Pilih jawaban di sebelah kiri. Hasilnya muncul di sini.",
+      fine: (section: string) => `${section}: sudah berjalan rapi.`,
+      sopMatch: "SOP yang cocok",
+      count: (found: number, answered: number) =>
+        found === 0
+          ? `Dari ${answered} jawaban, belum ada yang perlu dirapikan.`
+          : `Dari ${answered} jawaban, ${found} hal perlu dirapikan.`,
+      cta: "Lanjut ke cek usaha lengkap",
+      ctaNote: (total: number) =>
+        `Cek usaha lengkap berisi ${total} pertanyaan dan menghasilkan paket SOP untuk usaha Anda.`,
     },
     problems: {
       eyebrow: "Terdengar akrab?",
@@ -115,6 +135,8 @@ export const id = {
         "Masalahnya bukan kurang kerja keras. Cara kerjanya belum tertulis. Di situ bikinlaris membantu.",
     },
     how: {
+      tabsLabel: "Langkah cek usaha",
+      exampleLabel: "Contoh tampilan",
       eyebrow: "Cara kerjanya",
       title: "Tiga langkah, satu kali duduk",
       steps: [
@@ -139,6 +161,15 @@ export const id = {
       title: "SOP yang bisa langsung dijalankan",
       body: "Tiap SOP berisi alasannya, persiapan sekali jalan, tugas harian dan mingguan, serta tabel coret 2 minggu. Isi paket menyesuaikan jawaban Anda.",
       listTitle: "SOP yang tersedia per bagian",
+      filterLabel: "Pilih bagian usaha",
+      taskCount: (setup: number, daily: number, weekly: number) =>
+        [
+          setup ? `${setup} persiapan` : null,
+          daily ? `${daily} tugas harian` : null,
+          weekly ? `${weekly} tugas mingguan` : null,
+        ]
+          .filter(Boolean)
+          .join(" · "),
       openSample: "Buka contoh SOP",
       sampleTitle: "Contoh SOP",
       sampleDescription:

@@ -107,6 +107,67 @@
   }
 }
 
+/*
+ * Motion that demonstrates the product (bars growing, boxes being ticked) and a gentle
+ * scroll reveal on the landing page. Everything is off under prefers-reduced-motion,
+ * and the reveal needs CSS scroll-driven animations (no JavaScript). See docs/PERUBAHAN.md.
+ */
+@theme {
+  --animate-bar-grow: bar-grow 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-tick-in: tick-in 200ms ease-out both;
+  --animate-fade-up: fade-up 200ms ease-out both;
+
+  @keyframes bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes tick-in {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
 @media print {
   @page {
     margin: 14mm;
