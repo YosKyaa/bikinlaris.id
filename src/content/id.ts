@@ -418,6 +418,7 @@ export const id = {
       withSetup: (title: string, minutes: number) =>
         `Buka SOP 1, “${title}”. Kerjakan bagian “Siapkan dulu”, totalnya sekitar ${minutes} menit.`,
       withoutSetup: (title: string) => `Buka SOP 1, “${title}”. Mulai tugas hariannya besok pagi.`,
+      open: "Buka SOP 1",
     },
     guide: {
       title: "Cara pakai paket ini",
@@ -462,8 +463,15 @@ export const id = {
       title: "Yang ketemu dari cek usaha",
       body: "Hal-hal ini muncul dari jawaban Anda. SOP di atas disusun untuk mengatasinya.",
     },
-    followUp: (day: number, date: string) =>
-      `Hari ke-${day} sejak paket dibuat. Sekitar ${date}, peneliti akan menghubungi Anda untuk menanyakan pengalaman memakai SOP, kira-kira 15 menit. Sebelum itu, tidak ada yang perlu diisi di sini.`,
+    status: {
+      day: (day: number, total: number) => `Hari ke-${day} dari ${total}`,
+      progressLabel: (day: number, total: number) =>
+        `Hari ke-${day} dari ${total} hari menjalankan SOP`,
+      before: (date: string) =>
+        `Sekitar ${date}, peneliti akan menghubungi Anda untuk menanyakan pengalaman memakai SOP, kira-kira 15 menit.`,
+      after: "Hari ke-30 sudah lewat. Peneliti akan segera menghubungi Anda, kira-kira 15 menit.",
+      nothingToFill: "Tidak ada yang perlu diisi di sini. Cukup jalankan SOP-nya.",
+    },
     printHeader: (business: string) => `bikinlaris.id · Paket SOP ${business}`,
     printMeta: (product: string, location: string, date: string) =>
       `${product} · ${location} · dibuat ${date}`,
@@ -502,13 +510,30 @@ export const id = {
     title: "Panel peneliti",
     subtitle: "Pantau UMKM peserta dan siapa yang sudah bisa dihubungi untuk kuesioner hari ke-30.",
     mockBanner: "Mode contoh: angka di halaman ini berasal dari data contoh, bukan data lapangan.",
-    stats: {
-      registered: "UMKM terdaftar",
-      diagnosisDone: "Selesai cek usaha",
-      packsCreated: "Paket SOP dibuat",
-      pastDay30: "Sudah H+30",
-      questionnaires: "Kuesioner masuk",
+    funnel: {
+      title: "Perjalanan peserta",
+      body: "Jumlah UMKM di tiap tahap. Penurunan tajam menunjukkan di mana peserta tertahan.",
+      steps: {
+        registered: "Akun dibuat",
+        profileDone: "Profil usaha diisi",
+        diagnosisStarted: "Mulai cek usaha",
+        diagnosisDone: "Selesai cek usaha",
+        packsCreated: "Paket SOP dibuat",
+        pastDay30: "Sudah H+30",
+        contacted: "Sudah dihubungi",
+        questionnaires: "Kuesioner masuk",
+      },
+      share: (percent: number) => `${percent}% dari akun`,
       questionnairesNote: "Modul kuesioner belum dibuat",
+    },
+    due: {
+      title: "Hubungi minggu ini",
+      body: (days: number) =>
+        `UMKM yang mencapai H+30 dalam ${days} hari ke depan dan belum dihubungi, urut dari yang paling mendesak.`,
+      groups: { overdue: "Sudah lewat", today: "Hari ini", tomorrow: "Besok" },
+      day: (n: number) => `Hari ke-${n}`,
+      emptyTitle: "Minggu ini tidak ada yang perlu dihubungi",
+      emptyBody: "Daftar ini terisi sendiri saat UMKM mendekati hari ke-30.",
     },
     table: {
       title: "Daftar tindak lanjut",

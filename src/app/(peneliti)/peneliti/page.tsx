@@ -4,14 +4,17 @@ import type { Metadata } from "next";
 import { CreateAccountDialog } from "@/components/organisms/create-account-dialog";
 import { FILTER_PARAM, FollowupFilter } from "@/components/organisms/followup-filter";
 import { FollowupTable } from "@/components/organisms/followup-table";
-import { ResearchSummary } from "@/components/organisms/research-summary";
+import { DueThisWeek } from "@/components/organisms/due-this-week";
+import { ResearchFunnel } from "@/components/organisms/research-funnel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import {
+  DUE_WINDOW_DAYS,
   FOLLOWUP_FILTERS,
-  getResearchSummary,
+  getFunnel,
+  listDueSoon,
   listFollowups,
   type FollowupFilter as Filter,
 } from "@/lib/data/research";
@@ -25,7 +28,11 @@ function parseFilter(value: string | string[] | undefined): Filter {
 
 export default async function ResearcherPage({ searchParams }: PageProps<"/peneliti">) {
   const filter = parseFilter((await searchParams)[FILTER_PARAM]);
-  const [summary, all] = await Promise.all([getResearchSummary(), listFollowups("semua")]);
+  const [funnel, due, all] = await Promise.all([
+    getFunnel(),
+    listDueSoon(),
+    listFollowups("semua"),
+  ]);
   const rows = filter === "semua" ? all : all.filter((row) => row.status === filter);
   const counts = Object.fromEntries(
     FOLLOWUP_FILTERS.map((f) => [
@@ -52,7 +59,10 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
         </Alert>
       ) : null}
 
-      <ResearchSummary summary={summary} />
+      <div className="grid gap-6 *:min-w-0 lg:grid-cols-[1.4fr_1fr]">
+        <DueThisWeek items={due} windowDays={DUE_WINDOW_DAYS} />
+        <ResearchFunnel steps={funnel} />
+      </div>
 
       <section aria-labelledby="tindak-lanjut" className="space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

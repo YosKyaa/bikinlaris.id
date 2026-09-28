@@ -129,13 +129,34 @@ export interface FollowupRow {
   questionnaireDone: boolean;
 }
 
-export interface ResearchSummary {
-  registered: number;
-  diagnosisDone: number;
-  packsCreated: number;
-  pastDay30: number;
-  /** null while the questionnaire module does not exist yet. */
-  questionnairesIn: number | null;
+export const FUNNEL_STEPS = [
+  "registered",
+  "profileDone",
+  "diagnosisStarted",
+  "diagnosisDone",
+  "packsCreated",
+  "pastDay30",
+  "contacted",
+  "questionnaires",
+] as const;
+export type FunnelStepKey = (typeof FUNNEL_STEPS)[number];
+
+/** Participants per stage. `count` is null while a stage cannot be measured yet. */
+export interface FunnelStep {
+  key: FunnelStepKey;
+  count: number | null;
+}
+
+/** "Hubungi minggu ini": participants reaching day 30 soon and not contacted yet. */
+export type DueGroup = "overdue" | "today" | "tomorrow" | "later";
+
+export interface DueItem {
+  businessId: string;
+  businessName: string;
+  email: string;
+  followUpOn: string;
+  dayNumber: number;
+  group: DueGroup;
 }
 
 /** Uniform Server Action result (CLAUDE.md "Clean code"). */

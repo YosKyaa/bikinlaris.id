@@ -2,19 +2,24 @@ import "server-only";
 
 import { diagnosisBank } from "@/content/diagnosis";
 import { sections } from "@/lib/diagnosis/bank";
-import { dayNumber, todayIso } from "@/lib/format";
+import { addDays, dayNumber, todayIso } from "@/lib/format";
 
 import { store } from "./mock-store";
 import {
   EVENT_ACTIONS,
   type Business,
   type Diagnosis,
+  type DueGroup,
+  type DueItem,
   type FollowupRow,
   type FollowupStatus,
+  type FunnelStep,
   type Pack,
   type ResearchEvent,
-  type ResearchSummary,
 } from "./types";
+
+/** How far ahead "Hubungi minggu ini" looks. */
+export const DUE_WINDOW_DAYS = 7;
 
 export const FOLLOWUP_FILTERS = [
   "semua",
@@ -29,17 +34,56 @@ function followupStatus(pack: Pack, today: string): FollowupStatus {
   return today >= pack.followUpOn ? "siap_dihubungi" : "belum_h30";
 }
 
-export async function getResearchSummary(): Promise<ResearchSummary> {
+/** Participants per stage, from account creation to questionnaire. Counted from data only. */
+export async function getFunnel(): Promise<FunnelStep[]> {
   const s = store();
   const today = todayIso();
+  const diagnoses = [...s.diagnoses.values()];
   const packs = [...s.packs.values()].filter((p) => p.status === "siap");
-  return {
-    registered: [...s.users.values()].filter((u) => u.role === "pemilik").length,
-    diagnosisDone: [...s.diagnoses.values()].filter((d) => d.completedAt).length,
-    packsCreated: packs.length,
-    pastDay30: packs.filter((p) => today >= p.followUpOn).length,
-    questionnairesIn: null,
-  };
+  return [
+    { key: "registered", count: [...s.users.values()].filter((u) => u.role === "pemilik").length },
+    { key: "profileDone", count: s.businesses.size },
+    {
+      key: "diagnosisStarted",
+      count: diagnoses.filter((d) => Object.keys(d.answers).length > 0).length,
+    },
+    { key: "diagnosisDone", count: diagnoses.filter((d) => d.completedAt).length },
+    { key: "packsCreated", count: packs.length },
+    { key: "pastDay30", count: packs.filter((p) => today >= p.followUpOn).length },
+    { key: "contacted", count: packs.filter((p) => p.contactedAt).length },
+    // The questionnaire module does not exist yet: shown as "—", never as 0.
+    { key: "questionnaires", count: null },
+  ];
+}
+
+function dueGroup(followUpOn: string, today: string): DueGroup {
+  if (followUpOn < today) return "overdue";
+  if (followUpOn === today) return "today";
+  if (followUpOn === addDays(today, 1)) return "tomorrow";
+  return "later";
+}
+
+/** Not-yet-contacted participants whose day 30 is past or within the next week, most urgent first. */
+export async function listDueSoon(): Promise<DueItem[]> {
+  const s = store();
+  const today = todayIso();
+  const horizon = addDays(today, DUE_WINDOW_DAYS);
+  const items: DueItem[] = [];
+  for (const pack of s.packs.values()) {
+    const business = s.businesses.get(pack.businessId);
+    if (!business || pack.status !== "siap" || pack.contactedAt || pack.followUpOn > horizon) {
+      continue;
+    }
+    items.push({
+      businessId: business.id,
+      businessName: business.name,
+      email: business.email,
+      followUpOn: pack.followUpOn,
+      dayNumber: dayNumber(pack.createdOn, today),
+      group: dueGroup(pack.followUpOn, today),
+    });
+  }
+  return items.sort((a, b) => a.followUpOn.localeCompare(b.followUpOn));
 }
 
 /** Rows sorted so the most overdue, not yet contacted participants come first. */

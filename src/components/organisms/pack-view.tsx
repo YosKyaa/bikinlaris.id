@@ -2,12 +2,12 @@ import { Eyebrow } from "@/components/atoms/eyebrow";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { id } from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
-import { getProblem, getSection, getSop } from "@/lib/diagnosis/bank";
+import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";
 
 import { BusinessMap } from "./business-map";
-import { PackActions, PackViewTracker } from "./pack-actions";
-import { FirstStepCard, FollowUpNote, LaterSops, PackGuide, ProblemList } from "./pack-details";
+import { PackActions, PackStickyActions, PackViewTracker } from "./pack-actions";
+import { FirstStepCard, LaterSops, PackGuide, PackStatusCard, ProblemList } from "./pack-details";
 import { SopDocument } from "./sop-document";
 import { SopPackList } from "./sop-pack-list";
 
@@ -33,13 +33,18 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackVie
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-20 md:pb-0">
       <PackViewTracker />
       <header className="space-y-4 print:hidden">
         <Eyebrow>{id.pack.eyebrow}</Eyebrow>
         <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
           {id.pack.title(business.name)}
         </h1>
+        <PackStatusCard
+          day={dayNumber(pack.createdOn)}
+          totalDays={rules.followUpDays}
+          followUpDate={formatDate(pack.followUpOn)}
+        />
         {pack.sops.length > 0 ? (
           <>
             <p className="text-lg text-muted-foreground">
@@ -99,7 +104,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackVie
       <div className="print:hidden">
         <ProblemList problems={pack.problems} />
       </div>
-      <FollowUpNote day={dayNumber(pack.createdOn)} date={formatDate(pack.followUpOn)} />
+      {pack.sops.length > 0 ? <PackStickyActions whatsAppUrl={whatsAppUrl} /> : null}
     </div>
   );
 }

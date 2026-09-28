@@ -1,8 +1,11 @@
 import { CalendarClockIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import type { SopId } from "@/content/diagnosis";
 import { id } from "@/content/id";
+import { sopAnchor } from "@/lib/anchors";
 import type { PackProblem } from "@/lib/data/types";
 import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
 
@@ -21,6 +24,12 @@ export function FirstStepCard({ sopId }: { sopId: SopId }) {
           ? id.pack.firstStep.withSetup(sop.title, setupMinutes)
           : id.pack.firstStep.withoutSetup(sop.title)}
       </p>
+      <Button
+        asChild
+        className="mt-4 bg-accent-lime text-brand-deep shadow-none hover:bg-accent-lime/90 hover:shadow-none"
+      >
+        <a href={`#${sopAnchor(sopId)}`}>{id.pack.firstStep.open}</a>
+      </Button>
     </section>
   );
 }
@@ -98,11 +107,34 @@ export function ProblemList({ problems }: { problems: PackProblem[] }) {
   );
 }
 
-export function FollowUpNote({ day, date }: { day: number; date: string }) {
+/**
+ * Where the owner is in the 30 days, shown first. Information only: nothing to fill in,
+ * no streaks or reminders (docs/keputusan.md).
+ */
+export function PackStatusCard({
+  day,
+  totalDays,
+  followUpDate,
+}: {
+  day: number;
+  totalDays: number;
+  followUpDate: string;
+}) {
+  const shownDay = Math.min(day, totalDays);
+  const copy = id.pack.status;
   return (
-    <section className="flex gap-3 rounded-xl bg-muted p-5 text-muted-foreground print:hidden">
-      <CalendarClockIcon aria-hidden className="mt-0.5 size-5 shrink-0" />
-      <p>{id.pack.followUp(day, date)}</p>
+    <section className="rounded-xl border bg-background p-5 shadow-card print:hidden">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-lg font-semibold tabular-nums">{copy.day(shownDay, totalDays)}</p>
+        <CalendarClockIcon aria-hidden className="size-5 text-primary" />
+      </div>
+      <Progress
+        value={(shownDay / totalDays) * 100}
+        aria-label={copy.progressLabel(shownDay, totalDays)}
+        className="mt-3 h-2"
+      />
+      <p className="mt-3">{day > totalDays ? copy.after : copy.before(followUpDate)}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{copy.nothingToFill}</p>
     </section>
   );
 }

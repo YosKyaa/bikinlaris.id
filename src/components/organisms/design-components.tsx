@@ -117,9 +117,9 @@ export function DesignComponents() {
           <div className="grid grid-cols-2 gap-3">
             <StatCard label={id.design.statLabel} value={SAMPLE_STAT} />
             <StatCard
-              label={id.researcher.stats.questionnaires}
+              label={id.researcher.funnel.steps.questionnaires}
               value={null}
-              hint={id.researcher.stats.questionnairesNote}
+              hint={id.researcher.funnel.questionnairesNote}
             />
           </div>
           <div className="space-y-4">
