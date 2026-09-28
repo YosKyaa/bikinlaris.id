@@ -7,11 +7,11 @@ import { ROUTES } from "@/lib/auth/constants";
 import { totalQuestions } from "@/lib/diagnosis/bank";
 
 import { SampleSopDialog } from "../sample-sop-dialog";
-import { SopDocumentPreview } from "./sop-document-preview";
+import { HeroVisual } from "./hero-visual";
 
 export const HERO_ID = "awal";
 
-/** Attention: concrete outcome, one primary CTA, example SOP as the visual. */
+/** Attention: concrete outcome, one primary CTA, a real business owner with a live SOP page. */
 export function HeroSection() {
   const copy = id.landing.hero;
   return (
@@ -31,7 +31,7 @@ export function HeroSection() {
           </div>
           <p className="mt-4 text-sm text-muted-foreground">{copy.microcopy}</p>
         </div>
-        <SopDocumentPreview />
+        <HeroVisual />
       </div>
     </section>
   );

@@ -113,6 +113,13 @@
  * and the reveal needs CSS scroll-driven animations (no JavaScript). See docs/PERUBAHAN.md.
  */
 @theme {
+  /* Soft, green-tinted elevation (docs/PERUBAHAN.md: shadows allowed on cards and buttons). */
+  --shadow-card: 0 1px 2px rgb(11 61 46 / 0.05), 0 8px 24px -12px rgb(11 61 46 / 0.16);
+  --shadow-card-hover: 0 2px 4px rgb(11 61 46 / 0.06), 0 18px 36px -14px rgb(11 61 46 / 0.24);
+  --shadow-float: 0 4px 8px rgb(11 61 46 / 0.06), 0 28px 56px -18px rgb(11 61 46 / 0.35);
+  --shadow-button: 0 1px 2px rgb(21 128 61 / 0.25), 0 6px 14px -6px rgb(21 128 61 / 0.45);
+  --shadow-button-hover: 0 2px 4px rgb(21 128 61 / 0.25), 0 10px 20px -8px rgb(21 128 61 / 0.55);
+
   --animate-bar-grow: bar-grow 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-tick-in: tick-in 200ms ease-out both;
   --animate-fade-up: fade-up 200ms ease-out both;

@@ -50,7 +50,10 @@ export function BusinessDetail({ detail }: { detail: Detail }) {
       {pack ? (
         <div className="grid gap-6 *:min-w-0 lg:grid-cols-2">
           <BusinessMap map={pack.map} hardest={pack.hardestSection} />
-          <section aria-labelledby="isi-paket" className="space-y-3 rounded-xl border p-5 sm:p-6">
+          <section
+            aria-labelledby="isi-paket"
+            className="space-y-3 rounded-xl border bg-background p-5 shadow-card sm:p-6"
+          >
             <div className="flex flex-wrap items-center gap-2">
               <h2 id="isi-paket" className="text-2xl font-semibold">
                 {copy.pack}
@@ -78,7 +81,7 @@ export function BusinessDetail({ detail }: { detail: Detail }) {
         {events.length === 0 ? (
           <EmptyState title={copy.events} body={copy.noEvents} />
         ) : (
-          <div className="rounded-xl border">
+          <div className="rounded-xl border bg-background shadow-card">
             <Table>
               <TableHeader>
                 <TableRow>

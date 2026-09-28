@@ -39,7 +39,7 @@ export function SopPackList({ items }: { items: SopPackItem[] }) {
         <AccordionItem
           key={item.sopId}
           value={item.sopId}
-          className="rounded-xl border px-4 last:border-b sm:px-5"
+          className="rounded-xl border bg-background px-4 shadow-card transition-shadow duration-200 last:border-b hover:shadow-card-hover sm:px-5"
         >
           <AccordionTrigger className="py-4 hover:no-underline">
             <span className="flex items-start gap-3">

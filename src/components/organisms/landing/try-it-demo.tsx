@@ -95,7 +95,7 @@ export function TryItDemo({
       </ol>
 
       <div className="lg:sticky lg:top-24 lg:self-start">
-        <div className="rounded-xl border bg-background p-5 sm:p-6">
+        <div className="rounded-xl border bg-background p-5 shadow-float sm:p-6">
           <h3 className="text-lg font-semibold">{copy.resultTitle}</h3>
           <div aria-live="polite" className="mt-4 space-y-3">
             {answered.length === 0 ? (

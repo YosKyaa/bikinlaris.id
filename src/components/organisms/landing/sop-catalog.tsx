@@ -53,7 +53,7 @@ export function SopCatalog({ sections }: { sections: CatalogSection[] }) {
           {active.sops.map((sop) => (
             <li
               key={sop.id}
-              className="rounded-xl border bg-background p-4 transition-colors duration-150 hover:border-primary/50"
+              className="rounded-xl border bg-background p-4 shadow-card transition-[border-color,box-shadow,translate] duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-card-hover"
             >
               <p className="font-semibold">{sop.title}</p>
               <p className="mt-1 text-muted-foreground">{sop.goal}</p>

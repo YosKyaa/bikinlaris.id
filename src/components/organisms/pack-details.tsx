@@ -14,7 +14,7 @@ export function FirstStepCard({ sopId }: { sopId: SopId }) {
     0,
   );
   return (
-    <section className="rounded-xl bg-brand-deep p-5 text-white sm:p-6 print:hidden">
+    <section className="rounded-xl bg-brand-deep p-5 text-white shadow-float sm:p-6 print:hidden">
       <p className="text-sm font-semibold text-accent-lime">{id.pack.firstStep.eyebrow}</p>
       <p className="mt-2 text-lg font-medium">
         {setupMinutes > 0
@@ -67,7 +67,10 @@ const MANY_POINTS = rules.redPoints + rules.yellowPoints;
 export function ProblemList({ problems }: { problems: PackProblem[] }) {
   if (problems.length === 0) return null;
   return (
-    <section aria-labelledby="masalah" className="rounded-xl border p-5 sm:p-6">
+    <section
+      aria-labelledby="masalah"
+      className="rounded-xl border bg-background p-5 shadow-card sm:p-6"
+    >
       <h2 id="masalah" className="text-lg font-semibold">
         {id.pack.problems.title}
       </h2>

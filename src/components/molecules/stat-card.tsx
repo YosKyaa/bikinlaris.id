@@ -11,7 +11,7 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-xl border bg-background p-4">
+    <div className="rounded-xl border bg-background p-4 shadow-card">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 text-3xl font-bold tabular-nums">{value ?? id.common.notAvailable}</p>
       {hint ? <p className="mt-1 text-sm text-muted-foreground">{hint}</p> : null}

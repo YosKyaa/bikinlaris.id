@@ -23,7 +23,10 @@ export function AnswerReview({ sections }: { sections: ReviewSection[] }) {
         <section
           key={section.id}
           aria-labelledby={`review-${section.id}`}
-          className={cn("rounded-xl border p-4 sm:p-5", !section.complete && "border-destructive")}
+          className={cn(
+            "rounded-xl border bg-background p-4 shadow-card sm:p-5",
+            !section.complete && "border-destructive",
+          )}
         >
           <div className="flex flex-wrap items-center gap-2">
             <h2 id={`review-${section.id}`} className="text-lg font-semibold">

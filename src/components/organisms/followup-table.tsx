@@ -45,7 +45,7 @@ export function FollowupTable({ rows, filter }: { rows: FollowupRow[]; filter: F
   }
 
   return (
-    <div className="rounded-xl border">
+    <div className="rounded-xl border bg-background shadow-card">
       <Table>
         <TableCaption className="sr-only">{copy.caption}</TableCaption>
         <TableHeader>

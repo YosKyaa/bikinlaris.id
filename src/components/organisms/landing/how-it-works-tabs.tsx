@@ -70,8 +70,8 @@ export function HowItWorksTabs({ steps }: { steps: HowStep[] }) {
               className={cn(
                 "group flex gap-4 rounded-xl border-2 p-4 text-left transition-colors duration-200 sm:p-5",
                 selected
-                  ? "border-primary bg-success-soft"
-                  : "border-border hover:border-primary/40 hover:bg-muted",
+                  ? "border-primary bg-success-soft shadow-card-hover"
+                  : "border-border bg-background shadow-card hover:border-primary/40 hover:shadow-card-hover",
               )}
             >
               <span
@@ -99,7 +99,7 @@ export function HowItWorksTabs({ steps }: { steps: HowStep[] }) {
             role="tabpanel"
             aria-labelledby={`${baseId}-tab-${index}`}
             tabIndex={0}
-            className="animate-fade-up rounded-xl border bg-muted/60 p-4 sm:p-6"
+            className="animate-fade-up rounded-xl border bg-muted/60 p-4 shadow-card sm:p-6"
           >
             <p className="mb-3 text-sm font-semibold text-muted-foreground">
               {id.landing.how.exampleLabel}
