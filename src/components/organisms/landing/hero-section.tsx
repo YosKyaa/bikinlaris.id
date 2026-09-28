@@ -27,13 +27,7 @@ export function HeroSection() {
             <Button asChild size="lg">
               <Link href={ROUTES.login}>{id.common.startCheck}</Link>
             </Button>
-            <SampleSopDialog
-              trigger={
-                <Button variant="outline" size="lg">
-                  {copy.secondaryCta}
-                </Button>
-              }
-            />
+            <SampleSopDialog label={copy.secondaryCta} size="lg" />
           </div>
           <p className="mt-4 text-sm text-muted-foreground">{copy.microcopy}</p>
         </div>

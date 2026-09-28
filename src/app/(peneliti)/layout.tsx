@@ -1,5 +1,6 @@
 import { AccountMenu } from "@/components/organisms/account-menu";
 import { AppShell } from "@/components/templates/app-shell";
+import { Toaster } from "@/components/ui/sonner";
 import { ROUTES } from "@/lib/auth/constants";
 import { requireResearcherPage } from "@/lib/data/session";
 
@@ -13,6 +14,7 @@ export default async function ResearcherLayout({ children }: LayoutProps<"/">) {
       headerAction={<AccountMenu label={user.email} />}
     >
       {children}
+      <Toaster position="top-center" />
     </AppShell>
   );
 }

@@ -1,5 +1,4 @@
 import { Eyebrow } from "@/components/atoms/eyebrow";
-import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { sections, sopsOf } from "@/lib/diagnosis/bank";
 
@@ -16,13 +15,7 @@ export function SopPackPreviewSection() {
           <Eyebrow>{copy.eyebrow}</Eyebrow>
           <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
           <p className="mt-4 text-lg text-muted-foreground">{copy.body}</p>
-          <SampleSopDialog
-            trigger={
-              <Button variant="outline" className="mt-6">
-                {copy.openSample}
-              </Button>
-            }
-          />
+          <SampleSopDialog label={copy.openSample} className="mt-6" />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground">{copy.listTitle}</h3>

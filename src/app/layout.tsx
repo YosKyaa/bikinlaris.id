@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { id } from "@/content/id";
 
 import "./globals.css";
@@ -36,8 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {id.app.skipToContent}
         </a>
-        <TooltipProvider>{children}</TooltipProvider>
-        <Toaster position="top-center" />
+        {children}
       </body>
     </html>
   );

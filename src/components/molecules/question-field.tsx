@@ -4,7 +4,6 @@ import { CheckIcon } from "lucide-react";
 import { useId, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   ANSWER_VALUES,
   SKIP_ANSWER,
@@ -31,11 +30,11 @@ function answerLabel(answer: AnswerValue, reversed: boolean) {
   return copy.answers[answer];
 }
 
-function isStoredAnswer(value: string): value is StoredAnswer {
-  return value === SKIP_ANSWER || (ANSWER_VALUES as readonly string[]).includes(value);
-}
-
-/** One diagnosis question: text, three large answer options, optional skip, "Kenapa ditanya?". */
+/**
+ * One diagnosis question: text, three large answer options, optional skip, "Kenapa ditanya?".
+ * Native radio inputs (fieldset + legend): no extra JavaScript on low-end phones, arrow keys
+ * work out of the box.
+ */
 export function QuestionField({
   number,
   text,
@@ -48,35 +47,28 @@ export function QuestionField({
 }: QuestionFieldProps) {
   const baseId = useId();
   const [showWhy, setShowWhy] = useState(false);
-  const labelId = `${baseId}-label`;
   const whyId = `${baseId}-why`;
+  const showInvalid = invalid && !value;
 
   return (
-    <div
+    <fieldset
+      aria-invalid={showInvalid || undefined}
       className={cn(
         "rounded-xl border p-4 sm:p-5",
-        invalid && !value ? "border-destructive bg-destructive-soft/40" : "bg-background",
+        showInvalid ? "border-destructive bg-destructive-soft/40" : "bg-background",
       )}
     >
-      <p id={labelId} className="font-semibold">
+      <legend className="float-left w-full font-semibold">
         <span className="mr-1 text-muted-foreground tabular-nums">{number}.</span>
         {text}
-      </p>
+      </legend>
 
-      <RadioGroup
-        aria-labelledby={labelId}
-        aria-invalid={invalid && !value}
-        value={value ?? ""}
-        onValueChange={(next) => isStoredAnswer(next) && onChange(next)}
-        className="mt-3 grid grid-cols-3 gap-2"
-      >
+      <div className="clear-both grid grid-cols-3 gap-2 pt-3">
         {ANSWER_VALUES.map((answer) => {
-          const optionId = `${baseId}-${answer}`;
           const selected = value === answer;
           return (
             <label
               key={answer}
-              htmlFor={optionId}
               className={cn(
                 "relative flex min-h-12 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 bg-muted px-2 text-center font-semibold transition-colors duration-150",
                 "has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
@@ -85,10 +77,13 @@ export function QuestionField({
                   : "border-transparent text-foreground hover:border-border",
               )}
             >
-              <RadioGroupItem
-                id={optionId}
+              <input
+                type="radio"
+                name={baseId}
                 value={answer}
-                className="absolute inset-0 size-full rounded-lg opacity-0 after:hidden"
+                checked={selected}
+                onChange={() => onChange(answer)}
+                className="absolute inset-0 size-full cursor-pointer opacity-0"
               />
               {selected ? <CheckIcon aria-hidden className="size-4 shrink-0" /> : null}
               {answerLabel(answer, reversed)}
@@ -97,15 +92,19 @@ export function QuestionField({
         })}
 
         {skipWhen ? (
-          <label
-            htmlFor={`${baseId}-skip`}
-            className="col-span-3 flex min-h-11 cursor-pointer items-center gap-2 text-muted-foreground has-data-[state=checked]:font-semibold has-data-[state=checked]:text-foreground"
-          >
-            <RadioGroupItem id={`${baseId}-skip`} value={SKIP_ANSWER} />
+          <label className="col-span-3 flex min-h-11 cursor-pointer items-center gap-2 text-muted-foreground has-checked:font-semibold has-checked:text-foreground">
+            <input
+              type="radio"
+              name={baseId}
+              value={SKIP_ANSWER}
+              checked={value === SKIP_ANSWER}
+              onChange={() => onChange(SKIP_ANSWER)}
+              className="size-4 accent-primary"
+            />
             {copy.answers.skip(skipWhen)}
           </label>
         ) : null}
-      </RadioGroup>
+      </div>
 
       <Button
         type="button"
@@ -121,6 +120,6 @@ export function QuestionField({
       <p id={whyId} hidden={!showWhy} className="rounded-lg bg-muted p-3 text-muted-foreground">
         {whyAsked}
       </p>
-    </div>
+    </fieldset>
   );
 }

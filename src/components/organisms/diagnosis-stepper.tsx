@@ -67,7 +67,7 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
       setShowMissing(true);
       const first = questionRefs.current[missing[0].id];
       first?.scrollIntoView({ behavior: "smooth", block: "center" });
-      first?.querySelector<HTMLButtonElement>("[role=radio]")?.focus({ preventScroll: true });
+      first?.querySelector<HTMLInputElement>("input[type=radio]")?.focus({ preventScroll: true });
       return;
     }
     startTransition(async () => {

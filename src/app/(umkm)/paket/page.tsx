@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AccountMenu } from "@/components/organisms/account-menu";
 import { PackView } from "@/components/organisms/pack-view";
 import { AppShell } from "@/components/templates/app-shell";
+import { Toaster } from "@/components/ui/sonner";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { getBusiness } from "@/lib/data/account";
@@ -44,6 +45,7 @@ export default async function PackPage() {
         locationLabel={options.location[business.location]}
         whatsAppUrl={whatsAppShareUrl(buildWhatsAppText(business.name, pack))}
       />
+      <Toaster position="top-center" />
     </AppShell>
   );
 }
