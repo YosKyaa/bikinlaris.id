@@ -140,7 +140,7 @@ export function HowItWorksSection() {
           <Eyebrow>{copy.eyebrow}</Eyebrow>
           <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
         </div>
-        <div className="mt-10">
+        <div className="reveal-scale mt-10">
           <HowItWorksTabs steps={steps} />
         </div>
       </div>

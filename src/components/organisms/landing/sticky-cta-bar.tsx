@@ -24,11 +24,11 @@ export function StickyCtaBar({ heroId }: { heroId: string }) {
     <div
       aria-hidden={!visible}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-30 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-200 md:hidden",
+        "glass fixed inset-x-0 bottom-0 z-30 border-x-0 border-b-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-200 md:hidden",
         visible ? "translate-y-0" : "invisible translate-y-full",
       )}
     >
-      <Button asChild size="lg" className="w-full">
+      <Button asChild size="lg" className="btn-shine w-full">
         <Link href={ROUTES.login} tabIndex={visible ? undefined : -1}>
           {id.common.startCheck}
         </Link>

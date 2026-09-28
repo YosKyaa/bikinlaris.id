@@ -80,6 +80,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    /* Scroll-in animations translate sideways; never let them widen the page. */
+    overflow-x: clip;
+  }
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
@@ -165,12 +170,255 @@
   }
 }
 
+/* ---------- Landing motion (owner request; see docs/PERUBAHAN.md) ----------
+ * CSS only: scroll-driven animations (animation-timeline) and keyframes, no JS library.
+ * Browsers without scroll timelines show the final, static state.
+ * Everything below is disabled under prefers-reduced-motion.
+ */
+
+@layer components {
+  /* Glass surfaces: translucent white + blur. Kept few (blur is costly on low-end phones). */
+  .glass {
+    background-color: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    border: 1px solid rgb(255 255 255 / 0.6);
+  }
+  /* Stronger glass for surfaces that carry body text or controls (contrast stays AA). */
+  .glass-strong {
+    background-color: rgb(255 255 255 / 0.86);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
+    backdrop-filter: saturate(160%) blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.7);
+  }
+  .glass-dark {
+    background-color: rgb(11 61 46 / 0.55);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    color: #fff;
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass,
+    .glass-strong {
+      background-color: rgb(255 255 255 / 0.96);
+    }
+    .glass-dark {
+      background-color: rgb(11 61 46 / 0.92);
+    }
+  }
+}
+
+/* Count-up numbers: the real number is in the DOM; the counter only replaces it visually. */
+@property --count {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    translate: -32px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    translate: 32px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes header-elevate {
+  to {
+    box-shadow: 0 8px 24px -16px rgb(11 61 46 / 0.35);
+    border-color: transparent;
+  }
+}
+@keyframes parallax {
+  from {
+    translate: 0 -6%;
+  }
+  to {
+    translate: 0 6%;
+  }
+}
+@keyframes float-y {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes enter-zoom {
+  from {
+    scale: 0.96;
+  }
+  to {
+    scale: 1;
+  }
+}
+@keyframes count-up {
+  from {
+    --count: 0;
+  }
+  to {
+    --count: var(--target);
+  }
+}
+@keyframes marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+@keyframes shine {
+  from {
+    translate: -120% 0;
+  }
+  to {
+    translate: 220% 0;
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 24px -18px;
+  }
+}
+
+.scroll-progress {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.count-up::after {
+  content: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* On-load entrance, staggered with --delay. Opacity is never animated on the LCP heading. */
+  .enter {
+    animation: enter-up 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+  .enter-zoom {
+    animation: enter-zoom 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .float-y {
+    animation: float-y 5s ease-in-out infinite;
+    animation-delay: var(--delay, 0ms);
+  }
+  .drift {
+    animation: drift 14s ease-in-out infinite;
+    animation-delay: var(--delay, 0ms);
+  }
+  .marquee-track {
+    animation: marquee var(--duration, 45s) linear infinite;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    translate: -120% 0;
+    pointer-events: none;
+  }
+  .btn-shine:hover::after {
+    animation: shine 800ms ease-out;
+  }
+
   @supports (animation-timeline: view()) {
     .reveal {
       animation: reveal-in linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 40%;
+    }
+    .reveal-scale {
+      animation: reveal-scale linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    .reveal-left {
+      animation: reveal-left linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    .reveal-right {
+      animation: reveal-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+    .scroll-progress {
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+    .header-elevate {
+      animation: header-elevate linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+    .count-up > .count-up-value {
+      display: none;
+    }
+    .count-up::after {
+      content: counter(num);
+      counter-reset: num var(--count);
+      animation: count-up linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
     }
   }
 }

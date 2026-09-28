@@ -15,7 +15,7 @@ export function ProblemSection() {
           {copy.items.map((item) => (
             <li
               key={item}
-              className="reveal rounded-xl border-l-4 border-primary/30 bg-background px-5 py-4 text-lg font-medium shadow-card transition-[border-color,box-shadow] duration-200 hover:border-primary hover:shadow-card-hover sm:text-xl"
+              className="reveal-left rounded-xl border-l-4 border-primary/30 bg-background px-5 py-4 text-lg font-medium shadow-card transition-[border-color,box-shadow] duration-200 hover:border-primary hover:shadow-card-hover sm:text-xl"
             >
               “{item}”
             </li>

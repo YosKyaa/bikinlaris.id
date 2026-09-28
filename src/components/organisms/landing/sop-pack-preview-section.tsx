@@ -26,13 +26,15 @@ export function SopPackPreviewSection() {
   return (
     <section id={LANDING_ANCHORS.pack} className="scroll-mt-20 border-t">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 *:min-w-0 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:py-24">
-        <div className="reveal">
+        <div className="reveal-left">
           <Eyebrow>{copy.eyebrow}</Eyebrow>
           <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
           <p className="mt-4 text-lg text-muted-foreground">{copy.body}</p>
           <SampleSopDialog label={copy.openSample} className="mt-6" />
         </div>
-        <SopCatalog sections={catalog} />
+        <div className="reveal-right">
+          <SopCatalog sections={catalog} />
+        </div>
       </div>
     </section>
   );

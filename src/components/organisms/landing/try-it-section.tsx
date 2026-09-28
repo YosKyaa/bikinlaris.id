@@ -39,7 +39,7 @@ export function TryItSection() {
           <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
           <p className="mt-3 text-lg text-muted-foreground">{copy.body(totalQuestions)}</p>
         </div>
-        <div className="mt-10">
+        <div className="reveal-scale mt-10">
           <TryItDemo questions={questions} totalQuestions={totalQuestions} />
         </div>
       </div>

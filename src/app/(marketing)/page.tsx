@@ -5,6 +5,7 @@ import { HERO_ID, HeroSection } from "@/components/organisms/landing/hero-sectio
 import { HowItWorksSection } from "@/components/organisms/landing/how-it-works-section";
 import { ProblemSection } from "@/components/organisms/landing/problem-section";
 import { SopPackPreviewSection } from "@/components/organisms/landing/sop-pack-preview-section";
+import { SopMarquee } from "@/components/organisms/landing/sop-marquee";
 import { StickyCtaBar } from "@/components/organisms/landing/sticky-cta-bar";
 import { TryItSection } from "@/components/organisms/landing/try-it-section";
 import { MarketingLayout } from "@/components/templates/marketing-layout";
@@ -14,6 +15,7 @@ export default function LandingPage() {
   return (
     <MarketingLayout>
       <HeroSection />
+      <SopMarquee />
       <ProblemSection />
       <HowItWorksSection />
       <TryItSection />

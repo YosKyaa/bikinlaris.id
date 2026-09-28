@@ -11,10 +11,10 @@ export const LANDING_ANCHORS = {
   faq: "tanya-jawab",
 } as const;
 
-/** Marketing header: logo, 3 anchors, "Masuk" (ghost) and the primary CTA. */
+/** Marketing header (glass): logo, 3 anchors, "Masuk" (ghost), primary CTA, scroll progress. */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
+    <header className="glass header-elevate sticky top-0 z-40 border-x-0 border-t-0 border-b border-b-border/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link href={ROUTES.home} className="rounded-lg" aria-label={id.app.domain}>
           <Logo />
@@ -34,11 +34,13 @@ export function SiteHeader() {
           <Button asChild variant="ghost">
             <Link href={ROUTES.login}>{id.common.login}</Link>
           </Button>
-          <Button asChild className="hidden sm:inline-flex">
+          <Button asChild className="btn-shine hidden sm:inline-flex">
             <Link href={ROUTES.login}>{id.common.startCheck}</Link>
           </Button>
         </div>
       </div>
+      {/* Reading progress, driven by page scroll (CSS only). */}
+      <div aria-hidden className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-primary" />
     </header>
   );
 }

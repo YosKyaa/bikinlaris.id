@@ -13,16 +13,25 @@ import { InteractiveChecklist } from "./interactive-checklist";
 export function SopDocumentPreview({
   className,
   compact = false,
+  glass = false,
 }: {
   className?: string;
   /** Title + first daily task only, to float over a photo without hiding it. */
   compact?: boolean;
+  /** Frosted glass surface, for floating over a photo. */
+  glass?: boolean;
 }) {
   const { sop } = sampleSop();
   const daily = sop.tasks.filter((t) => t.kind === "harian").slice(0, compact ? 1 : undefined);
 
   return (
-    <div className={cn("rounded-xl border bg-background p-5 shadow-float sm:p-6", className)}>
+    <div
+      className={cn(
+        "rounded-xl p-5 shadow-float sm:p-6",
+        glass ? "glass-strong" : "border bg-background",
+        className,
+      )}
+    >
       <div className="flex items-center justify-between border-b pb-3 text-sm text-muted-foreground">
         <span className="font-semibold text-foreground">{id.landing.hero.previewLabel}</span>
         <span>{id.pack.sops.number(1)}</span>
