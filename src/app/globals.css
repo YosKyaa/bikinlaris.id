@@ -1,26 +1,119 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* No dark mode for now: `dark:` classes only apply under an explicit .dark ancestor, which is never set. */
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-deep-muted: var(--brand-deep-muted);
+  --color-accent-lime: var(--accent-lime);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Design tokens from CLAUDE.md, converted from hex to oklch. Contrast ratios in docs/AUDIT.md. */
+:root {
+  --radius: 0.5rem;
+
+  --background: oklch(1 0 0); /* #FFFFFF */
+  --foreground: oklch(0.222 0.026 164.64); /* #0F1F18 */
+  --muted: oklch(0.973 0.004 157.18); /* #F4F7F5 */
+  --muted-foreground: oklch(0.512 0.023 163.9); /* #5B6B63 */
+  --border: oklch(0.931 0.009 161.34); /* #E3EAE6 */
+  --primary: oklch(0.527 0.137 150.07); /* #15803D */
+  --primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  --brand-deep: oklch(0.323 0.058 168.33); /* #0B3D2E */
+  --accent-lime: oklch(0.9 0.191 123.3); /* #C6F24E, only on --brand-deep */
+  --destructive: oklch(0.5 0.182 29.51); /* #B42318 */
+  --warning: oklch(0.539 0.156 42.99); /* #B54708 */
+
+  /* Additions (see docs/PERUBAHAN.md): status text/background for section colours. */
+  --success: oklch(0.448 0.108 151.33); /* #166534, AA on --success-soft */
+  --success-soft: oklch(0.954 0.015 158.25); /* #E8F3EC */
+  --warning-soft: oklch(0.968 0.025 78.92); /* #FEF3E2 */
+  --destructive-soft: oklch(0.956 0.019 25.6); /* #FDECEA */
+  --brand-deep-muted: oklch(0.848 0.019 161.04); /* #C3D1C9, secondary text on --brand-deep */
+
+  /* shadcn aliases mapped onto the tokens above. */
+  --card: var(--background);
+  --card-foreground: var(--foreground);
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+  --accent: var(--muted);
+  --accent-foreground: var(--foreground);
+  --input: var(--border);
+  --ring: var(--primary);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-base/[1.6] text-foreground antialiased;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
 }
