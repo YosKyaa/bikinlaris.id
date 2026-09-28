@@ -17,13 +17,13 @@ export interface Photo {
 }
 
 export const photos = {
-  warungBekasi: {
-    src: "/images/warung-bekasi.jpg",
-    width: 1600,
-    height: 1200,
-    alt: "Penjual di pasar tradisional Bekasi membungkus sambal di balik baskom-baskom lauk.",
-    place: "Warung lauk, Bekasi",
-    credit: "Foto: Izzuddin Azzam / Unsplash",
-    focus: "48% 30%",
+  hero: {
+    src: "/images/penjual-lapak-bali.jpg",
+    width: 1280,
+    height: 1600,
+    alt: "Ibu penjual sayur dan kerupuk tersenyum di lapaknya di Bali.",
+    place: "Lapak sayur, Bali",
+    credit: "Foto: Polina Kuzovkova / Unsplash",
+    focus: "50% 25%",
   },
 } satisfies Record<string, Photo>;

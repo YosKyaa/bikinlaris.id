@@ -4,14 +4,14 @@ import { photos } from "@/content/photos";
 import { SopDocumentPreview } from "./sop-document-preview";
 
 /**
- * Hero visual: a real warung owner in Bekasi (one of the research cities) with a live SOP page
+ * Hero visual: a real, cheerful stall owner (Bali) with a live SOP page
  * floating over the photo. The person gives context; the SOP stays the main subject.
  */
 export function HeroVisual() {
   return (
     <div className="relative lg:pb-12 lg:pl-12">
       <PhotoFrame
-        photo={photos.warungBekasi}
+        photo={photos.hero}
         priority
         sizes="(min-width: 1024px) 30rem, (min-width: 640px) calc(100vw - 3rem), calc(100vw - 2rem)"
         className="aspect-[4/3] lg:aspect-[4/5]"
