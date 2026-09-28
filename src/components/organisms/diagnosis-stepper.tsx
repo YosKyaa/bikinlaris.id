@@ -81,7 +81,7 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
   }
 
   return (
-    <div className="pb-28 sm:pb-0">
+    <div className="pb-28 lg:pb-0">
       <div className="sticky top-14 z-20 -mx-4 border-b bg-background px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <StepCounter current={props.index + 1} total={props.totalSections} />

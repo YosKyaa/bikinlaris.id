@@ -71,7 +71,7 @@ export function DiagnosisSummary({
   }
 
   return (
-    <div className="space-y-10 pb-28 sm:pb-0">
+    <div className="space-y-10 pb-28 lg:pb-0">
       <AnswerReview sections={sections} />
 
       <section aria-labelledby="hardest-title" className="space-y-4">
@@ -112,9 +112,9 @@ export function DiagnosisSummary({
 
       <InlineError message={error} />
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:border-0 sm:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:p-0">
         <div className="mx-auto max-w-2xl">
-          <Button size="lg" className="w-full sm:w-auto" onClick={requestCreate} disabled={pending}>
+          <Button size="lg" className="w-full lg:w-auto" onClick={requestCreate} disabled={pending}>
             {pending ? id.summary.pending : id.summary.cta}
           </Button>
         </div>

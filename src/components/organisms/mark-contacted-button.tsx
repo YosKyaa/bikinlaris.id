@@ -19,6 +19,7 @@ export function MarkContactedButton({
     <Button
       variant="outline"
       size="sm"
+      className="pointer-coarse:h-11"
       disabled={pending}
       onClick={() =>
         startTransition(async () => {

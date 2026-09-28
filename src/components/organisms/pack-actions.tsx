@@ -57,11 +57,11 @@ export function PackStickyActions({ whatsAppUrl }: { whatsAppUrl: string }) {
     <div
       aria-hidden={!visible}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-30 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-200 md:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-30 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-200 lg:hidden print:hidden",
         visible ? "translate-y-0" : "invisible translate-y-full",
       )}
     >
-      <div className="flex gap-2">
+      <div className="mx-auto flex max-w-3xl gap-2">
         <Button asChild size="lg" className="flex-1">
           <a
             href={whatsAppUrl}

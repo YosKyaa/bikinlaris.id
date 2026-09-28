@@ -25,7 +25,11 @@ export function AppShell({ children, homeHref, headerAction, width = "default" }
             container,
           )}
         >
-          <Link href={homeHref} className="rounded-lg" aria-label={id.app.domain}>
+          <Link
+            href={homeHref}
+            className="inline-flex min-h-11 items-center rounded-lg"
+            aria-label={id.app.domain}
+          >
             <Logo />
           </Link>
           {headerAction}

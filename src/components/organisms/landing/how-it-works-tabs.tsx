@@ -44,7 +44,7 @@ export function HowItWorksTabs({ steps }: { steps: HowStep[] }) {
   }
 
   return (
-    <div className="grid gap-6 *:min-w-0 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+    <div className="grid gap-6 *:min-w-0 md:grid-cols-[1fr_1.2fr] lg:gap-12">
       <div
         role="tablist"
         aria-label={id.landing.how.tabsLabel}

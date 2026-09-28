@@ -67,15 +67,17 @@ export function DueThisWeek({ items, windowDays }: { items: DueItem[]; windowDay
                     <div className="min-w-0 flex-1">
                       <Link
                         href={ROUTES.researcherBusiness(item.businessId)}
-                        className="font-semibold underline-offset-4 hover:underline"
+                        className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:underline"
                       >
                         {item.businessName}
                       </Link>
-                      <p className="text-sm break-all text-muted-foreground">
-                        <a href={`mailto:${item.email}`} className="hover:underline">
-                          {item.email}
-                        </a>
-                      </p>
+                      <a
+                        href={`mailto:${item.email}`}
+                        title={item.email}
+                        className="flex min-h-6 min-w-0 items-center text-sm text-muted-foreground hover:underline pointer-coarse:min-h-11"
+                      >
+                        <span className="truncate">{item.email}</span>
+                      </a>
                     </div>
                     <Badge variant={GROUP_VARIANT[group]}>{copy.day(item.dayNumber)}</Badge>
                     <MarkContactedButton

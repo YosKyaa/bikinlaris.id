@@ -159,8 +159,8 @@ export function BusinessProfileForm({ defaults }: { defaults: Partial<BusinessPr
       </FieldSet>
 
       <InlineError message={serverError} />
-      <div className="sticky bottom-0 -mx-4 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:mx-0 sm:border-0 sm:p-0">
-        <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={pending}>
+      <div className="sticky bottom-0 -mx-4 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:p-0">
+        <Button type="submit" size="lg" className="w-full lg:w-auto" disabled={pending}>
           {pending ? copy.pending : copy.submit}
         </Button>
       </div>

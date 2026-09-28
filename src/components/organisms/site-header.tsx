@@ -16,7 +16,11 @@ export function SiteHeader() {
   return (
     <header className="glass header-elevate sticky top-0 z-40 border-x-0 border-t-0 border-b border-b-border/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link href={ROUTES.home} className="rounded-lg" aria-label={id.app.domain}>
+        <Link
+          href={ROUTES.home}
+          className="inline-flex min-h-11 items-center rounded-lg"
+          aria-label={id.app.domain}
+        >
           <Logo />
         </Link>
         <nav aria-label={id.nav.main} className="ml-6 hidden md:block">

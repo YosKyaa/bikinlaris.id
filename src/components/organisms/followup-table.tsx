@@ -64,7 +64,7 @@ export function FollowupTable({ rows, filter }: { rows: FollowupRow[]; filter: F
               <TableCell>
                 <Link
                   href={ROUTES.researcherBusiness(row.businessId)}
-                  className="font-semibold underline-offset-4 hover:underline"
+                  className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:underline"
                   aria-label={copy.detail(row.businessName)}
                 >
                   {row.businessName}
@@ -74,7 +74,10 @@ export function FollowupTable({ rows, filter }: { rows: FollowupRow[]; filter: F
                 </div>
               </TableCell>
               <TableCell>
-                <a href={`mailto:${row.email}`} className="underline-offset-4 hover:underline">
+                <a
+                  href={`mailto:${row.email}`}
+                  className="underline-offset-4 hover:underline pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center"
+                >
                   {row.email}
                 </a>
               </TableCell>

@@ -33,7 +33,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackVie
   });
 
   return (
-    <div className="space-y-10 pb-20 md:pb-0">
+    <div className="space-y-10 pb-20 lg:pb-0">
       <PackViewTracker />
       <header className="space-y-4 print:hidden">
         <Eyebrow>{id.pack.eyebrow}</Eyebrow>

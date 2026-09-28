@@ -56,7 +56,7 @@ export function InteractiveChecklist({ rows }: { rows: { id: string; label: stri
                     setTicks((current) => ({ ...current, [key(rowIndex, dayIndex)]: !done }))
                   }
                   className={cn(
-                    "flex h-11 flex-col items-center justify-center gap-0.5 rounded-lg border-2 text-xs font-medium transition-colors duration-150",
+                    "flex h-11 flex-col items-center justify-center gap-0.5 rounded-lg border-2 text-sm font-medium transition-colors duration-150",
                     done
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border text-muted-foreground hover:border-primary/60",

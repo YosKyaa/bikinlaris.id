@@ -14,7 +14,7 @@ import { SopDocumentPreview } from "./sop-document-preview";
  */
 export function HeroVisual() {
   return (
-    <div className="enter-zoom relative lg:pb-12 lg:pl-12">
+    <div className="enter-zoom relative w-full md:mx-auto md:max-w-xl lg:max-w-none lg:pb-12 lg:pl-12">
       <PhotoFrame
         photo={photos.hero}
         priority
