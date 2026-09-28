@@ -325,7 +325,7 @@ export const id = {
       cancel: "Lanjut mengisi",
     },
     beforeStart: (questions: number, sections: number) =>
-      `${questions} pertanyaan dalam ${sections} bagian, sekitar ${DURATION_MINUTES} menit. Jawaban tersimpan otomatis.`,
+      `${questions} pertanyaan dalam ${sections} bagian. Bisa dilanjut nanti.`,
     errors: {
       saveFailed: "Jawaban belum tersimpan. Periksa internet Anda, lalu pilih lagi.",
       advanceFailed: "Belum bisa lanjut. Periksa internet Anda, lalu coba lagi.",
@@ -418,6 +418,10 @@ export const id = {
       week: (n: number) => `Minggu ${n}`,
       days: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"],
       dayNames: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+    },
+    empty: {
+      title: "Belum ada bagian yang perlu dirapikan",
+      body: "Dari jawaban Anda, semua bagian sudah berjalan rapi. Tidak ada SOP yang perlu dijalankan sekarang. Pertahankan cara kerja yang sudah ada.",
     },
     later: {
       title: "Nanti, kalau yang di atas sudah jalan",
