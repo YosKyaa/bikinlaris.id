@@ -26,22 +26,4 @@ export const photos = {
     credit: "Foto: Izzuddin Azzam / Unsplash",
     focus: "48% 30%",
   },
-  gorenganGarut: {
-    src: "/images/gorengan-garut.jpg",
-    width: 1600,
-    height: 1200,
-    alt: "Penjual gorengan di Garut melayani dari balik etalase kaca pada malam hari.",
-    place: "Lapak gorengan, Garut",
-    credit: "Foto: Luthfian Alfajr / Unsplash",
-    focus: "60% 50%",
-  },
-  lapakYogyakarta: {
-    src: "/images/lapak-yogyakarta.jpg",
-    width: 1600,
-    height: 2400,
-    alt: "Pedagang sate dan ketupat di kawasan Malioboro, Yogyakarta, menata tusukan sate di lapaknya.",
-    place: "Lapak sate, Yogyakarta",
-    credit: "Foto: Lek Nikto / Unsplash",
-    focus: "50% 62%",
-  },
 } satisfies Record<string, Photo>;
