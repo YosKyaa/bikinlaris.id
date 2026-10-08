@@ -115,10 +115,13 @@ export function PackStatusCard({
   day,
   totalDays,
   followUpDate,
+  code,
 }: {
   day: number;
   totalDays: number;
   followUpDate: string;
+  /** Participant code: the owner types it into the day-30 questionnaire. */
+  code: string;
 }) {
   const shownDay = Math.min(day, totalDays);
   const copy = id.pack.status;
@@ -135,6 +138,10 @@ export function PackStatusCard({
       />
       <p className="mt-3">{day > totalDays ? copy.after : copy.before(followUpDate)}</p>
       <p className="mt-1 text-sm text-muted-foreground">{copy.nothingToFill}</p>
+      <div className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t pt-3">
+        <p className="font-semibold tabular-nums">{copy.code(code)}</p>
+        <p className="text-sm text-muted-foreground">{copy.codeHint}</p>
+      </div>
     </section>
   );
 }

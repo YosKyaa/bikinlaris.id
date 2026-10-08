@@ -5,19 +5,19 @@ import { PackGenerationProgress } from "@/components/organisms/pack-generation-p
 import { FocusLayout } from "@/components/templates/focus-layout";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import { getBusiness } from "@/lib/data/account";
 import { resolveOwnerStep } from "@/lib/data/flow";
-import { getPack } from "@/lib/data/pack";
-import { requireOwnerPage } from "@/lib/data/session";
+import { requireOwnerState } from "@/lib/data/owner-session";
 import { getSop } from "@/lib/diagnosis/bank";
 
 export const metadata: Metadata = { title: id.pack.eyebrow };
 
+/** The Claude call can take up to 15 s (lib/diagnosis/personalize.ts); leave headroom. */
+export const maxDuration = 30;
+
 export default async function GeneratingPage() {
-  const user = await requireOwnerPage();
-  const pack = user.businessId ? await getPack(user.businessId) : null;
-  const business = user.businessId ? await getBusiness(user.businessId) : null;
-  if (!pack || !business) redirect(await resolveOwnerStep(user));
+  const state = await requireOwnerState();
+  const { business, pack } = state;
+  if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
   if (pack.status === "siap") redirect(ROUTES.pack);
 
   return (

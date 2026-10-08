@@ -39,7 +39,7 @@ export function SiteHeader() {
             <Link href={ROUTES.login}>{id.common.login}</Link>
           </Button>
           <Button asChild className="btn-shine hidden sm:inline-flex">
-            <Link href={ROUTES.login}>{id.common.startCheck}</Link>
+            <Link href={ROUTES.join}>{id.common.join}</Link>
           </Button>
         </div>
       </div>

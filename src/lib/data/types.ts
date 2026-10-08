@@ -2,21 +2,26 @@ import type { ProblemId, QuestionId, SectionId, SopId } from "@/content/diagnosi
 import type { SectionColor, StoredAnswer } from "@/content/diagnosis.types";
 import type { BusinessProfile } from "@/lib/validations/business";
 
-/** spec `data_model.memberships.role` */
-export type Role = "pemilik" | "enumerator" | "admin";
-export const RESEARCH_ROLES: readonly Role[] = ["enumerator", "admin"];
+/**
+ * Research team role. UMKM owners have no account: they reach their data through a private
+ * link (access token) sent over WhatsApp by the enumerator.
+ */
+export type StaffRole = "enumerator" | "admin";
 
-export interface SessionUser {
+export interface StaffUser {
   id: string;
   email: string;
-  role: Role;
-  businessId: string | null;
+  name: string | null;
+  role: StaffRole;
 }
 
 export interface Business extends BusinessProfile {
   id: string;
-  /** Contact shown to researchers. The spec has no phone number; email is used. */
-  email: string;
+  /** Participant code shown to the owner and typed into the questionnaire (e.g. "BL-023"). */
+  code: string;
+  ownerName: string;
+  /** WhatsApp number in international format without "+", e.g. "6281234567890". */
+  whatsapp: string;
   createdAt: string;
 }
 
@@ -57,7 +62,8 @@ export interface PackSop {
   taskTexts: Record<string, string> | null;
 }
 
-export type PackStatus = "menyusun" | "siap" | "gagal";
+export type PackStatus = "menyusun" | "siap";
+export type PackSource = "template" | "llm";
 
 /** spec `data_model.paket` */
 export interface Pack {
@@ -69,16 +75,25 @@ export interface Pack {
   problems: PackProblem[];
   sops: PackSop[];
   laterSopIds: SopId[];
-  /** ISO date (yyyy-mm-dd) the pack was created. */
+  /** ISO date (yyyy-mm-dd, WIB) the pack was created. */
   createdOn: string;
-  /** ISO date of the day-30 follow-up. */
+  /** ISO date of the day-30 questionnaire. */
   followUpOn: string;
-  source: "template" | "llm";
+  source: PackSource;
   status: PackStatus;
   generationStartedAt: string;
-  /** Research follow-up (dashboard). Not in the spec data model yet, see docs/PERUBAHAN.md. */
-  contactedAt: string | null;
-  questionnaireDone: boolean;
+  /** Questionnaire link sent over WhatsApp by the research team. */
+  questionnaireSentAt: string | null;
+  /** Marked by the research team once the SurveyMonkey answers are in. */
+  questionnaireDoneAt: string | null;
+}
+
+/** Everything the owner pages need, resolved from the private link. */
+export interface OwnerState {
+  token: string;
+  business: Business;
+  diagnosis: Diagnosis | null;
+  pack: Pack | null;
 }
 
 /** spec `data_model.events.catatan` */
@@ -107,56 +122,80 @@ export interface ResearchEvent {
   createdAt: string;
 }
 
-export interface PackGenerationStatus {
-  status: PackStatus;
-  done: number;
-  total: number;
-  /** SOP currently being prepared, null when finished. */
-  currentSopId: SopId | null;
+/** Input for a new participant, entered by the enumerator. */
+export interface NewParticipant extends BusinessProfile {
+  ownerName: string;
+  whatsapp: string;
 }
 
-export type FollowupStatus = "belum_h30" | "siap_dihubungi" | "sudah_dihubungi";
+/** A participant with their progress, as the researcher panel sees it. */
+export interface Participant {
+  business: Business;
+  /** Private link token; only exposed to the research team. */
+  token: string;
+  diagnosis: Diagnosis | null;
+  pack: Pack | null;
+}
 
-export interface FollowupRow {
-  businessId: string;
-  businessName: string;
+export interface TeamMember {
+  id: string;
   email: string;
-  location: BusinessProfile["location"];
-  packCreatedOn: string;
-  dayNumber: number;
-  followUpOn: string;
-  status: FollowupStatus;
-  questionnaireDone: boolean;
+  name: string | null;
+  role: StaffRole;
 }
+
+/** Pending invite. The code is shared by the admin over WhatsApp and typed at /daftar. */
+export interface TeamInvite {
+  email: string;
+  role: StaffRole;
+  code: string;
+}
+
+/** Where a participant is in the 30-day study. */
+export type ParticipantStage =
+  "belum_mulai" | "cek_usaha" | "belum_h30" | "siap_dikirim" | "terkirim" | "selesai";
 
 export const FUNNEL_STEPS = [
   "registered",
-  "profileDone",
   "diagnosisStarted",
   "diagnosisDone",
   "packsCreated",
   "pastDay30",
-  "contacted",
-  "questionnaires",
+  "questionnaireSent",
+  "questionnaireDone",
 ] as const;
 export type FunnelStepKey = (typeof FUNNEL_STEPS)[number];
 
-/** Participants per stage. `count` is null while a stage cannot be measured yet. */
 export interface FunnelStep {
   key: FunnelStepKey;
-  count: number | null;
+  count: number;
 }
 
-/** "Hubungi minggu ini": participants reaching day 30 soon and not contacted yet. */
+/** "Kirim kuesioner minggu ini": day 30 is past or close, questionnaire not sent yet. */
 export type DueGroup = "overdue" | "today" | "tomorrow" | "later";
 
 export interface DueItem {
   businessId: string;
+  code: string;
   businessName: string;
-  email: string;
+  ownerName: string;
+  whatsapp: string;
   followUpOn: string;
   dayNumber: number;
   group: DueGroup;
+}
+
+export interface ParticipantRow {
+  businessId: string;
+  code: string;
+  businessName: string;
+  ownerName: string;
+  whatsapp: string;
+  location: BusinessProfile["location"];
+  packCreatedOn: string | null;
+  dayNumber: number | null;
+  followUpOn: string | null;
+  stage: ParticipantStage;
 }
 
 /** Uniform Server Action result (CLAUDE.md "Clean code"). */

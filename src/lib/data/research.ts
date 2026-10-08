@@ -1,58 +1,117 @@
-import "server-only";
-
 import { diagnosisBank } from "@/content/diagnosis";
 import { sections } from "@/lib/diagnosis/bank";
-import { addDays, dayNumber, todayIso } from "@/lib/format";
+import { answeredCount } from "@/lib/diagnosis/scoring";
+import { addDays, dayNumber } from "@/lib/format";
 
-import { store } from "./mock-store";
 import {
   EVENT_ACTIONS,
-  type Business,
-  type Diagnosis,
   type DueGroup,
   type DueItem,
-  type FollowupRow,
-  type FollowupStatus,
   type FunnelStep,
-  type Pack,
+  type Participant,
+  type ParticipantRow,
+  type ParticipantStage,
   type ResearchEvent,
 } from "./types";
 
-/** How far ahead "Hubungi minggu ini" looks. */
+/**
+ * Researcher panel figures, computed from participants and the event log only.
+ * Pure functions: the same code serves demo data and Supabase.
+ */
+
+/** How far ahead "Kirim kuesioner minggu ini" looks. */
 export const DUE_WINDOW_DAYS = 7;
 
-export const FOLLOWUP_FILTERS = [
+export const PARTICIPANT_FILTERS = [
   "semua",
-  "siap_dihubungi",
-  "sudah_dihubungi",
+  "siap_dikirim",
+  "terkirim",
   "belum_h30",
+  "cek_usaha",
+  "belum_mulai",
+  "selesai",
 ] as const;
-export type FollowupFilter = (typeof FOLLOWUP_FILTERS)[number];
+export type ParticipantFilter = (typeof PARTICIPANT_FILTERS)[number];
 
-function followupStatus(pack: Pack, today: string): FollowupStatus {
-  if (pack.contactedAt) return "sudah_dihubungi";
-  return today >= pack.followUpOn ? "siap_dihubungi" : "belum_h30";
+/** Most urgent first in the table. */
+const STAGE_ORDER: Record<ParticipantStage, number> = {
+  siap_dikirim: 0,
+  terkirim: 1,
+  belum_h30: 2,
+  cek_usaha: 3,
+  belum_mulai: 4,
+  selesai: 5,
+};
+
+export function participantStage(
+  { diagnosis, pack }: Participant,
+  today: string,
+): ParticipantStage {
+  if (pack?.status === "siap") {
+    if (pack.questionnaireDoneAt) return "selesai";
+    if (pack.questionnaireSentAt) return "terkirim";
+    return today >= pack.followUpOn ? "siap_dikirim" : "belum_h30";
+  }
+  if (pack || answeredCount(diagnosis?.answers ?? {}) > 0) return "cek_usaha";
+  return "belum_mulai";
 }
 
-/** Participants per stage, from account creation to questionnaire. Counted from data only. */
-export async function getFunnel(): Promise<FunnelStep[]> {
-  const s = store();
-  const today = todayIso();
-  const diagnoses = [...s.diagnoses.values()];
-  const packs = [...s.packs.values()].filter((p) => p.status === "siap");
+export function toRow(participant: Participant, today: string): ParticipantRow {
+  const { business, pack } = participant;
+  const ready = pack?.status === "siap" ? pack : null;
+  return {
+    businessId: business.id,
+    code: business.code,
+    businessName: business.name,
+    ownerName: business.ownerName,
+    whatsapp: business.whatsapp,
+    location: business.location,
+    packCreatedOn: ready?.createdOn ?? null,
+    dayNumber: ready ? dayNumber(ready.createdOn, today) : null,
+    followUpOn: ready?.followUpOn ?? null,
+    stage: participantStage(participant, today),
+  };
+}
+
+export function buildRows(participants: Participant[], today: string): ParticipantRow[] {
+  return participants
+    .map((participant) => toRow(participant, today))
+    .sort(
+      (a, b) =>
+        STAGE_ORDER[a.stage] - STAGE_ORDER[b.stage] ||
+        (b.dayNumber ?? 0) - (a.dayNumber ?? 0) ||
+        a.code.localeCompare(b.code),
+    );
+}
+
+export function countByFilter(rows: ParticipantRow[]): Record<ParticipantFilter, number> {
+  const counts = Object.fromEntries(PARTICIPANT_FILTERS.map((f) => [f, 0])) as Record<
+    ParticipantFilter,
+    number
+  >;
+  counts.semua = rows.length;
+  for (const row of rows) counts[row.stage] += 1;
+  return counts;
+}
+
+/** Participants per stage, from "Tambah UMKM" to the questionnaire. */
+export function buildFunnel(participants: Participant[], today: string): FunnelStep[] {
+  const ready = participants.flatMap(({ pack }) => (pack?.status === "siap" ? [pack] : []));
   return [
-    { key: "registered", count: [...s.users.values()].filter((u) => u.role === "pemilik").length },
-    { key: "profileDone", count: s.businesses.size },
+    { key: "registered", count: participants.length },
     {
       key: "diagnosisStarted",
-      count: diagnoses.filter((d) => Object.keys(d.answers).length > 0).length,
+      count: participants.filter((p) => p.pack || answeredCount(p.diagnosis?.answers ?? {}) > 0)
+        .length,
     },
-    { key: "diagnosisDone", count: diagnoses.filter((d) => d.completedAt).length },
-    { key: "packsCreated", count: packs.length },
-    { key: "pastDay30", count: packs.filter((p) => today >= p.followUpOn).length },
-    { key: "contacted", count: packs.filter((p) => p.contactedAt).length },
-    // The questionnaire module does not exist yet: shown as "—", never as 0.
-    { key: "questionnaires", count: null },
+    {
+      key: "diagnosisDone",
+      count: participants.filter((p) => p.pack || p.diagnosis?.completedAt).length,
+    },
+    { key: "packsCreated", count: ready.length },
+    { key: "pastDay30", count: ready.filter((p) => today >= p.followUpOn).length },
+    { key: "questionnaireSent", count: ready.filter((p) => p.questionnaireSentAt).length },
+    { key: "questionnaireDone", count: ready.filter((p) => p.questionnaireDoneAt).length },
   ];
 }
 
@@ -63,130 +122,102 @@ function dueGroup(followUpOn: string, today: string): DueGroup {
   return "later";
 }
 
-/** Not-yet-contacted participants whose day 30 is past or within the next week, most urgent first. */
-export async function listDueSoon(): Promise<DueItem[]> {
-  const s = store();
-  const today = todayIso();
+/** Questionnaire not sent yet, day 30 past or within the next week. Most urgent first. */
+export function buildDueList(participants: Participant[], today: string): DueItem[] {
   const horizon = addDays(today, DUE_WINDOW_DAYS);
-  const items: DueItem[] = [];
-  for (const pack of s.packs.values()) {
-    const business = s.businesses.get(pack.businessId);
-    if (!business || pack.status !== "siap" || pack.contactedAt || pack.followUpOn > horizon) {
-      continue;
-    }
-    items.push({
-      businessId: business.id,
-      businessName: business.name,
-      email: business.email,
-      followUpOn: pack.followUpOn,
-      dayNumber: dayNumber(pack.createdOn, today),
-      group: dueGroup(pack.followUpOn, today),
-    });
-  }
-  return items.sort((a, b) => a.followUpOn.localeCompare(b.followUpOn));
+  return participants
+    .flatMap(({ business, pack }): DueItem[] => {
+      if (pack?.status !== "siap" || pack.questionnaireSentAt || pack.followUpOn > horizon) {
+        return [];
+      }
+      return [
+        {
+          businessId: business.id,
+          code: business.code,
+          businessName: business.name,
+          ownerName: business.ownerName,
+          whatsapp: business.whatsapp,
+          followUpOn: pack.followUpOn,
+          dayNumber: dayNumber(pack.createdOn, today),
+          group: dueGroup(pack.followUpOn, today),
+        },
+      ];
+    })
+    .sort((a, b) => a.followUpOn.localeCompare(b.followUpOn) || a.code.localeCompare(b.code));
 }
 
-/** Rows sorted so the most overdue, not yet contacted participants come first. */
-export async function listFollowups(filter: FollowupFilter): Promise<FollowupRow[]> {
-  const s = store();
-  const today = todayIso();
-  const order: Record<FollowupStatus, number> = {
-    siap_dihubungi: 0,
-    belum_h30: 1,
-    sudah_dihubungi: 2,
-  };
-  const rows: FollowupRow[] = [];
-  for (const pack of s.packs.values()) {
-    const business = s.businesses.get(pack.businessId);
-    if (!business || pack.status !== "siap") continue;
-    rows.push({
-      businessId: business.id,
-      businessName: business.name,
-      email: business.email,
-      location: business.location,
-      packCreatedOn: pack.createdOn,
-      dayNumber: dayNumber(pack.createdOn, today),
-      followUpOn: pack.followUpOn,
-      status: followupStatus(pack, today),
-      questionnaireDone: pack.questionnaireDone,
-    });
-  }
-  return rows
-    .filter((row) => filter === "semua" || row.status === filter)
-    .sort((a, b) => order[a.status] - order[b.status] || b.dayNumber - a.dayNumber);
-}
+/* ---------- CSV export (SmartPLS input, joined to SurveyMonkey by `kode`) ---------- */
 
-export interface BusinessDetail {
-  business: Business;
-  diagnosis: Diagnosis | null;
-  pack: Pack | null;
-  events: ResearchEvent[];
-}
+type Cell = string | number | boolean | null | undefined;
 
-export async function getBusinessDetail(businessId: string): Promise<BusinessDetail | null> {
-  const s = store();
-  const business = s.businesses.get(businessId);
-  if (!business) return null;
-  return {
-    business,
-    diagnosis: s.diagnoses.get(businessId) ?? null,
-    pack: s.packs.get(businessId) ?? null,
-    events: s.events.filter((e) => e.businessId === businessId).reverse(),
-  };
-}
-
-/* ---------- CSV export (SmartPLS input, FASE.md fase 3) ---------- */
-
-function csvCell(value: string | number | boolean | null | undefined): string {
+function csvCell(value: Cell): string {
   const text = value === null || value === undefined ? "" : String(value);
   return /[",\n;]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-function toCsv(header: string[], rows: (string | number | boolean | null)[][]): string {
+function toCsv(header: string[], rows: Cell[][]): string {
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
-/** One row per business: profile, answers per question, map per section, counts, events per action. */
-export async function exportSummaryCsv(): Promise<string> {
-  const s = store();
-  const today = todayIso();
+/** One row per participant: profile, answers per question, map, pack, questionnaire, usage. */
+export function summaryCsv(
+  participants: Participant[],
+  events: ResearchEvent[],
+  today: string,
+): string {
   const header = [
+    "kode",
     "business_id",
-    "nama",
-    "email",
+    "nama_usaha",
+    "nama_pemilik",
+    "wa",
     "produk",
     "lokasi",
     "sektor",
     "lama_usaha",
     "jumlah_karyawan",
     "peran",
+    "terdaftar",
+    "tahap",
     ...diagnosisBank.questions.map((q) => q.id),
     ...sections.flatMap((sec) => [`skor_${sec.id}`, `warna_${sec.id}`]),
     "repot",
     "jumlah_masalah",
     "jumlah_sop",
     "sop",
+    "sumber",
     "paket_dibuat",
     "h30",
     "hari_ke",
-    "sumber",
-    "dihubungi",
+    "kuesioner_dikirim",
+    "kuesioner_selesai",
+    "sop_dibuka_unik",
     ...EVENT_ACTIONS.map((a) => `event_${a}`),
   ];
-  const rows = [...s.businesses.values()].map((b) => {
-    const pack = s.packs.get(b.id);
-    const events = s.events.filter((e) => e.businessId === b.id);
-    const answers = s.diagnoses.get(b.id)?.answers ?? {};
+  const rows = participants.map((participant) => {
+    const { business: b, diagnosis } = participant;
+    const pack = participant.pack?.status === "siap" ? participant.pack : null;
+    const own = events.filter((e) => e.businessId === b.id);
+    const answers = diagnosis?.answers ?? {};
+    const openedSops = new Set(
+      own.flatMap((e) =>
+        e.action === "sop_buka" && typeof e.meta?.sop === "string" ? [e.meta.sop] : [],
+      ),
+    );
     return [
+      b.code,
       b.id,
       b.name,
-      b.email,
+      b.ownerName,
+      b.whatsapp,
       b.product,
       b.location,
       b.sector,
       b.yearsRunning,
       b.employees,
       b.ownerRole,
+      b.createdAt.slice(0, 10),
+      participantStage(participant, today),
       ...diagnosisBank.questions.map((q) => answers[q.id] ?? null),
       ...sections.flatMap((sec) =>
         pack ? [pack.map[sec.id].score, pack.map[sec.id].color] : [null, null],
@@ -195,23 +226,26 @@ export async function exportSummaryCsv(): Promise<string> {
       pack?.problems.length ?? null,
       pack?.sops.length ?? null,
       pack ? pack.sops.map((sop) => sop.sopId).join("|") : null,
+      pack?.source ?? null,
       pack?.createdOn ?? null,
       pack?.followUpOn ?? null,
       pack ? dayNumber(pack.createdOn, today) : null,
-      pack?.source ?? null,
-      pack?.contactedAt ?? null,
-      ...EVENT_ACTIONS.map((a) => events.filter((e) => e.action === a).length),
+      pack?.questionnaireSentAt ?? null,
+      pack?.questionnaireDoneAt ?? null,
+      openedSops.size,
+      ...EVENT_ACTIONS.map((a) => own.filter((e) => e.action === a).length),
     ];
   });
   return toCsv(header, rows);
 }
 
-export async function exportEventsCsv(): Promise<string> {
-  const events = store().events;
+export function eventsCsv(participants: Participant[], events: ResearchEvent[]): string {
+  const codes = new Map(participants.map((p) => [p.business.id, p.business.code]));
   return toCsv(
-    ["id", "business_id", "action", "meta", "created_at"],
+    ["id", "kode", "business_id", "action", "meta", "created_at"],
     events.map((e) => [
       e.id,
+      codes.get(e.businessId) ?? null,
       e.businessId,
       e.action,
       e.meta ? JSON.stringify(e.meta) : null,

@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 
 import { id } from "@/content/id";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
-import { verifyPassword } from "@/lib/data/account";
-import { logEvent } from "@/lib/data/events";
-import { createSession, destroySession, isResearcher } from "@/lib/data/session";
-import { loginSchema } from "@/lib/validations/auth";
+import { data } from "@/lib/data";
+import type { SignInResult, SignUpResult } from "@/lib/data/source";
+import { loginSchema, signUpSchema } from "@/lib/validations/auth";
+
+/** Research team sign-in. UMKM owners never sign in: they use their private link. */
 
 export interface LoginState {
   email: string;
@@ -15,9 +16,9 @@ export interface LoginState {
   error: string | null;
 }
 
-/** Only same-site relative paths are accepted as the post-login target. */
+/** Only paths inside the researcher panel are accepted as the post-login target. */
 function safeNext(next: string | undefined): string | null {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+  return next && next.startsWith(ROUTES.researcher) ? next : null;
 }
 
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -37,15 +38,72 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     return { email, fieldErrors, error: null };
   }
 
-  const user = await verifyPassword(parsed.data.email, parsed.data.password);
-  if (!user) return { email, fieldErrors: {}, error: id.auth.errors.invalidCredentials };
-
-  await createSession(user.email);
-  if (user.businessId) await logEvent(user.businessId, "login");
-  redirect(safeNext(parsed.data.next) ?? (isResearcher(user) ? ROUTES.researcher : ROUTES.start));
+  let result: SignInResult;
+  try {
+    result = await data().staff.signIn(parsed.data.email, parsed.data.password);
+  } catch {
+    return { email, fieldErrors: {}, error: id.auth.errors.generic };
+  }
+  if (!result.ok) {
+    const error =
+      result.reason === "notStaff" ? id.auth.errors.notStaff : id.auth.errors.invalidCredentials;
+    return { email, fieldErrors: {}, error };
+  }
+  redirect(safeNext(parsed.data.next) ?? ROUTES.researcher);
 }
 
-export async function logoutAction(notice?: "saved"): Promise<void> {
-  await destroySession();
-  redirect(notice ? `${ROUTES.login}?${NOTICE_PARAM}=${notice}` : ROUTES.login);
+type SignUpField = "name" | "email" | "inviteCode" | "password";
+
+export interface SignUpState {
+  values: { name: string; email: string; inviteCode: string };
+  fieldErrors: Partial<Record<SignUpField, string>>;
+  error: string | null;
+}
+
+const SIGN_UP_FIELD_ERRORS: Record<SignUpField, string> = {
+  name: id.signUp.errors.nameRequired,
+  email: id.auth.errors.emailInvalid,
+  inviteCode: id.signUp.errors.inviteInvalid,
+  password: id.signUp.errors.passwordShort,
+};
+
+const isSignUpField = (key: unknown): key is SignUpField =>
+  typeof key === "string" && key in SIGN_UP_FIELD_ERRORS;
+
+export async function signUpAction(_prev: SignUpState, formData: FormData): Promise<SignUpState> {
+  const values = {
+    name: String(formData.get("name") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    inviteCode: String(formData.get("inviteCode") ?? ""),
+  };
+  const parsed = signUpSchema.safeParse({ ...values, password: formData.get("password") ?? "" });
+  if (!parsed.success) {
+    const fieldErrors: SignUpState["fieldErrors"] = {};
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0];
+      if (isSignUpField(key)) fieldErrors[key] = SIGN_UP_FIELD_ERRORS[key];
+    }
+    return { values, fieldErrors, error: null };
+  }
+
+  let result: SignUpResult;
+  try {
+    result = await data().staff.signUp(parsed.data);
+  } catch {
+    return { values, fieldErrors: {}, error: id.auth.errors.generic };
+  }
+  if (!result.ok) {
+    if (result.reason === "confirmEmail") redirect(`${ROUTES.login}?${NOTICE_PARAM}=konfirmasi`);
+    return { values, fieldErrors: {}, error: id.signUp.errors[result.reason] };
+  }
+  redirect(ROUTES.researcher);
+}
+
+export async function logoutAction(): Promise<void> {
+  try {
+    await data().staff.signOut();
+  } catch {
+    // The session cookie is gone or Supabase is unreachable: either way, show the login page.
+  }
+  redirect(`${ROUTES.login}?${NOTICE_PARAM}=keluar`);
 }

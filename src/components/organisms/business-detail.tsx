@@ -1,5 +1,9 @@
+import { PencilIcon } from "lucide-react";
+import Link from "next/link";
+
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,34 +13,51 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { id } from "@/content/id";
-import type { BusinessDetail as Detail } from "@/lib/data/research";
+import { ROUTES } from "@/lib/auth/constants";
+import type { Participant, ResearchEvent } from "@/lib/data/types";
 import { getSop } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate, formatDateTime } from "@/lib/format";
 
 import { BusinessMap } from "./business-map";
 
 /** Researcher view of one participant: profile, map, pack, passive event log. */
-export function BusinessDetail({ detail }: { detail: Detail }) {
-  const { business, pack, events } = detail;
+export function BusinessDetail({
+  participant,
+  events,
+}: {
+  participant: Participant;
+  events: ResearchEvent[];
+}) {
+  const { business, pack } = participant;
   const copy = id.researcher.detail;
   const options = id.profile.options;
   const fields = id.profile.fields;
   const profile = [
+    [copy.owner, business.ownerName],
+    [copy.whatsapp, `+${business.whatsapp}`],
     [fields.product.label, business.product],
     [fields.location.label, options.location[business.location]],
     [fields.sector.label, options.sector[business.sector]],
     [fields.yearsRunning.label, options.yearsRunning[business.yearsRunning]],
     [fields.employees.label, options.employees[business.employees]],
     [fields.ownerRole.label, options.ownerRole[business.ownerRole]],
-    [id.auth.email, business.email],
   ];
+  const ready = pack?.status === "siap" ? pack : null;
 
   return (
     <div className="space-y-8">
       <section aria-labelledby="profil" className="space-y-3">
-        <h2 id="profil" className="text-xl font-semibold">
-          {copy.profile}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="profil" className="text-xl font-semibold">
+            {copy.profile}
+          </h2>
+          <Button asChild variant="ghost">
+            <Link href={ROUTES.editParticipant(business.id)}>
+              <PencilIcon aria-hidden />
+              {id.researcher.actions.edit}
+            </Link>
+          </Button>
+        </div>
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {profile.map(([label, value]) => (
             <div key={label} className="rounded-lg bg-muted p-3">
@@ -47,9 +68,9 @@ export function BusinessDetail({ detail }: { detail: Detail }) {
         </dl>
       </section>
 
-      {pack ? (
+      {ready ? (
         <div className="grid gap-6 *:min-w-0 lg:grid-cols-2">
-          <BusinessMap map={pack.map} hardest={pack.hardestSection} />
+          <BusinessMap map={ready.map} hardest={ready.hardestSection} />
           <section
             aria-labelledby="isi-paket"
             className="space-y-3 rounded-xl border bg-background p-5 shadow-card sm:p-6"
@@ -58,13 +79,13 @@ export function BusinessDetail({ detail }: { detail: Detail }) {
               <h2 id="isi-paket" className="text-2xl font-semibold">
                 {copy.pack}
               </h2>
-              <Badge variant="outline">{copy.source[pack.source]}</Badge>
+              <Badge variant="outline">{copy.source[ready.source]}</Badge>
             </div>
             <p className="text-muted-foreground">
-              {formatDate(pack.createdOn)} · {id.researcher.table.day} {dayNumber(pack.createdOn)}
+              {formatDate(ready.createdOn)} · {id.researcher.table.day} {dayNumber(ready.createdOn)}
             </p>
             <ol className="list-decimal space-y-1 pl-5">
-              {pack.sops.map((sop) => (
+              {ready.sops.map((sop) => (
                 <li key={sop.sopId}>{getSop(sop.sopId).title}</li>
               ))}
             </ol>
@@ -82,7 +103,7 @@ export function BusinessDetail({ detail }: { detail: Detail }) {
           <EmptyState title={copy.events} body={copy.noEvents} />
         ) : (
           <div className="rounded-xl border bg-background shadow-card">
-            <Table>
+            <Table scrollLabel={copy.eventsTable}>
               <TableHeader>
                 <TableRow>
                   <TableHead>{copy.eventTime}</TableHead>

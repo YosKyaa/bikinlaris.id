@@ -51,7 +51,12 @@ export function InteractiveChecklist({ rows }: { rows: { id: string; label: stri
                   key={day}
                   type="button"
                   aria-pressed={done}
-                  aria-label={id.landing.hero.tick(row.label, id.pack.sop.dayNames[dayIndex], done)}
+                  aria-label={id.landing.hero.tick(
+                    day,
+                    id.pack.sop.dayNames[dayIndex],
+                    row.label,
+                    done,
+                  )}
                   onClick={() =>
                     setTicks((current) => ({ ...current, [key(rowIndex, dayIndex)]: !done }))
                   }

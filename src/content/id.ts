@@ -13,7 +13,8 @@ import type {
   Sector,
   YearsRunning,
 } from "@/lib/validations/business";
-import type { EventAction, FollowupStatus } from "@/lib/data/types";
+import type { ParticipantFilter } from "@/lib/data/research";
+import type { EventAction, FunnelStepKey, ParticipantStage, StaffRole } from "@/lib/data/types";
 
 // [KONFIRMASI] Durasi: spec menulis ~8 menit, HANDOVER.md ±10 menit.
 const DURATION_MINUTES = 10;
@@ -37,13 +38,16 @@ export const id = {
     loading: "Memuat…",
     saving: "Menyimpan…",
     startCheck: "Mulai cek usaha",
-    login: "Masuk",
+    join: "Ikut cek usaha",
+    login: "Masuk tim",
     logout: "Keluar",
     notAvailable: "—",
     minutes: (n: number) => `${n} menit`,
     aboutMinutes: (n: number) => `Sekitar ${n} menit`,
     durationMinutes: DURATION_MINUTES,
     sopExplained: "SOP (panduan kerja langkah demi langkah)",
+    trackFailed: "Aktivitas belum tercatat.",
+    copy: "Salin",
   },
 
   saveIndicator: {
@@ -100,11 +104,12 @@ export const id = {
         "Jawab pertanyaan tentang usaha Anda. Lihat bagian yang perlu dibenahi dulu. Bawa pulang SOP (panduan kerja langkah demi langkah) yang siap dipakai.",
       secondaryCta: "Lihat contoh SOP",
       // [KONFIRMASI] Durasi dan pendampingan.
-      microcopy: `Sekitar ${DURATION_MINUTES} menit, dibantu pendamping. Jawaban tersimpan, jadi bisa dilanjut nanti.`,
+      microcopy: `Sekitar ${DURATION_MINUTES} menit, dibantu pendamping dari tim peneliti. Tanpa daftar akun.`,
       previewLabel: "Contoh halaman SOP dari paket",
       previewHint: "Coba ketuk kotaknya, begini cara mencoret tiap hari.",
-      tick: (task: string, day: string, done: boolean) =>
-        `${task}, ${day}: ${done ? "sudah dicoret" : "belum dicoret"}`,
+      // Starts with the visible short day ("Sen") so voice control users can say what they see.
+      tick: (dayShort: string, dayFull: string, task: string, done: boolean) =>
+        `${dayShort} (${dayFull}), ${task}: ${done ? "sudah dicoret" : "belum dicoret"}`,
     },
     tryIt: {
       eyebrow: "Coba dulu",
@@ -119,7 +124,7 @@ export const id = {
         found === 0
           ? `Dari ${answered} jawaban, belum ada yang perlu dirapikan.`
           : `Dari ${answered} jawaban, ${found} hal perlu dirapikan.`,
-      cta: "Lanjut ke cek usaha lengkap",
+      cta: "Lihat cara ikut",
       ctaNote: (total: number) =>
         `Cek usaha lengkap berisi ${total} pertanyaan dan menghasilkan paket SOP untuk usaha Anda.`,
     },
@@ -203,7 +208,7 @@ export const id = {
         {
           q: "Berapa lama mengisinya?",
           // [KONFIRMASI] Durasi.
-          a: `Sekitar ${DURATION_MINUTES} menit. Jawaban tersimpan otomatis, jadi bisa dilanjut nanti dari bagian terakhir.`,
+          a: `Sekitar ${DURATION_MINUTES} menit bersama pendamping. Jawaban tersimpan otomatis, jadi bisa dilanjut nanti lewat tautan yang sama.`,
         },
         {
           q: "Apakah data usaha saya aman?",
@@ -215,19 +220,19 @@ export const id = {
           a: "Tidak. Kalau bisa membuka WhatsApp, Anda bisa memakai bikinlaris. Pendamping membantu dari awal sampai paket SOP diterima.",
         },
         {
-          q: "Bagaimana cara dapat akun?",
-          // [KONFIRMASI] Alur akun untuk pengunjung yang datang sendiri.
-          a: "Akun dibuatkan oleh pendamping dari tim peneliti. Hubungi pendamping Anda untuk mulai.",
+          q: "Bagaimana cara ikut?",
+          // [KONFIRMASI] Alur untuk pengunjung yang datang sendiri.
+          a: "Pendamping dari tim peneliti datang dan menemani cek usaha. Setelah itu Anda dapat tautan pribadi lewat WhatsApp. Tidak perlu membuat akun atau mengingat sandi.",
         },
         {
           q: "Apa yang terjadi setelah dapat SOP?",
-          a: "Jalankan SOP pertama dulu sampai jadi kebiasaan. Sekitar 30 hari kemudian, peneliti menghubungi Anda untuk menanyakan pengalamannya.",
+          a: "Jalankan SOP pertama dulu sampai jadi kebiasaan. Sekitar hari ke-30, peneliti mengirim kuesioner singkat lewat WhatsApp, kira-kira 15 menit.",
         },
       ],
     },
     closing: {
       title: "Cara kerja yang rapi dimulai dari satu langkah kecil.",
-      body: "Jawab pertanyaannya hari ini. Pulang dengan SOP yang siap ditempel di dinding.",
+      body: "Pendamping menemani Anda menjawab pertanyaannya. Hasilnya SOP yang siap ditempel di dinding.",
     },
     footer: {
       // [KONFIRMASI] Redaksi afiliasi.
@@ -236,9 +241,73 @@ export const id = {
     },
   },
 
+  join: {
+    eyebrow: "Cara ikut",
+    title: "Cek usaha dilakukan bersama pendamping",
+    body: "bikinlaris dipakai dalam penelitian Jakarta Global University. Anda tidak perlu mendaftar atau membuat kata sandi.",
+    stepsTitle: "Langkahnya",
+    steps: [
+      {
+        title: "Pendamping datang ke usaha Anda",
+        body: (questions: number) =>
+          `Pendamping dari tim peneliti menemani Anda menjawab ${questions} pertanyaan, sekitar ${DURATION_MINUTES} menit.`,
+      },
+      {
+        title: "Anda dapat tautan pribadi lewat WhatsApp",
+        body: () =>
+          "Tautan itu kunci Anda untuk membuka paket SOP. Simpan pesannya dan jangan dibagikan.",
+      },
+      {
+        title: "Jalankan SOP selama 30 hari",
+        body: () =>
+          "Buka tautan kapan saja untuk melihat SOP. Sekitar hari ke-30, peneliti mengirim kuesioner singkat.",
+      },
+    ],
+    // [KONFIRMASI] Siapa yang bisa ikut dan bagaimana pengunjung umum menghubungi tim.
+    whoTitle: "Siapa yang bisa ikut?",
+    whoBody:
+      "Peserta dipilih tim peneliti dari UMKM di Depok, Bekasi, dan Bogor. Pendamping akan menghubungi Anda lebih dulu.",
+    lostTitle: "Tautan hilang atau tidak bisa dibuka?",
+    lostBody: "Minta pendamping mengirim ulang tautannya. Jawaban dan paket SOP Anda tetap aman.",
+    resumeTitle: (business: string) => `Lanjutkan ${business}`,
+    resumeBody: "Tautan Anda sudah tersimpan di HP ini.",
+    resume: "Lanjutkan",
+    notices: {
+      tautan:
+        "Tautan ini tidak dikenali. Buka lagi tautan dari WhatsApp pendamping, atau minta dikirim ulang.",
+      tersimpan:
+        "Jawaban Anda tersimpan. Buka lagi tautan dari WhatsApp kapan saja untuk melanjutkan.",
+      keluar: "Anda sudah keluar dari HP ini. Buka lagi tautan dari WhatsApp untuk masuk.",
+      gangguan: "bikinlaris sedang tidak bisa dibuka. Coba lagi beberapa menit lagi.",
+    },
+  },
+
+  owner: {
+    welcome: {
+      code: (code: string) => `Kode peserta ${code}`,
+      title: (owner: string) => `Halo, ${owner}.`,
+      subtitle: (business: string) => `Mari cek cara kerja ${business}.`,
+      body: (questions: number, sections: number) =>
+        `${questions} pertanyaan dalam ${sections} bagian, sekitar ${DURATION_MINUTES} menit. Jawaban tersimpan otomatis, jadi bisa dilanjut nanti.`,
+      stepsTitle: "Yang akan terjadi",
+      steps: [
+        "Jawab tiap pertanyaan apa adanya. Tidak ada jawaban yang salah.",
+        "Pilih bagian usaha yang paling bikin repot.",
+        "Dapat paket SOP untuk dijalankan 30 hari.",
+      ],
+      start: "Mulai cek usaha",
+      notYou: "Bukan usaha Anda?",
+    },
+    logout: "Keluar dari HP ini",
+    errors: {
+      noLink: "Tautan Anda belum terbuka di HP ini. Buka lagi tautan dari WhatsApp.",
+    },
+  },
+
   auth: {
-    title: "Masuk",
-    subtitle: "Akun dibuatkan oleh pendamping. Belum punya? Minta ke pendamping Anda.",
+    title: "Masuk tim peneliti",
+    subtitle:
+      "Khusus enumerator dan admin penelitian. Pemilik usaha tidak perlu masuk: cukup buka tautan dari WhatsApp.",
     email: "Email",
     emailPlaceholder: "nama@gmail.com",
     password: "Kata sandi",
@@ -246,20 +315,22 @@ export const id = {
     hidePassword: "Sembunyikan sandi",
     submit: "Masuk",
     pending: "Memeriksa…",
+    signUpPrompt: "Baru diundang ke tim?",
+    signUpLink: "Buat akun tim",
     errors: {
       emailInvalid: "Tulis email lengkap, contoh: nama@gmail.com.",
       passwordRequired: "Isi kata sandi Anda.",
-      invalidCredentials:
-        "Email atau kata sandi belum cocok. Cek lagi, atau minta pendamping mengatur ulang sandi.",
+      invalidCredentials: "Email atau kata sandi belum cocok. Cek lagi, lalu coba masuk.",
+      notStaff: "Akun ini belum terdaftar sebagai tim. Minta admin mengirim undangan.",
       generic: "Belum bisa masuk. Periksa internet Anda, lalu coba lagi.",
-      sessionExpired: "Sesi Anda sudah berakhir. Masuk lagi untuk melanjutkan.",
     },
     notices: {
-      saved: "Jawaban Anda sudah tersimpan. Masuk lagi kapan saja untuk melanjutkan.",
-      loggedOut: "Anda sudah keluar.",
+      keluar: "Anda sudah keluar.",
+      konfirmasi: "Akun dibuat. Buka email Anda, klik tautan konfirmasi, lalu masuk di sini.",
+      terkonfirmasi: "Email sudah dikonfirmasi. Silakan masuk.",
     },
     mockHint: (password: string) =>
-      `Mode contoh. Akun: demo@bikinlaris.id (paket jadi), coba@bikinlaris.id (mulai dari awal), peneliti@bikinlaris.id (panel peneliti). Sandi semua akun: ${password}`,
+      `Mode contoh. Akun tim: peneliti@bikinlaris.id (enumerator) dan admin@bikinlaris.id (admin), sandi ${password}. Tautan UMKM contoh: /u/demo (paket jadi) dan /u/coba (belum mulai).`,
     otp: {
       label: "Kode 6 angka dari email",
       hint: (email: string) => `Kode dikirim ke ${email}. Cek juga folder spam.`,
@@ -275,10 +346,33 @@ export const id = {
     },
   },
 
+  signUp: {
+    title: "Buat akun tim",
+    subtitle: "Pakai email yang diundang admin dan kode undangan dari pesan admin.",
+    name: "Nama Anda",
+    inviteCode: "Kode undangan",
+    inviteCodePlaceholder: "Contoh: a1b2c3d4",
+    password: "Kata sandi",
+    passwordHint: (min: number) => `Minimal ${min} karakter.`,
+    submit: "Buat akun tim",
+    pending: "Membuat akun…",
+    haveAccount: "Sudah punya akun?",
+    loginLink: "Masuk",
+    errors: {
+      nameRequired: "Isi nama Anda.",
+      inviteInvalid: "Kode undangan berisi 8 huruf dan angka, contoh: a1b2c3d4.",
+      passwordShort: "Kata sandi minimal 8 karakter.",
+      inviteMismatch:
+        "Email atau kode undangan belum cocok. Cek pesan dari admin, atau minta undangan baru.",
+      exists: "Email ini sudah punya akun tim. Silakan masuk.",
+      weakPassword: "Kata sandi terlalu mudah ditebak. Pakai campuran huruf dan angka.",
+      failed: "Akun belum dibuat. Periksa internet Anda, lalu coba lagi.",
+    },
+    mockHint: (email: string, code: string) =>
+      `Mode contoh. Undangan yang tersedia: ${email} dengan kode ${code}.`,
+  },
+
   profile: {
-    eyebrow: "Langkah 1 dari 3",
-    title: "Kenalan dulu dengan usaha Anda",
-    subtitle: "Tujuh isian singkat. Dipakai supaya paket SOP pas untuk usaha Anda.",
     groups: {
       business: "Tentang usaha",
       people: "Lokasi dan orang",
@@ -290,17 +384,9 @@ export const id = {
       location: { label: "Lokasi usaha" },
       yearsRunning: { label: "Lama usaha berjalan" },
       employees: { label: "Jumlah karyawan" },
-      ownerRole: { label: "Peran Anda di usaha ini" },
+      ownerRole: { label: "Peran pemilik di usaha ini" },
     },
     choose: "Pilih salah satu",
-    submit: "Simpan dan mulai cek usaha",
-    pending: "Menyimpan…",
-    errors: {
-      required: "Bagian ini perlu diisi.",
-      tooLong: "Terlalu panjang. Singkat saja.",
-      choose: "Pilih salah satu jawaban.",
-      saveFailed: "Profil belum tersimpan. Periksa internet Anda, lalu coba lagi.",
-    },
     options: {
       location: {
         depok: "Depok",
@@ -335,8 +421,37 @@ export const id = {
     },
   },
 
+  participant: {
+    newTitle: "Tambah UMKM",
+    newSubtitle:
+      "Isi bersama pemilik usaha, sekitar 2 menit. Setelah disimpan, UMKM dapat kode peserta dan tautan pribadi.",
+    editTitle: (business: string) => `Ubah data ${business}`,
+    editSubtitle: "Kode peserta dan tautan pribadi tidak berubah.",
+    groups: {
+      owner: "Pemilik usaha",
+    },
+    fields: {
+      ownerName: { label: "Nama pemilik", placeholder: "Contoh: Rini" },
+      whatsapp: {
+        label: "Nomor WhatsApp",
+        placeholder: "Contoh: 0812 3456 7890",
+        hint: "Tautan pribadi dan kuesioner dikirim ke nomor ini.",
+      },
+    },
+    submitNew: "Simpan dan buat tautan",
+    submitEdit: "Simpan perubahan",
+    pending: "Menyimpan…",
+    errors: {
+      required: "Bagian ini perlu diisi.",
+      tooLong: "Terlalu panjang. Singkat saja.",
+      choose: "Pilih salah satu jawaban.",
+      whatsapp: "Tulis nomor WhatsApp yang aktif, contoh: 0812 3456 7890.",
+      saveFailed: "Data belum tersimpan. Periksa internet Anda, lalu coba lagi.",
+    },
+  },
+
   diagnosis: {
-    eyebrow: "Langkah 2 dari 3",
+    eyebrow: "Langkah 1 dari 2",
     feature: FEATURE,
     intro: "Jawab apa adanya. Tidak ada jawaban yang salah.",
     progress: (answered: number, total: number) => `${answered} dari ${total} pertanyaan terjawab`,
@@ -351,8 +466,8 @@ export const id = {
     exit: {
       trigger: "Keluar, lanjut nanti",
       title: "Keluar dulu?",
-      body: "Jawaban Anda sudah tersimpan. Saat masuk lagi, Anda lanjut dari bagian ini.",
-      confirm: "Keluar",
+      body: "Jawaban Anda sudah tersimpan. Buka lagi tautan dari WhatsApp untuk lanjut dari bagian ini.",
+      confirm: "Keluar dulu",
       cancel: "Lanjut mengisi",
     },
     beforeStart: (questions: number, sections: number) =>
@@ -364,7 +479,7 @@ export const id = {
   },
 
   summary: {
-    eyebrow: "Langkah 3 dari 3",
+    eyebrow: "Langkah 2 dari 2",
     title: "Cek lagi jawaban Anda",
     subtitle:
       "Ubah jawaban kalau ada yang kurang pas. Setelah itu pilih bagian yang paling bikin repot.",
@@ -378,7 +493,7 @@ export const id = {
     cta: "Buat paket SOP",
     confirm: {
       title: "Buat paket SOP sekarang?",
-      body: "Paket disusun dari jawaban di atas. Hari ini dihitung sebagai hari pertama. Sekitar 30 hari lagi, peneliti akan menghubungi Anda.",
+      body: "Paket disusun dari jawaban di atas. Hari ini dihitung sebagai hari pertama. Sekitar 30 hari lagi, peneliti mengirim kuesioner singkat lewat WhatsApp.",
       confirm: "Ya, buat paket",
       cancel: "Cek lagi",
     },
@@ -468,9 +583,12 @@ export const id = {
       progressLabel: (day: number, total: number) =>
         `Hari ke-${day} dari ${total} hari menjalankan SOP`,
       before: (date: string) =>
-        `Sekitar ${date}, peneliti akan menghubungi Anda untuk menanyakan pengalaman memakai SOP, kira-kira 15 menit.`,
-      after: "Hari ke-30 sudah lewat. Peneliti akan segera menghubungi Anda, kira-kira 15 menit.",
+        `Sekitar ${date}, peneliti mengirim kuesioner singkat lewat WhatsApp, kira-kira 15 menit.`,
+      after:
+        "Hari ke-30 sudah lewat. Kuesioner singkat dikirim lewat WhatsApp dalam beberapa hari.",
       nothingToFill: "Tidak ada yang perlu diisi di sini. Cukup jalankan SOP-nya.",
+      code: (code: string) => `Kode peserta Anda: ${code}`,
+      codeHint: "Tulis kode ini saat mengisi kuesioner nanti.",
     },
     printHeader: (business: string) => `bikinlaris.id · Paket SOP ${business}`,
     printMeta: (product: string, location: string, date: string) =>
@@ -478,7 +596,7 @@ export const id = {
     menu: {
       profile: "Profil usaha",
       redo: "Ulang cek usaha",
-      logout: "Keluar",
+      logout: "Keluar dari HP ini",
     },
     redo: {
       title: "Ulang cek usaha?",
@@ -489,7 +607,7 @@ export const id = {
     },
     profileSheet: {
       title: "Profil usaha",
-      description: "Data ini diisi di awal dan dipakai untuk menyusun paket.",
+      description: "Data ini diisi bersama pendamping dan dipakai untuk menyusun paket.",
     },
   },
 
@@ -503,113 +621,156 @@ export const id = {
     },
     checkbox: "☐",
     footer: (date: string) =>
-      `Kerjakan satu dulu sampai jadi kebiasaan. Sekitar ${date} peneliti akan menghubungi.`,
+      `Kerjakan satu dulu sampai jadi kebiasaan. Sekitar ${date} peneliti mengirim kuesioner singkat.`,
   },
 
   researcher: {
     title: "Panel peneliti",
-    subtitle: "Pantau UMKM peserta dan siapa yang sudah bisa dihubungi untuk kuesioner hari ke-30.",
-    mockBanner: "Mode contoh: angka di halaman ini berasal dari data contoh, bukan data lapangan.",
+    subtitle: "Tambah UMKM, kirim kuesioner hari ke-30, dan unduh data.",
+    mockBanner: "Mode contoh: data di halaman ini adalah data contoh, bukan data lapangan.",
+    menu: {
+      participants: "Daftar UMKM",
+      newParticipant: "Tambah UMKM",
+      team: "Tim peneliti",
+      logout: "Keluar",
+    },
     funnel: {
       title: "Perjalanan peserta",
       body: "Jumlah UMKM di tiap tahap. Penurunan tajam menunjukkan di mana peserta tertahan.",
       steps: {
-        registered: "Akun dibuat",
-        profileDone: "Profil usaha diisi",
+        registered: "UMKM ditambahkan",
         diagnosisStarted: "Mulai cek usaha",
         diagnosisDone: "Selesai cek usaha",
         packsCreated: "Paket SOP dibuat",
-        pastDay30: "Sudah H+30",
-        contacted: "Sudah dihubungi",
-        questionnaires: "Kuesioner masuk",
-      },
-      share: (percent: number) => `${percent}% dari akun`,
-      questionnairesNote: "Modul kuesioner belum dibuat",
+        pastDay30: "Sudah hari ke-30",
+        questionnaireSent: "Kuesioner dikirim",
+        questionnaireDone: "Kuesioner diisi",
+      } satisfies Record<FunnelStepKey, string>,
+      share: (percent: number) => `${percent}% dari UMKM`,
     },
     due: {
-      title: "Hubungi minggu ini",
+      title: "Kirim kuesioner minggu ini",
       body: (days: number) =>
-        `UMKM yang mencapai H+30 dalam ${days} hari ke depan dan belum dihubungi, urut dari yang paling mendesak.`,
+        `UMKM yang mencapai hari ke-30 dalam ${days} hari ke depan dan belum dikirimi kuesioner.`,
       groups: { overdue: "Sudah lewat", today: "Hari ini", tomorrow: "Besok" },
       day: (n: number) => `Hari ke-${n}`,
-      emptyTitle: "Minggu ini tidak ada yang perlu dihubungi",
+      emptyTitle: "Minggu ini belum ada kuesioner yang perlu dikirim",
       emptyBody: "Daftar ini terisi sendiri saat UMKM mendekati hari ke-30.",
+      noSurvey:
+        "Tautan kuesioner belum diatur. Minta admin mengisi SURVEY_URL di pengaturan server.",
+      notYet: "Belum hari ke-30",
     },
     table: {
-      title: "Daftar tindak lanjut",
-      body: "UMKM yang sudah H+30 dan belum dihubungi ada di filter “Siap dihubungi”.",
-      caption: "Daftar UMKM dengan paket SOP dan status tindak lanjut",
-      business: "Nama usaha",
-      contact: "Kontak",
+      title: "Daftar UMKM",
+      body: "Urut dari yang paling perlu ditindaklanjuti.",
+      caption: "Daftar UMKM peserta dan tahapnya",
+      business: "UMKM",
+      owner: "Pemilik",
       packDate: "Paket dibuat",
       day: "Hari ke-",
-      status: "Status",
-      action: "Aksi",
+      stage: "Tahap",
       detail: (business: string) => `Lihat detail ${business}`,
     },
     filters: {
       label: "Saring daftar",
       semua: "Semua",
-      siap_dihubungi: "Siap dihubungi",
-      sudah_dihubungi: "Sudah dihubungi",
-      belum_h30: "Belum H+30",
-    },
-    status: {
-      belum_h30: "Belum H+30",
-      siap_dihubungi: "Siap dihubungi",
-      sudah_dihubungi: "Sudah dihubungi",
-    } satisfies Record<FollowupStatus, string>,
-    markContacted: "Tandai sudah dihubungi",
-    marked: (business: string) => `${business} ditandai sudah dihubungi.`,
-    markFailed: "Status belum tersimpan. Coba lagi.",
+      siap_dikirim: "Siap dikirim",
+      terkirim: "Menunggu diisi",
+      belum_h30: "Belum hari ke-30",
+      cek_usaha: "Sedang cek usaha",
+      belum_mulai: "Belum mulai",
+      selesai: "Selesai",
+    } satisfies Record<ParticipantFilter | "label", string>,
     empty: {
       title: "Belum ada UMKM di daftar ini",
-      semua: "UMKM muncul di sini setelah membuat paket SOP. Buat akun UMKM untuk mulai.",
-      siap_dihubungi: "Belum ada UMKM yang sudah H+30 dan belum dihubungi.",
-      sudah_dihubungi: "Belum ada UMKM yang ditandai sudah dihubungi.",
-      belum_h30: "Semua UMKM sudah melewati hari ke-30.",
+      semua: "Tambah UMKM pertama untuk mulai.",
+      siap_dikirim: "Belum ada UMKM yang sudah hari ke-30 dan belum dikirimi kuesioner.",
+      terkirim: "Tidak ada kuesioner yang sedang ditunggu.",
+      belum_h30: "Belum ada UMKM yang sedang menjalankan SOP.",
+      cek_usaha: "Tidak ada UMKM yang cek usahanya terhenti di tengah.",
+      belum_mulai: "Semua UMKM sudah mulai cek usaha.",
+      selesai: "Belum ada UMKM yang selesai mengisi kuesioner.",
       showAll: "Tampilkan semua",
-    },
+    } satisfies Record<ParticipantFilter | "title" | "showAll", string>,
     export: {
+      title: "Unduh data",
+      body: "Satu baris per UMKM, dengan kode peserta untuk digabung dengan jawaban kuesioner.",
       summary: "Unduh ringkasan (CSV)",
       events: "Unduh log aktivitas (CSV)",
     },
-    createAccount: {
-      trigger: "Buat akun UMKM",
-      title: "Buat akun UMKM",
-      description: "Akun dipakai pemilik usaha untuk masuk. Sandi hanya tampil sekali, jadi catat.",
-      email: "Email pemilik usaha",
-      businessName: "Nama usaha",
-      submit: "Buat akun",
-      pending: "Membuat akun…",
-      successTitle: "Akun siap dipakai",
-      successBody: "Berikan email dan sandi ini ke pemilik usaha.",
-      passwordLabel: "Sandi sementara",
-      done: "Selesai",
-      errors: {
-        emailInvalid: "Tulis email lengkap, contoh: nama@gmail.com.",
-        businessRequired: "Isi nama usaha.",
-        emailTaken: "Email ini sudah punya akun. Pakai email lain.",
-        generic: "Akun belum dibuat. Coba lagi.",
-      },
+    actions: {
+      startHere: "Mulai cek usaha di HP ini",
+      startHereHint:
+        "Membuka halaman UMKM di perangkat ini. Pemilik menjawab sendiri, Anda mendampingi.",
+      sendLink: "Kirim tautan ke WhatsApp",
+      sendPack: "Kirim paket ke WhatsApp",
+      sendQuestionnaire: "Kirim kuesioner",
+      resendQuestionnaire: "Kirim ulang kuesioner",
+      markDone: "Tandai sudah isi",
+      undoSent: "Batalkan tanda terkirim",
+      undoDone: "Batalkan tanda selesai",
+      copyLink: "Salin tautan",
+      copied: "Tautan disalin.",
+      copyFailed: "Tautan belum tersalin. Tekan lama tautannya untuk menyalin.",
+      edit: "Ubah data",
+      sent: (business: string) => `Kuesioner ${business} ditandai terkirim.`,
+      done: (business: string) => `${business} ditandai sudah mengisi kuesioner.`,
+      undone: "Tanda dibatalkan.",
     },
+    next: {
+      title: "Langkah berikutnya",
+      belum_mulai: "Mulai cek usaha bersama pemilik, atau kirim tautannya supaya diisi sendiri.",
+      cek_usaha: "Cek usaha belum selesai. Kirim ulang tautan supaya pemilik bisa melanjutkan.",
+      belum_h30: (date: string) => `Pemilik sedang menjalankan SOP. Kuesioner dikirim ${date}.`,
+      siap_dikirim: "Sudah hari ke-30. Kirim kuesioner lewat WhatsApp.",
+      terkirim: "Kuesioner sudah dikirim. Tandai setelah jawabannya masuk di SurveyMonkey.",
+      selesai: "Kuesioner sudah diisi. Tidak ada langkah lagi.",
+    },
+    stage: {
+      belum_mulai: "Belum mulai",
+      cek_usaha: "Sedang cek usaha",
+      belum_h30: "Belum hari ke-30",
+      siap_dikirim: "Siap dikirim",
+      terkirim: "Menunggu diisi",
+      selesai: "Selesai",
+    } satisfies Record<ParticipantStage, string>,
+    // [KONFIRMASI] Redaksi pesan WhatsApp ke peserta.
+    messages: {
+      link: (owner: string, business: string, url: string, code: string) =>
+        `Halo ${owner}. Ini tautan pribadi bikinlaris untuk ${business}:\n${url}\n\nBuka tautan ini untuk cek usaha dan melihat paket SOP. Simpan pesan ini dan jangan dibagikan.\nKode peserta: ${code}`,
+      pack: (owner: string, business: string, url: string, code: string) =>
+        `Halo ${owner}. Paket SOP untuk ${business} sudah siap:\n${url}\n\nMulai dari SOP 1 minggu ini. Sekitar 30 hari lagi kami mengirim kuesioner singkat.\nKode peserta: ${code}`,
+      questionnaire: (owner: string, business: string, url: string, code: string) =>
+        `Halo ${owner}. Sudah 30 hari sejak paket SOP ${business} dibuat. Mohon isi kuesioner singkat, sekitar 15 menit:\n${url}\n\nTulis kode peserta ${code} di kuesioner. Terima kasih.`,
+    },
+    created: (code: string) => `UMKM ditambahkan dengan kode peserta ${code}.`,
     detail: {
       back: "Kembali ke daftar",
-      profile: "Profil usaha",
+      profile: "Data UMKM",
+      code: "Kode peserta",
+      owner: "Pemilik",
+      whatsapp: "WhatsApp",
+      link: "Tautan pribadi",
+      linkHint: "Rahasia. Kirim hanya ke pemilik usaha ini.",
       map: "Peta usaha",
       pack: "Isi paket",
       events: "Log aktivitas",
+      eventsTable: "Tabel log aktivitas, bisa digeser ke samping",
       noPack: "UMKM ini belum membuat paket SOP.",
       noEvents: "Belum ada aktivitas tercatat.",
       hardest: "Paling bikin repot",
       source: { template: "Teks template", llm: "Dipersonalisasi AI" },
+      questionnaire: "Kuesioner hari ke-30",
+      sentAt: (date: string) => `Dikirim ${date}`,
+      doneAt: (date: string) => `Diisi ${date}`,
+      notSent: "Belum dikirim",
       eventTime: "Waktu",
       eventAction: "Aktivitas",
       eventMeta: "Keterangan",
     },
     events: {
-      login: "Masuk",
-      profil_selesai: "Profil selesai",
+      login: "Buka tautan",
+      profil_selesai: "Data UMKM diisi",
       diagnosa_mulai: "Mulai cek usaha",
       diagnosa_bagian: "Selesai satu bagian",
       diagnosa_selesai: "Cek usaha selesai",
@@ -621,6 +782,35 @@ export const id = {
       diagnosa_ulang: "Ulang cek usaha",
     } satisfies Record<EventAction, string>,
     forbidden: "Halaman ini khusus tim peneliti.",
+    markFailed: "Status belum tersimpan. Coba lagi.",
+  },
+
+  team: {
+    title: "Tim peneliti",
+    subtitle:
+      "Undang anggota dengan email. Kirim kode undangannya lewat WhatsApp, lalu mereka membuat akun sendiri.",
+    members: "Anggota",
+    you: "Anda",
+    invites: "Undangan belum dipakai",
+    noInvites: "Tidak ada undangan yang menunggu.",
+    inviteTitle: "Undang anggota",
+    email: "Email",
+    role: "Peran",
+    roles: { enumerator: "Enumerator", admin: "Admin" } satisfies Record<StaffRole, string>,
+    submit: "Buat undangan",
+    pending: "Membuat…",
+    created: (email: string) => `Undangan untuk ${email} siap. Kirim kodenya lewat WhatsApp.`,
+    code: "Kode undangan",
+    share: "Kirim lewat WhatsApp",
+    message: (email: string, code: string, url: string) =>
+      `Halo. Anda diundang ke tim peneliti bikinlaris.\nBuka ${url}\nDaftar dengan email ${email} dan kode undangan ${code}.`,
+    remove: "Hapus",
+    removeLabel: (email: string) => `Hapus undangan ${email}`,
+    errors: {
+      emailInvalid: "Tulis email lengkap, contoh: nama@gmail.com.",
+      member: "Email ini sudah menjadi anggota tim.",
+      failed: "Undangan belum tersimpan. Coba lagi.",
+    },
   },
 
   states: {

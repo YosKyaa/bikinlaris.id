@@ -13,7 +13,7 @@ import { StepActionBar } from "@/components/molecules/step-action-bar";
 import { Progress } from "@/components/ui/progress";
 import type { StoredAnswer } from "@/content/diagnosis.types";
 import { id } from "@/content/id";
-import { completeSectionAction, saveAnswerAction } from "@/lib/actions/diagnosis";
+import { completeSectionAction, saveAnswerAction } from "@/lib/actions/owner";
 
 export interface StepperQuestion {
   id: string;

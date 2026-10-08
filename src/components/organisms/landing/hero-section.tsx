@@ -39,7 +39,7 @@ export function HeroSection() {
             </p>
             <div className="enter mt-8 flex flex-col gap-3 sm:flex-row" style={delay(220)}>
               <Button asChild size="lg" className="btn-shine">
-                <Link href={ROUTES.login}>{id.common.startCheck}</Link>
+                <Link href={ROUTES.join}>{id.common.join}</Link>
               </Button>
               <SampleSopDialog label={copy.secondaryCta} size="lg" />
             </div>

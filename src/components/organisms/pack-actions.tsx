@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
-import { trackPackOpenedAction, trackShareAction } from "@/lib/actions/pack";
+import { trackPackOpenedAction, trackShareAction } from "@/lib/actions/owner";
 import { PACK_ACTIONS_ID } from "@/lib/anchors";
 import { cn } from "@/lib/utils";
 

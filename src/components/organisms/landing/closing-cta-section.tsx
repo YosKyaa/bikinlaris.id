@@ -13,7 +13,7 @@ export function ClosingCtaSection() {
         <h2 className="text-3xl font-bold tracking-tight text-balance">{copy.title}</h2>
         <p className="mt-3 text-lg text-muted-foreground">{copy.body}</p>
         <Button asChild size="lg" className="btn-shine mt-8">
-          <Link href={ROUTES.login}>{id.common.startCheck}</Link>
+          <Link href={ROUTES.join}>{id.common.join}</Link>
         </Button>
         <p className="mt-4 text-sm text-muted-foreground">{id.landing.hero.microcopy}</p>
       </div>

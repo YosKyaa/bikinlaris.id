@@ -1,7 +1,7 @@
-import { requireOwnerPage } from "@/lib/data/session";
+import { requireOwnerState } from "@/lib/data/owner-session";
 
-/** Every page in (umkm) needs a signed-in business owner. */
+/** Every page in (umkm) needs the private link opened on this device (/u/[token]). */
 export default async function OwnerLayout({ children }: LayoutProps<"/">) {
-  await requireOwnerPage();
+  await requireOwnerState();
   return children;
 }

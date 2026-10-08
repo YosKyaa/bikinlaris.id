@@ -9,9 +9,7 @@ import type { QuestionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import { getDiagnosis } from "@/lib/data/diagnosis";
-import { getPack } from "@/lib/data/pack";
-import { requireOwnerPage } from "@/lib/data/session";
+import { requireOwnerState } from "@/lib/data/owner-session";
 import { questionsOf, sections } from "@/lib/diagnosis/bank";
 import { computeMap, hardestCandidates, isSectionComplete } from "@/lib/diagnosis/scoring";
 
@@ -25,11 +23,9 @@ function answerLabel(answer: StoredAnswer | undefined, reversed: boolean): strin
 }
 
 export default async function SummaryPage() {
-  const user = await requireOwnerPage();
-  if (!user.businessId) redirect(ROUTES.profile);
-  if (await getPack(user.businessId)) redirect(ROUTES.pack);
+  const { diagnosis, pack } = await requireOwnerState();
+  if (pack) redirect(ROUTES.pack);
 
-  const diagnosis = await getDiagnosis(user.businessId);
   const answers = diagnosis?.answers ?? {};
   const map = computeMap(answers);
   const candidates = new Set(hardestCandidates(map));

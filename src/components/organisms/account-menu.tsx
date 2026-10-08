@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -30,18 +32,32 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { id } from "@/content/id";
-import { logoutAction } from "@/lib/actions/auth";
-import { redoDiagnosisAction } from "@/lib/actions/diagnosis";
+import { redoDiagnosisAction } from "@/lib/actions/owner";
 import { ROUTES } from "@/lib/auth/constants";
+
+const ITEM_CLASS = "min-h-11 text-base";
 
 interface AccountMenuProps {
   label: string;
-  /** Business profile rows for the sheet; omitted for researchers. */
+  /** Navigation entries (researcher panel). */
+  links?: { label: string; href: string }[];
+  /** Business profile rows for the sheet (owner). */
   profile?: { label: string; value: string }[];
+  /** "Ulang cek usaha" (owner). */
   allowRedo?: boolean;
+  logoutLabel: string;
+  /** Server action that ends the session and redirects. */
+  logout: () => Promise<void>;
 }
 
-export function AccountMenu({ label, profile, allowRedo = false }: AccountMenuProps) {
+export function AccountMenu({
+  label,
+  links = [],
+  profile,
+  allowRedo = false,
+  logoutLabel,
+  logout,
+}: AccountMenuProps) {
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const [redoOpen, setRedoOpen] = useState(false);
@@ -51,7 +67,7 @@ export function AccountMenu({ label, profile, allowRedo = false }: AccountMenuPr
     startTransition(async () => {
       const result = await redoDiagnosisAction();
       if (!result.ok) {
-        toast.error(id.pack.redo.failed);
+        toast.error(result.error);
         return;
       }
       setRedoOpen(false);
@@ -65,29 +81,32 @@ export function AccountMenu({ label, profile, allowRedo = false }: AccountMenuPr
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="max-w-56"
+            className="h-11 max-w-56"
             aria-label={`${id.nav.accountMenu}: ${label}`}
           >
             <span className="truncate">{label}</span>
             <ChevronDownIcon aria-hidden />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-52">
+        <DropdownMenuContent align="end" className="min-w-56">
+          {links.map((link) => (
+            <DropdownMenuItem key={link.href} asChild className={ITEM_CLASS}>
+              <Link href={link.href}>{link.label}</Link>
+            </DropdownMenuItem>
+          ))}
           {profile ? (
-            <DropdownMenuItem className="min-h-11 text-base" onSelect={() => setProfileOpen(true)}>
+            <DropdownMenuItem className={ITEM_CLASS} onSelect={() => setProfileOpen(true)}>
               {id.pack.menu.profile}
             </DropdownMenuItem>
           ) : null}
           {allowRedo ? (
-            <DropdownMenuItem className="min-h-11 text-base" onSelect={() => setRedoOpen(true)}>
+            <DropdownMenuItem className={ITEM_CLASS} onSelect={() => setRedoOpen(true)}>
               {id.pack.menu.redo}
             </DropdownMenuItem>
           ) : null}
-          <DropdownMenuItem
-            className="min-h-11 text-base"
-            onSelect={() => startTransition(() => logoutAction())}
-          >
-            {id.pack.menu.logout}
+          {links.length > 0 || profile || allowRedo ? <DropdownMenuSeparator /> : null}
+          <DropdownMenuItem className={ITEM_CLASS} onSelect={() => startTransition(logout)}>
+            {logoutLabel}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -103,7 +122,7 @@ export function AccountMenu({ label, profile, allowRedo = false }: AccountMenuPr
               {profile.map((row) => (
                 <div key={row.label} className="rounded-lg bg-muted p-3">
                   <dt className="text-sm text-muted-foreground">{row.label}</dt>
-                  <dd className="font-semibold">{row.value}</dd>
+                  <dd className="font-semibold break-words">{row.value}</dd>
                 </div>
               ))}
             </dl>
@@ -111,27 +130,29 @@ export function AccountMenu({ label, profile, allowRedo = false }: AccountMenuPr
         </Sheet>
       ) : null}
 
-      <AlertDialog open={redoOpen} onOpenChange={(open) => !pending && setRedoOpen(open)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{id.pack.redo.title}</AlertDialogTitle>
-            <AlertDialogDescription>{id.pack.redo.body}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>{id.pack.redo.cancel}</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={pending}
-              onClick={(event) => {
-                event.preventDefault();
-                redo();
-              }}
-            >
-              {id.pack.redo.confirm}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {allowRedo ? (
+        <AlertDialog open={redoOpen} onOpenChange={(open) => !pending && setRedoOpen(open)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{id.pack.redo.title}</AlertDialogTitle>
+              <AlertDialogDescription>{id.pack.redo.body}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={pending}>{id.pack.redo.cancel}</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                disabled={pending}
+                onClick={(event) => {
+                  event.preventDefault();
+                  redo();
+                }}
+              >
+                {id.pack.redo.confirm}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : null}
     </>
   );
 }

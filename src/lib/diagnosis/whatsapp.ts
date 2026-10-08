@@ -5,9 +5,12 @@ import { formatDate } from "@/lib/format";
 
 import { getSop } from "./bank";
 
-const WHATSAPP_SHARE_URL = "https://wa.me/?text=";
+const WHATSAPP_BASE_URL = "https://wa.me/";
 
-/** Plain-text pack for WhatsApp, ported from prototype `teksWA`. */
+/**
+ * Plain-text pack for WhatsApp, ported from prototype `teksWA`. Owners forward it to their
+ * staff, so it never contains the private link (which also allows "Ulang cek usaha").
+ */
 export function buildWhatsAppText(businessName: string, pack: Pack): string {
   const copy = id.whatsapp;
   const lines: string[] = [copy.header(businessName), copy.created(formatDate(pack.createdOn)), ""];
@@ -30,6 +33,10 @@ export function buildWhatsAppText(businessName: string, pack: Pack): string {
   return lines.join("\n");
 }
 
-export function whatsAppShareUrl(text: string): string {
-  return WHATSAPP_SHARE_URL + encodeURIComponent(text);
+/**
+ * wa.me link. With a number it opens that chat; without one WhatsApp asks who to send to
+ * (used for the owner's own sharing, and in demo mode so test messages never reach a stranger).
+ */
+export function whatsAppUrl(text: string, number: string | null = null): string {
+  return `${WHATSAPP_BASE_URL}${number ?? ""}?text=${encodeURIComponent(text)}`;
 }

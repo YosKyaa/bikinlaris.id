@@ -1,22 +1,16 @@
-import "server-only";
-
 import { ROUTES } from "@/lib/auth/constants";
-import { firstIncompleteSection } from "@/lib/diagnosis/scoring";
+import { answeredCount, firstIncompleteSection } from "@/lib/diagnosis/scoring";
 
-import { getBusiness } from "./account";
-import { getDiagnosis } from "./diagnosis";
-import { getPack } from "./pack";
-import type { SessionUser } from "./types";
+import type { OwnerState } from "./types";
 
 /**
- * Where the owner should be right now. Replaces a "beranda" dashboard, which
- * docs/keputusan.md rejected: the app routes straight to the next step.
+ * Where the owner should be right now. There is no dashboard (docs/keputusan.md): the
+ * private link always resumes at the current step. Null = not started, show the welcome.
  */
-export async function resolveOwnerStep(user: SessionUser): Promise<string> {
-  if (!user.businessId || !(await getBusiness(user.businessId))) return ROUTES.profile;
-  const pack = await getPack(user.businessId);
+export function resolveOwnerStep({ diagnosis, pack }: OwnerState): string | null {
   if (pack) return pack.status === "menyusun" ? ROUTES.generating : ROUTES.pack;
-  const diagnosis = await getDiagnosis(user.businessId);
-  const next = firstIncompleteSection(diagnosis?.answers ?? {});
+  const answers = diagnosis?.answers ?? {};
+  if (answeredCount(answers) === 0) return null;
+  const next = firstIncompleteSection(answers);
   return next ? ROUTES.diagnosisArea(next) : ROUTES.summary;
 }

@@ -97,7 +97,7 @@ export function DesignFoundations() {
           <div className="grid gap-2">
             <Label htmlFor="design-invalid">{id.profile.fields.name.label}</Label>
             <Input id="design-invalid" aria-invalid defaultValue="" />
-            <p className="text-sm text-destructive">{id.profile.errors.required}</p>
+            <p className="text-sm text-destructive">{id.participant.errors.required}</p>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="design-textarea">{id.profile.fields.product.label}</Label>

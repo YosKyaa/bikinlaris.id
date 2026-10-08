@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import Link from "next/link";
 
 import {
   AlertDialog,
@@ -15,11 +15,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
-import { logoutAction } from "@/lib/actions/auth";
+import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 
-/** "Keluar, lanjut nanti": answers are already saved; confirms, then signs out. */
+/**
+ * "Keluar, lanjut nanti": answers are already saved. The private link stays on this phone,
+ * so opening the WhatsApp link (or the site) again resumes at this section.
+ */
 export function ExitLaterDialog() {
-  const [pending, startTransition] = useTransition();
   const copy = id.diagnosis.exit;
   return (
     <AlertDialog>
@@ -35,14 +37,8 @@ export function ExitLaterDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{copy.cancel}</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={pending}
-            onClick={(event) => {
-              event.preventDefault();
-              startTransition(() => logoutAction("saved"));
-            }}
-          >
-            {copy.confirm}
+          <AlertDialogAction asChild>
+            <Link href={`${ROUTES.join}?${NOTICE_PARAM}=tersimpan`}>{copy.confirm}</Link>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

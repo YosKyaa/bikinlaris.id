@@ -116,11 +116,7 @@ export function DesignComponents() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <StatCard label={id.design.statLabel} value={SAMPLE_STAT} />
-            <StatCard
-              label={id.researcher.funnel.steps.questionnaires}
-              value={null}
-              hint={id.researcher.funnel.questionnairesNote}
-            />
+            <StatCard label={id.researcher.funnel.steps.questionnaireDone} value={null} />
           </div>
           <div className="space-y-4">
             <EmptyState

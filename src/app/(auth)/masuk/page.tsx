@@ -5,21 +5,16 @@ import { LoginPanel } from "@/components/organisms/login-panel";
 import { FocusLayout } from "@/components/templates/focus-layout";
 import { id } from "@/content/id";
 import { NEXT_PARAM, NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
-import { MOCK_PASSWORD } from "@/lib/data/account";
-import { resolveOwnerStep } from "@/lib/data/flow";
-import { getSessionUser, isResearcher } from "@/lib/data/session";
+import { MOCK_PASSWORD } from "@/lib/data/mock/store";
+import { getStaffUser } from "@/lib/data/staff-session";
 import { isMockData } from "@/lib/env";
 
 export const metadata: Metadata = { title: id.auth.title };
 
-const NOTICES: Record<string, string> = {
-  saved: id.auth.notices.saved,
-  keluar: id.auth.notices.loggedOut,
-};
+const NOTICES: Record<string, string> = id.auth.notices;
 
 export default async function LoginPage({ searchParams }: PageProps<"/masuk">) {
-  const user = await getSessionUser();
-  if (user) redirect(isResearcher(user) ? ROUTES.researcher : await resolveOwnerStep(user));
+  if (await getStaffUser()) redirect(ROUTES.researcher);
 
   const params = await searchParams;
   const next = typeof params[NEXT_PARAM] === "string" ? params[NEXT_PARAM] : null;

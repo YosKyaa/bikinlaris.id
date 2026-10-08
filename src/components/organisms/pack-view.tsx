@@ -44,6 +44,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackVie
           day={dayNumber(pack.createdOn)}
           totalDays={rules.followUpDays}
           followUpDate={formatDate(pack.followUpOn)}
+          code={business.code}
         />
         {pack.sops.length > 0 ? (
           <>

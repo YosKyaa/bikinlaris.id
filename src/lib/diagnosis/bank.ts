@@ -38,6 +38,10 @@ export function isQuestionId(value: string): value is QuestionId {
   return questionById.has(value as QuestionId);
 }
 
+export function isProblemId(value: string): value is ProblemId {
+  return problemById.has(value as ProblemId);
+}
+
 export function questionsOf(sectionId: SectionId) {
   return diagnosisBank.questions.filter((q) => q.sectionId === sectionId);
 }

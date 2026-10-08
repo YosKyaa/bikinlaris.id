@@ -6,20 +6,18 @@ import { PackView } from "@/components/organisms/pack-view";
 import { AppShell } from "@/components/templates/app-shell";
 import { Toaster } from "@/components/ui/sonner";
 import { id } from "@/content/id";
+import { ownerLogoutAction } from "@/lib/actions/owner";
 import { ROUTES } from "@/lib/auth/constants";
-import { getBusiness } from "@/lib/data/account";
 import { resolveOwnerStep } from "@/lib/data/flow";
-import { getPack } from "@/lib/data/pack";
-import { requireOwnerPage } from "@/lib/data/session";
-import { buildWhatsAppText, whatsAppShareUrl } from "@/lib/diagnosis/whatsapp";
+import { requireOwnerState } from "@/lib/data/owner-session";
+import { buildWhatsAppText, whatsAppUrl } from "@/lib/diagnosis/whatsapp";
 
 export const metadata: Metadata = { title: id.pack.eyebrow };
 
 export default async function PackPage() {
-  const user = await requireOwnerPage();
-  const business = user.businessId ? await getBusiness(user.businessId) : null;
-  const pack = business ? await getPack(business.id) : null;
-  if (!business || !pack) redirect(await resolveOwnerStep(user));
+  const state = await requireOwnerState();
+  const { business, pack } = state;
+  if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
   if (pack.status !== "siap") redirect(ROUTES.generating);
 
   const options = id.profile.options;
@@ -32,18 +30,27 @@ export default async function PackPage() {
     { label: fields.yearsRunning.label, value: options.yearsRunning[business.yearsRunning] },
     { label: fields.employees.label, value: options.employees[business.employees] },
     { label: fields.ownerRole.label, value: options.ownerRole[business.ownerRole] },
+    { label: id.researcher.detail.code, value: business.code },
   ];
 
   return (
     <AppShell
       homeHref={ROUTES.pack}
-      headerAction={<AccountMenu label={business.name} profile={profile} allowRedo />}
+      headerAction={
+        <AccountMenu
+          label={business.name}
+          profile={profile}
+          allowRedo
+          logoutLabel={id.pack.menu.logout}
+          logout={ownerLogoutAction}
+        />
+      }
     >
       <PackView
         business={business}
         pack={pack}
         locationLabel={options.location[business.location]}
-        whatsAppUrl={whatsAppShareUrl(buildWhatsAppText(business.name, pack))}
+        whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack))}
       />
       <Toaster position="top-center" />
     </AppShell>

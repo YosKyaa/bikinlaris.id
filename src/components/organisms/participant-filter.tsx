@@ -2,13 +2,13 @@ import Link from "next/link";
 
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import type { FollowupFilter as Filter } from "@/lib/data/research";
+import type { ParticipantFilter as Filter } from "@/lib/data/research";
 import { cn } from "@/lib/utils";
 
-export const FILTER_PARAM = "status";
+export const FILTER_PARAM = "tahap";
 
-/** Status filter as links, so the filtered list is shareable and works without JavaScript. */
-export function FollowupFilter({
+/** Stage filter as links, so the filtered list is shareable and works without JavaScript. */
+export function ParticipantFilter({
   filters,
   active,
   counts,
@@ -18,12 +18,15 @@ export function FollowupFilter({
   counts: Record<Filter, number>;
 }) {
   return (
-    <nav aria-label={id.researcher.filters.label}>
-      <ul className="flex flex-wrap gap-2">
+    <nav
+      aria-label={id.researcher.filters.label}
+      className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+    >
+      <ul className="flex gap-2 sm:flex-wrap">
         {filters.map((filter) => {
           const current = filter === active;
           return (
-            <li key={filter}>
+            <li key={filter} className="shrink-0">
               <Link
                 href={
                   filter === "semua"
@@ -32,7 +35,7 @@ export function FollowupFilter({
                 }
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "inline-flex h-11 items-center gap-2 rounded-lg border px-4 font-medium transition-colors duration-150",
+                  "inline-flex h-11 items-center gap-2 rounded-lg border px-4 font-medium whitespace-nowrap transition-colors duration-150",
                   current
                     ? "border-foreground bg-foreground text-background"
                     : "bg-background hover:bg-muted",

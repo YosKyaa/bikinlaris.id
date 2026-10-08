@@ -6,9 +6,7 @@ import { ExitLaterDialog } from "@/components/organisms/exit-later-dialog";
 import { FocusLayout } from "@/components/templates/focus-layout";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import { getDiagnosis } from "@/lib/data/diagnosis";
-import { getPack } from "@/lib/data/pack";
-import { requireOwnerPage } from "@/lib/data/session";
+import { requireOwnerState } from "@/lib/data/owner-session";
 import {
   getSection,
   isSectionId,
@@ -28,11 +26,10 @@ export default async function DiagnosisAreaPage({ params }: PageProps<"/diagnosi
   const { area } = await params;
   if (!isSectionId(area)) notFound();
 
-  const user = await requireOwnerPage();
-  if (!user.businessId) redirect(ROUTES.profile);
-  if (await getPack(user.businessId)) redirect(ROUTES.pack);
+  const { diagnosis, pack } = await requireOwnerState();
+  if (pack) redirect(ROUTES.pack);
 
-  const answers = (await getDiagnosis(user.businessId))?.answers ?? {};
+  const answers = diagnosis?.answers ?? {};
   const index = sections.findIndex((s) => s.id === area);
   const section = getSection(area);
   const questions = questionsOf(area);

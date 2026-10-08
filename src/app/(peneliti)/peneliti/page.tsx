@@ -1,45 +1,45 @@
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { CreateAccountDialog } from "@/components/organisms/create-account-dialog";
-import { FILTER_PARAM, FollowupFilter } from "@/components/organisms/followup-filter";
-import { FollowupTable } from "@/components/organisms/followup-table";
 import { DueThisWeek } from "@/components/organisms/due-this-week";
+import { FILTER_PARAM, ParticipantFilter } from "@/components/organisms/participant-filter";
+import { ParticipantTable } from "@/components/organisms/participant-table";
 import { ResearchFunnel } from "@/components/organisms/research-funnel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
+import { data } from "@/lib/data";
 import {
+  buildDueList,
+  buildFunnel,
+  buildRows,
+  countByFilter,
   DUE_WINDOW_DAYS,
-  FOLLOWUP_FILTERS,
-  getFunnel,
-  listDueSoon,
-  listFollowups,
-  type FollowupFilter as Filter,
+  PARTICIPANT_FILTERS,
+  type ParticipantFilter as Filter,
 } from "@/lib/data/research";
 import { isMockData } from "@/lib/env";
+import { todayIso } from "@/lib/format";
+import { questionnaireHref } from "@/lib/research-links";
 
 export const metadata: Metadata = { title: id.researcher.title };
 
 function parseFilter(value: string | string[] | undefined): Filter {
-  return FOLLOWUP_FILTERS.find((f) => f === value) ?? "semua";
+  return PARTICIPANT_FILTERS.find((f) => f === value) ?? "semua";
 }
 
+/** Three jobs: add a participant, send this week's questionnaires, download the data. */
 export default async function ResearcherPage({ searchParams }: PageProps<"/peneliti">) {
   const filter = parseFilter((await searchParams)[FILTER_PARAM]);
-  const [funnel, due, all] = await Promise.all([
-    getFunnel(),
-    listDueSoon(),
-    listFollowups("semua"),
-  ]);
-  const rows = filter === "semua" ? all : all.filter((row) => row.status === filter);
-  const counts = Object.fromEntries(
-    FOLLOWUP_FILTERS.map((f) => [
-      f,
-      f === "semua" ? all.length : all.filter((r) => r.status === f).length,
-    ]),
-  ) as Record<Filter, number>;
+  const today = todayIso();
+  const participants = await data().staff.listParticipants();
+  const rows = buildRows(participants, today);
+  const due = buildDueList(participants, today).map((item) => ({
+    ...item,
+    sendHref: questionnaireHref(item),
+  }));
 
   return (
     <div className="space-y-8">
@@ -48,7 +48,12 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
           <h1 className="text-3xl font-bold tracking-tight">{id.researcher.title}</h1>
           <p className="text-muted-foreground">{id.researcher.subtitle}</p>
         </div>
-        <CreateAccountDialog />
+        <Button asChild size="lg">
+          <Link href={ROUTES.newParticipant}>
+            <PlusIcon aria-hidden />
+            {id.researcher.menu.newParticipant}
+          </Link>
+        </Button>
       </header>
 
       {isMockData ? (
@@ -61,34 +66,51 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
 
       <div className="grid gap-6 *:min-w-0 lg:grid-cols-[1.4fr_1fr]">
         <DueThisWeek items={due} windowDays={DUE_WINDOW_DAYS} />
-        <ResearchFunnel steps={funnel} />
+        <ResearchFunnel steps={buildFunnel(participants, today)} />
       </div>
 
-      <section aria-labelledby="tindak-lanjut" className="space-y-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h2 id="tindak-lanjut" className="text-2xl font-semibold">
-              {id.researcher.table.title}
-            </h2>
-            <p className="text-muted-foreground">{id.researcher.table.body}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <a href={ROUTES.researcherExport("ringkasan")} download>
-                <DownloadIcon aria-hidden />
-                {id.researcher.export.summary}
-              </a>
-            </Button>
-            <Button asChild variant="outline">
-              <a href={ROUTES.researcherExport("events")} download>
-                <DownloadIcon aria-hidden />
-                {id.researcher.export.events}
-              </a>
-            </Button>
-          </div>
+      <section aria-labelledby="daftar-umkm" className="space-y-4">
+        <div>
+          <h2 id="daftar-umkm" className="text-2xl font-semibold">
+            {id.researcher.table.title}
+          </h2>
+          <p className="text-muted-foreground">{id.researcher.table.body}</p>
         </div>
-        <FollowupFilter filters={FOLLOWUP_FILTERS} active={filter} counts={counts} />
-        <FollowupTable rows={rows} filter={filter} />
+        <ParticipantFilter
+          filters={PARTICIPANT_FILTERS}
+          active={filter}
+          counts={countByFilter(rows)}
+        />
+        <ParticipantTable
+          rows={filter === "semua" ? rows : rows.filter((row) => row.stage === filter)}
+          filter={filter}
+        />
+      </section>
+
+      <section
+        aria-labelledby="unduh-data"
+        className="flex flex-col gap-4 rounded-xl bg-muted p-5 lg:flex-row lg:items-center lg:justify-between"
+      >
+        <div>
+          <h2 id="unduh-data" className="text-lg font-semibold">
+            {id.researcher.export.title}
+          </h2>
+          <p className="text-muted-foreground">{id.researcher.export.body}</p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button asChild variant="outline" className="bg-background">
+            <a href={ROUTES.researcherExport("ringkasan")} download>
+              <DownloadIcon aria-hidden />
+              {id.researcher.export.summary}
+            </a>
+          </Button>
+          <Button asChild variant="outline" className="bg-background">
+            <a href={ROUTES.researcherExport("events")} download>
+              <DownloadIcon aria-hidden />
+              {id.researcher.export.events}
+            </a>
+          </Button>
+        </div>
       </section>
     </div>
   );
