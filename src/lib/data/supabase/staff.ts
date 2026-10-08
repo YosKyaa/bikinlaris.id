@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getAppUrl } from "@/lib/app-url";
+import { ROUTES } from "@/lib/auth/constants";
 import { createClient } from "@/lib/supabase/server";
 
 import type { SignUpResult, StaffStore } from "../source";
@@ -14,6 +16,12 @@ import {
   toPack,
   toStaff,
 } from "./mappers";
+
+/**
+ * How a rejected invite surfaces: the handle_new_staff trigger raises `undangan_tidak_cocok`,
+ * which Supabase Auth reports to supabase-js as a generic database error on sign-up.
+ */
+const INVITE_REJECTIONS = ["undangan_tidak_cocok", "Database error saving new user"];
 
 /** PostgREST returns at most this many rows per request (Supabase default max_rows). */
 const PAGE_SIZE = 1000;
@@ -83,15 +91,21 @@ export const supabaseStaffStore: StaffStore = {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nama: name, kode_undangan: inviteCode } },
+      options: {
+        data: { nama: name, kode_undangan: inviteCode },
+        // Only used when "Confirm email" is on for the project.
+        emailRedirectTo: `${await getAppUrl()}${ROUTES.authConfirm}`,
+      },
     });
     if (error) {
       if (error.code === "user_already_exists" || error.code === "email_exists") {
         return { ok: false, reason: "exists" };
       }
       if (error.code === "weak_password") return { ok: false, reason: "weakPassword" };
-      // The invite trigger aborts the insert: Supabase reports it as an unexpected database error.
-      if (error.code === "unexpected_failure") return { ok: false, reason: "inviteMismatch" };
+      // The invite trigger (handle_new_staff) aborts the insert with this exception.
+      if (INVITE_REJECTIONS.some((text) => error.message.includes(text))) {
+        return { ok: false, reason: "inviteMismatch" };
+      }
       return { ok: false, reason: "failed" };
     }
     if (!data.user || !data.session) return { ok: false, reason: "confirmEmail" };
