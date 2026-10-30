@@ -6,9 +6,10 @@ import { id } from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSop, rules } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 import { BusinessMap } from "./business-map";
-import { CoachPanel } from "./coach-panel";
+import { CoachWidget } from "./coach-widget";
 import { PackActions, PackStickyActions, PackViewTracker } from "./pack-actions";
 import { FirstStepCard, LaterSops, PackStatusCard, PackTips, ProblemList } from "./pack-details";
 import { SopDocument } from "./sop-document";
@@ -20,7 +21,7 @@ interface PackViewProps {
   locationLabel: string;
   whatsAppUrl: string;
   /** "Tanya coach", or null when the coach is off. */
-  coach: ComponentProps<typeof CoachPanel> | null;
+  coach: ComponentProps<typeof CoachWidget> | null;
 }
 
 /** The peak of the journey: calm completion, one clear first step, then the documents. */
@@ -38,7 +39,8 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
   });
 
   return (
-    <div className="space-y-8 pb-20 lg:pb-0">
+    // Room at the bottom for the phone action bar, and for the floating coach button when on.
+    <div className={cn("space-y-8", coach ? "pb-40 lg:pb-24" : "pb-20 lg:pb-0")}>
       <PackViewTracker />
       <header className="space-y-4 print:hidden">
         <div className="space-y-1">
@@ -97,7 +99,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
         </>
       )}
 
-      {coach && pack.sops.length > 0 ? <CoachPanel {...coach} /> : null}
+      {coach && pack.sops.length > 0 ? <CoachWidget {...coach} /> : null}
 
       <div className="print:hidden">
         <BusinessMap map={pack.map} hardest={pack.hardestSection} compact>

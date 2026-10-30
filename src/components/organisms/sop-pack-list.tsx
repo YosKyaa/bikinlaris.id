@@ -68,7 +68,9 @@ export function SopPackList({ items }: { items: SopPackItem[] }) {
               </span>
             </span>
           </AccordionTrigger>
-          <AccordionContent className="pb-5">{item.content}</AccordionContent>
+          {/* h-auto: the SOP holds a fold of its own ("Kenapa SOP ini?"), so its height must
+              follow the content instead of the height measured when the SOP was opened. */}
+          <AccordionContent className="h-auto pb-5">{item.content}</AccordionContent>
         </AccordionItem>
       ))}
     </Accordion>

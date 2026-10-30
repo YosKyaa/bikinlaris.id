@@ -828,6 +828,8 @@ export const id = {
   coach: {
     title: "Tanya coach soal SOP Anda",
     body: "Jawaban dari AI, bisa keliru. Keputusan tetap di tangan Anda.",
+    open: "Tanya coach",
+    conversation: "Percakapan dengan coach",
     you: "Anda",
     coach: "Coach",
     suggestionsLabel: "Contoh pertanyaan",
