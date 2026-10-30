@@ -520,15 +520,16 @@ export const id = {
 
   summary: {
     eyebrow: "Langkah 2 dari 2",
-    title: "Cek lagi jawaban Anda",
-    subtitle:
-      "Ubah jawaban kalau ada yang kurang pas. Setelah itu pilih bagian yang paling bikin repot.",
+    title: "Satu langkah lagi",
+    subtitle: "Pilih satu bagian, lalu paket SOP Anda dibuat.",
     edit: (section: string) => `Ubah jawaban bagian ${section}`,
-    editShort: "Ubah",
+    editShort: "Ubah jawaban",
     incomplete: "Ada bagian yang belum selesai. Lengkapi dulu, lalu kembali ke sini.",
     completeSection: "Lengkapi bagian ini",
     hardestTitle: "Yang paling bikin repot sehari-hari?",
-    hardestBody: "Pilih satu. Bagian ini dirapikan paling dulu di paket SOP.",
+    hardestBody: "Bagian ini dirapikan paling dulu.",
+    reviewTitle: "Cek jawaban Anda",
+    reviewBody: "Ketuk bagian untuk melihat atau mengubah jawaban.",
     hardestRequired: "Pilih satu bagian dulu.",
     cta: "Buat paket SOP",
     confirm: {
@@ -562,39 +563,35 @@ export const id = {
   pack: {
     eyebrow: "Paket SOP siap",
     title: (business: string) => `Paket SOP untuk ${business}`,
-    intro: (count: number, hardest: string) =>
-      `${count} SOP (panduan kerja langkah demi langkah) disusun dari jawaban Anda. Dimulai dari bagian yang paling bikin repot: ${hardest}.`,
     actions: {
       whatsapp: "Kirim ke WhatsApp",
       print: "Cetak atau simpan PDF",
     },
     firstStep: {
-      eyebrow: "Langkah pertama minggu ini",
-      withSetup: (title: string, minutes: number) =>
-        `Buka SOP 1, “${title}”. Kerjakan bagian “Siapkan dulu”, totalnya sekitar ${minutes} menit.`,
-      withoutSetup: (title: string) => `Buka SOP 1, “${title}”. Mulai tugas hariannya besok pagi.`,
+      eyebrow: "Mulai dari sini",
+      title: (title: string) => `SOP 1: ${title}`,
+      setup: (minutes: number) => `Siapkan dulu, sekitar ${minutes} menit`,
+      noSetup: "Mulai tugas hariannya besok pagi",
       open: "Buka SOP 1",
     },
-    guide: {
-      title: "Cara pakai paket ini",
-      items: [
-        "Kerjakan satu SOP dulu sampai jadi kebiasaan, baru yang berikutnya.",
-        "Cetak tabel coret dan tempel di tempat kerja. Coret tiap tugas yang selesai hari itu.",
-        "Kirim ke karyawan lewat WhatsApp supaya semua memakai cara yang sama.",
-      ],
+    tips: {
+      label: "Cara pakai paket",
+      oneAtATime: "Satu SOP dulu",
+      tickDaily: "Coret tiap hari",
+      share: "Bagikan ke karyawan",
     },
     map: {
       title: "Peta usaha Anda",
-      body: (questions: number) =>
-        `Dari ${questions} pertanyaan tadi, diurutkan dari yang paling perlu dirapikan.`,
+      body: "Yang merah dirapikan lebih dulu.",
     },
     sops: {
-      title: (business: string) => `SOP untuk ${business}`,
-      body: "Kerjakan satu dulu sampai jadi kebiasaan. Tidak perlu semua sekaligus.",
+      title: (count: number) => `${count} SOP untuk usaha Anda`,
       number: (n: number) => `SOP ${n}`,
     },
     sop: {
       why: (business: string) => `Kenapa ini untuk ${business}`,
+      whyToggle: "Kenapa SOP ini?",
+      printOnlyGrid: "Tabel coret 2 minggu ada di versi cetak.",
       fromAnswers: "Dari jawaban Anda:",
       setup: "Siapkan dulu, sekali saja",
       daily: "Tiap hari",
@@ -611,24 +608,19 @@ export const id = {
       body: "Dari jawaban Anda, semua bagian sudah berjalan rapi. Tidak ada SOP yang perlu dijalankan sekarang. Pertahankan cara kerja yang sudah ada.",
     },
     later: {
-      title: "Nanti, kalau yang di atas sudah jalan",
-      body: (n: number) => `Ada ${n} SOP lain yang cocok untuk usaha Anda.`,
+      title: "Untuk nanti",
+      body: "Setelah SOP di atas jadi kebiasaan.",
     },
     problems: {
-      title: "Yang ketemu dari cek usaha",
-      body: "Hal-hal ini muncul dari jawaban Anda. SOP di atas disusun untuk mengatasinya.",
+      toggle: (n: number) => `Lihat ${n} hal yang ketemu dari jawaban Anda`,
     },
     status: {
       day: (day: number, total: number) => `Hari ke-${day} dari ${total}`,
       progressLabel: (day: number, total: number) =>
         `Hari ke-${day} dari ${total} hari menjalankan SOP`,
-      before: (date: string) =>
-        `Sekitar ${date}, peneliti mengirim kuesioner singkat lewat WhatsApp, kira-kira 15 menit.`,
-      after:
-        "Hari ke-30 sudah lewat. Kuesioner singkat dikirim lewat WhatsApp dalam beberapa hari.",
-      nothingToFill: "Tidak ada yang perlu diisi di sini. Cukup jalankan SOP-nya.",
-      code: (code: string) => `Kode peserta Anda: ${code}`,
-      codeHint: "Tulis kode ini saat mengisi kuesioner nanti.",
+      before: (date: string) => `Kuesioner singkat lewat WhatsApp sekitar ${date}`,
+      after: "Kuesioner singkat segera dikirim lewat WhatsApp",
+      code: (code: string) => `Kode peserta: ${code}`,
     },
     printHeader: (business: string) => `bikinlaris.id · Paket SOP ${business}`,
     printMeta: (product: string, location: string, date: string) =>
@@ -835,7 +827,7 @@ export const id = {
 
   coach: {
     title: "Tanya coach soal SOP Anda",
-    body: "Coach AI menjawab berdasarkan paket SOP usaha Anda. Jawabannya bisa keliru. Keputusan tetap di tangan Anda.",
+    body: "Jawaban dari AI, bisa keliru. Keputusan tetap di tangan Anda.",
     you: "Anda",
     coach: "Coach",
     suggestionsLabel: "Contoh pertanyaan",
@@ -846,7 +838,7 @@ export const id = {
       ramai: "Kalau sedang ramai, apa yang tetap harus dijalankan?",
     } satisfies Record<CoachTopic, string>,
     inputLabel: "Pertanyaan Anda",
-    placeholder: "Tulis pertanyaan tentang usaha atau SOP Anda",
+    placeholder: "Tulis pertanyaan Anda",
     counter: (length: number, max: number) => `${length}/${max} huruf`,
     send: "Kirim pertanyaan",
     pending: "Coach sedang menulis jawaban…",
@@ -854,7 +846,7 @@ export const id = {
       n > 0
         ? `Sisa ${n} pertanyaan hari ini.`
         : "Pertanyaan hari ini sudah habis. Coba lagi besok.",
-    consent: "Pertanyaan dan jawaban disimpan untuk penelitian Jakarta Global University.",
+    consent: "Pertanyaan dan jawaban disimpan untuk penelitian.",
     demoAnswer:
       "Ini contoh jawaban di mode contoh. Mulai dari SOP 1 di paket Anda. Kerjakan bagian Siapkan dulu hari ini. Setelah itu, coret tabel 14 hari setiap tugas selesai.",
     errors: {

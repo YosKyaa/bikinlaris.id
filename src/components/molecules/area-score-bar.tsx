@@ -15,6 +15,8 @@ interface AreaScoreBarProps {
   hardest?: boolean;
   /** Grow the bar from zero when mounted (landing demo). Off under reduced motion. */
   animate?: boolean;
+  /** Owner's pack page: words and bar only; the score stays in the accessible value. */
+  compact?: boolean;
 }
 
 /** Section name, word status, bar and one-sentence detail. Score is secondary to the words. */
@@ -26,6 +28,7 @@ export function AreaScoreBar({
   redCount,
   hardest,
   animate = false,
+  compact = false,
 }: AreaScoreBarProps) {
   const percent = max > 0 ? Math.round((score / max) * 100) : 0;
   return (
@@ -53,10 +56,12 @@ export function AreaScoreBar({
           style={{ width: `${Math.max(percent, 2)}%` }}
         />
       </div>
-      <p className="flex flex-wrap justify-between gap-x-4 text-sm text-muted-foreground">
-        <span>{id.areaScore.detail(color, redCount)}</span>
-        <span className="tabular-nums">{id.areaScore.score(score, max)}</span>
-      </p>
+      {compact ? null : (
+        <p className="flex flex-wrap justify-between gap-x-4 text-sm text-muted-foreground">
+          <span>{id.areaScore.detail(color, redCount)}</span>
+          <span className="tabular-nums">{id.areaScore.score(score, max)}</span>
+        </p>
+      )}
     </div>
   );
 }

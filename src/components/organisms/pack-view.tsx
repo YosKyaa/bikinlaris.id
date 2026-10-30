@@ -1,16 +1,16 @@
+import type { ComponentProps } from "react";
+
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { id } from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
-import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
+import { getProblem, getSop, rules } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";
-
-import type { ComponentProps } from "react";
 
 import { BusinessMap } from "./business-map";
 import { CoachPanel } from "./coach-panel";
 import { PackActions, PackStickyActions, PackViewTracker } from "./pack-actions";
-import { FirstStepCard, LaterSops, PackGuide, PackStatusCard, ProblemList } from "./pack-details";
+import { FirstStepCard, LaterSops, PackStatusCard, PackTips, ProblemList } from "./pack-details";
 import { SopDocument } from "./sop-document";
 import { SopPackList } from "./sop-pack-list";
 
@@ -38,27 +38,21 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
   });
 
   return (
-    <div className="space-y-10 pb-20 lg:pb-0">
+    <div className="space-y-8 pb-20 lg:pb-0">
       <PackViewTracker />
       <header className="space-y-4 print:hidden">
-        <Eyebrow>{id.pack.eyebrow}</Eyebrow>
-        <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-          {id.pack.title(business.name)}
-        </h1>
+        <div className="space-y-1">
+          <Eyebrow>{id.pack.eyebrow}</Eyebrow>
+          <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+            {id.pack.title(business.name)}
+          </h1>
+        </div>
         <PackStatusCard
           day={dayNumber(pack.createdOn)}
           totalDays={rules.followUpDays}
           followUpDate={formatDate(pack.followUpOn)}
           code={business.code}
         />
-        {pack.sops.length > 0 ? (
-          <>
-            <p className="text-lg text-muted-foreground">
-              {id.pack.intro(pack.sops.length, getSection(pack.hardestSection).label.toLowerCase())}
-            </p>
-            <PackActions whatsAppUrl={whatsAppUrl} />
-          </>
-        ) : null}
       </header>
 
       <div className="hidden print:block">
@@ -72,21 +66,21 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
         <EmptyState title={id.pack.empty.title} body={id.pack.empty.body} />
       ) : (
         <>
-          <FirstStepCard sopId={pack.sops[0].sopId} />
-          <PackGuide />
+          <div className="space-y-4">
+            <FirstStepCard sopId={pack.sops[0].sopId} />
+            <PackActions whatsAppUrl={whatsAppUrl} />
+            <PackTips />
+          </div>
           <section aria-labelledby="daftar-sop" className="space-y-4 print:hidden">
-            <div>
-              <h2 id="daftar-sop" className="text-2xl font-semibold">
-                {id.pack.sops.title(business.name)}
-              </h2>
-              <p className="text-muted-foreground">{id.pack.sops.body}</p>
-            </div>
+            <h2 id="daftar-sop" className="text-2xl font-semibold">
+              {id.pack.sops.title(pack.sops.length)}
+            </h2>
             <SopPackList
               items={documents.map(({ sop, props }) => ({
                 sopId: sop.id,
                 title: sop.title,
                 goal: sop.goal,
-                content: <SopDocument {...props} showHeading={false} />,
+                content: <SopDocument {...props} showHeading={false} variant="screen" />,
               }))}
             />
           </section>
@@ -106,12 +100,11 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
       {coach && pack.sops.length > 0 ? <CoachPanel {...coach} /> : null}
 
       <div className="print:hidden">
-        <BusinessMap map={pack.map} hardest={pack.hardestSection} />
+        <BusinessMap map={pack.map} hardest={pack.hardestSection} compact>
+          <ProblemList problems={pack.problems} />
+        </BusinessMap>
       </div>
       <LaterSops sopIds={pack.laterSopIds} />
-      <div className="print:hidden">
-        <ProblemList problems={pack.problems} />
-      </div>
       {pack.sops.length > 0 ? <PackStickyActions whatsAppUrl={whatsAppUrl} /> : null}
     </div>
   );

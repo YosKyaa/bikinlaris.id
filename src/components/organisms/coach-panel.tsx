@@ -1,16 +1,19 @@
 "use client";
 
-import { MessageCircleQuestionMarkIcon } from "lucide-react";
+import { MessageCircleQuestionMarkIcon, SendHorizontalIcon } from "lucide-react";
 import { useId, useState, useTransition, type FormEvent } from "react";
 
 import { CoachBubble } from "@/components/molecules/coach-bubble";
 import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { id } from "@/content/id";
 import { askCoachAction } from "@/lib/actions/coach";
 import { COACH_TOPICS, type CoachTopic } from "@/lib/coach/rules";
 import type { CoachRole } from "@/lib/data/types";
+
+/** The length counter appears only once the question gets close to the limit. */
+const COUNTER_FROM = 0.8;
 
 interface CoachPanelProps {
   turns: { id: number; role: CoachRole; text: string }[];
@@ -84,43 +87,54 @@ export function CoachPanel({ turns: initial, askedToday, dailyLimit, maxLength }
 
       {remaining > 0 ? (
         <>
-          <div>
-            <p className="mb-2 text-sm font-medium">{copy.suggestionsLabel}</p>
-            <div className="flex flex-wrap gap-2">
-              {COACH_TOPICS.map((topic) => (
-                <Button
-                  key={topic}
-                  type="button"
-                  variant="outline"
-                  disabled={pending}
-                  className="h-auto min-h-11 w-full justify-start py-2 text-left whitespace-normal sm:w-auto"
-                  onClick={() => ask(copy.suggestions[topic], topic)}
-                >
-                  {copy.suggestions[topic]}
-                </Button>
-              ))}
+          {turns.length === 0 ? (
+            <div>
+              <p className="mb-2 text-sm font-medium">{copy.suggestionsLabel}</p>
+              <div className="flex flex-wrap gap-2">
+                {COACH_TOPICS.map((topic) => (
+                  <Button
+                    key={topic}
+                    type="button"
+                    variant="outline"
+                    disabled={pending}
+                    className="h-auto min-h-11 w-full justify-start py-2 text-left whitespace-normal sm:w-auto"
+                    onClick={() => ask(copy.suggestions[topic], topic)}
+                  >
+                    {copy.suggestions[topic]}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
-          <form onSubmit={onSubmit} className="space-y-2">
-            <label htmlFor={inputId} className="font-medium">
+          ) : null}
+          <form onSubmit={onSubmit} className="space-y-1">
+            <label htmlFor={inputId} className="sr-only">
               {copy.inputLabel}
             </label>
-            <Textarea
-              id={inputId}
-              value={draft}
-              maxLength={maxLength}
-              rows={3}
-              placeholder={copy.placeholder}
-              onChange={(event) => setDraft(event.target.value)}
-            />
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {copy.counter(draft.length, maxLength)}
-              </span>
-              <Button type="submit" variant="outline" className="h-11" disabled={pending}>
-                {copy.send}
+            <div className="flex gap-2">
+              <Input
+                id={inputId}
+                value={draft}
+                maxLength={maxLength}
+                placeholder={copy.placeholder}
+                onChange={(event) => setDraft(event.target.value)}
+                className="h-12 flex-1"
+              />
+              <Button
+                type="submit"
+                variant="outline"
+                size="icon-lg"
+                className="size-12"
+                aria-label={copy.send}
+                disabled={pending}
+              >
+                <SendHorizontalIcon aria-hidden />
               </Button>
             </div>
+            {draft.length > maxLength * COUNTER_FROM ? (
+              <p className="text-sm text-muted-foreground tabular-nums">
+                {copy.counter(draft.length, maxLength)}
+              </p>
+            ) : null}
           </form>
         </>
       ) : null}

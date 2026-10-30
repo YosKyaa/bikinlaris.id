@@ -72,8 +72,6 @@ export function DiagnosisSummary({
 
   return (
     <div className="space-y-10 pb-28 lg:pb-0">
-      <AnswerReview sections={sections} />
-
       <section aria-labelledby="hardest-title" className="space-y-4">
         <div>
           <h2 id="hardest-title" className="text-2xl font-semibold">
@@ -111,6 +109,16 @@ export function DiagnosisSummary({
       </section>
 
       <InlineError message={error} />
+
+      <section aria-labelledby="review-title" className="space-y-3">
+        <div>
+          <h2 id="review-title" className="text-xl font-semibold">
+            {id.summary.reviewTitle}
+          </h2>
+          <p className="text-muted-foreground">{id.summary.reviewBody}</p>
+        </div>
+        <AnswerReview sections={sections} />
+      </section>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:p-0">
         <div className="mx-auto max-w-2xl">
