@@ -22,8 +22,11 @@ import { toJson } from "@/lib/json";
 import type { Json, TableRow } from "@/types/database";
 
 import {
+  COACH_ROLES,
   EVENT_ACTIONS,
   type Business,
+  type CoachMessage,
+  type CoachTurn,
   type Diagnosis,
   type EventMeta,
   type NewParticipant,
@@ -171,6 +174,38 @@ const staffRowSchema = z.object({
   nama: z.string().nullable(),
   role: z.enum(STAFF_ROLES),
 });
+
+const coachTurnSchema = z.object({
+  id: z.number(),
+  peran: z.enum(COACH_ROLES),
+  isi: z.string(),
+  created_at: z.string(),
+});
+
+/** One message from umkm_coach_riwayat (owner view: no source or topic). */
+export function toCoachTurn(row: unknown): CoachTurn {
+  const r = coachTurnSchema.parse(row);
+  return { id: r.id, role: r.peran, text: r.isi, createdAt: r.created_at };
+}
+
+const coachMessageSchema = coachTurnSchema.extend({
+  business_id: z.string(),
+  topik: z.string().nullable(),
+  sumber: z.string().nullable(),
+});
+
+export function toCoachMessage(row: TableRow<"coach_pesan">): CoachMessage {
+  const r = coachMessageSchema.parse(row);
+  return {
+    id: r.id,
+    role: r.peran,
+    text: r.isi,
+    createdAt: r.created_at,
+    businessId: r.business_id,
+    topic: r.topik,
+    source: r.sumber,
+  };
+}
 
 export function toStaff(row: TableRow<"staff">): StaffUser {
   const r = staffRowSchema.parse(row);

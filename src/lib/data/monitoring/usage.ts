@@ -22,6 +22,7 @@ export function buildEngagement(packs: Pack[], events: ResearchEvent[]): Engagem
     new Set(events.filter((e) => e.action === action).map((e) => e.businessId));
   const sharedWa = did("kirim_wa");
   const printed = did("cetak");
+  const askedCoach = did("coach_tanya");
   const sopsOpened = new Map<string, Set<string>>();
   for (const event of events) {
     if (event.action !== "sop_buka" || typeof event.meta?.sop !== "string") continue;
@@ -46,6 +47,8 @@ export function buildEngagement(packs: Pack[], events: ResearchEvent[]): Engagem
     printed: packs.filter((p) => printed.has(p.businessId)).length,
     medianSopsOpened: median(packs.map((p) => sopsOpened.get(p.businessId)?.size ?? 0)),
     activeDays: ACTIVE_DAY_BUCKETS.map((key) => ({ key, value: buckets.get(key) ?? 0 })),
+    askedCoach: packs.filter((p) => askedCoach.has(p.businessId)).length,
+    coachQuestions: events.filter((e) => e.action === "coach_tanya").length,
   };
 }
 

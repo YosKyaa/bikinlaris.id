@@ -96,6 +96,9 @@ export interface Engagement {
   printed: number;
   medianSopsOpened: number | null;
   activeDays: CountRow<ActiveDayBucket>[];
+  /** Owners with a pack who asked the AI coach at least once, and all questions asked. */
+  askedCoach: number;
+  coachQuestions: number;
 }
 
 export const DURATION_BUCKETS = ["under5", "5to10", "10to15", "15to30", "over30"] as const;

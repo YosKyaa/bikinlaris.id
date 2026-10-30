@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { CopyField } from "@/components/molecules/copy-field";
 import { BusinessDetail } from "@/components/organisms/business-detail";
+import { CoachTranscript } from "@/components/organisms/coach-transcript";
 import { ParticipantNextStep } from "@/components/organisms/participant-next-step";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -25,9 +26,11 @@ export default async function ParticipantPage({
   const businessId = z.uuid().safeParse((await params).id);
   if (!businessId.success) notFound();
   const staff = data().staff;
-  const [participant, events] = await Promise.all([
+  const [participant, events, coachMessages] = await Promise.all([
     staff.getParticipant(businessId.data),
     staff.listEvents(businessId.data),
+    // The coach table may not exist yet on an older database: show no conversation then.
+    staff.listCoachMessages(businessId.data).catch(() => []),
   ]);
   if (!participant) notFound();
 
@@ -84,6 +87,7 @@ export default async function ParticipantPage({
       </div>
 
       <BusinessDetail participant={participant} events={[...events].reverse()} />
+      <CoachTranscript messages={coachMessages} />
     </div>
   );
 }

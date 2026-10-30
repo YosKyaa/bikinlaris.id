@@ -6,12 +6,17 @@ import { toJson } from "@/lib/json";
 import { createAnonClient } from "@/lib/supabase/server";
 
 import type { OwnerStore } from "../source";
-import { metaToJson, toBusiness, toDiagnosis, toPack } from "./mappers";
+import { metaToJson, toBusiness, toCoachTurn, toDiagnosis, toPack } from "./mappers";
 
 const stateSchema = z.object({
   business: z.unknown(),
   diagnosa: z.unknown().nullable(),
   paket: z.unknown().nullable(),
+});
+
+const coachHistorySchema = z.object({
+  pesan: z.array(z.unknown()),
+  hari_ini: z.number(),
 });
 
 /** Owner side over Supabase: anonymous calls to the token-checked SECURITY DEFINER functions. */
@@ -74,6 +79,25 @@ export const supabaseOwnerStore: OwnerStore = {
       p_token: token,
       p_action: action,
       p_meta: metaToJson(meta),
+    });
+    if (error) throw error;
+  },
+
+  async coachHistory(token) {
+    const { data, error } = await createAnonClient().rpc("umkm_coach_riwayat", { p_token: token });
+    if (error) throw error;
+    if (data === null) throw new Error("tautan_tidak_valid");
+    const history = coachHistorySchema.parse(data);
+    return { turns: history.pesan.map(toCoachTurn), askedToday: history.hari_ini };
+  },
+
+  async saveCoachExchange(token, exchange) {
+    const { error } = await createAnonClient().rpc("umkm_coach_simpan", {
+      p_token: token,
+      p_tanya: exchange.question,
+      p_topik: exchange.topic,
+      p_jawab: exchange.answer,
+      p_sumber: exchange.source,
     });
     if (error) throw error;
   },

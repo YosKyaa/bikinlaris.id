@@ -4,6 +4,8 @@ import { randomUUID } from "node:crypto";
 
 import type { QuestionId, SectionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
+import { id } from "@/content/id";
+import { demoProvider } from "@/lib/ai/demo";
 import { rules } from "@/lib/diagnosis/bank";
 import { buildPack } from "@/lib/diagnosis/scoring";
 import { addDays, todayIso } from "@/lib/format";
@@ -12,6 +14,8 @@ import type { BusinessProfile } from "@/lib/validations/business";
 import type {
   Answers,
   Business,
+  CoachMessage,
+  CoachRole,
   Diagnosis,
   EventAction,
   Pack,
@@ -54,6 +58,23 @@ interface MockStore {
   events: ResearchEvent[];
   nextEventId: number;
   nextCode: number;
+  coach: CoachMessage[];
+  nextCoachId: number;
+}
+
+/** Coach messages returned to the owner (same as umkm_coach_riwayat in Supabase). */
+export const COACH_HISTORY_SHOWN = 40;
+
+export function pushCoach(
+  s: MockStore,
+  businessId: string,
+  role: CoachRole,
+  text: string,
+  topic: string | null,
+  source: string | null,
+  createdAt = new Date().toISOString(),
+): void {
+  s.coach.push({ id: s.nextCoachId++, businessId, role, text, topic, source, createdAt });
 }
 
 const globalForStore = globalThis as typeof globalThis & { __bikinlarisMock?: MockStore };
@@ -267,6 +288,8 @@ function seed(): MockStore {
     events: [],
     nextEventId: 1,
     nextCode: 1,
+    coach: [],
+    nextCoachId: 1,
   };
   const today = todayIso();
 
@@ -361,6 +384,11 @@ function seedDemoParticipant(s: MockStore, item: DemoParticipant, n: number, cre
   });
   s.tokens.set(`demo-${n}`, businessId);
   for (const event of item.events) pushEvent(s, businessId, event.action, event.meta, event.at);
+  for (const { topic, at: when } of item.coach) {
+    pushCoach(s, businessId, "pemilik", id.coach.suggestions[topic], topic, null, when);
+    pushCoach(s, businessId, "coach", id.coach.demoAnswer, topic, demoProvider.label, when);
+    pushEvent(s, businessId, "coach_tanya", { topik: topic }, when);
+  }
   if (!item.answers || !item.startedAt) return;
 
   const diagnosisId = seedId(100 + n);

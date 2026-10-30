@@ -2,8 +2,14 @@ import "server-only";
 
 import { z } from "zod";
 
-/** Claude model for SOP personalisation (docs/keputusan.md: "model Sonnet"). */
+/** Claude model when AI_PROVIDER=anthropic (docs/keputusan.md: "model Sonnet"). */
 const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5-5";
+/**
+ * OpenAI model when AI_PROVIDER=openai: the most economical GPT-6 model (developers.openai.com,
+ * models page, 30 Oktober 2026). "gpt-6.1-terra" writes better at about ten times the price.
+ */
+const DEFAULT_OPENAI_MODEL = "gpt-6-luna";
+const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
 /** Query parameter that carries the participant code into the questionnaire link. */
 const DEFAULT_SURVEY_CODE_PARAM = "kode";
 /**
@@ -25,9 +31,21 @@ const serverEnvSchema = z
     MOCK_SESSION_SECRET: z.string().min(32).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
+    /** Which company answers the AI features: "openai" or "anthropic" (lib/ai). */
+    AI_PROVIDER: z.enum(["openai", "anthropic"]).default("openai"),
+    OPENAI_API_KEY: z.string().min(1).optional(),
+    OPENAI_MODEL: z.string().min(1).default(DEFAULT_OPENAI_MODEL),
+    /** Another service with the same /responses API can be used by changing this. */
+    OPENAI_BASE_URL: z.url().default(DEFAULT_OPENAI_BASE_URL),
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     ANTHROPIC_MODEL: z.string().min(1).default(DEFAULT_ANTHROPIC_MODEL),
+    /** AI rewrites the SOP texts so they mention the business (template text otherwise). */
     USE_LLM: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
+    /** "Tanya coach" on the pack page (lib/coach). */
+    AI_COACH: z
       .enum(["true", "false"])
       .default("false")
       .transform((value) => value === "true"),
@@ -60,7 +78,11 @@ const serverEnvSchema = z
     if (env.DATA_SOURCE === "mock" && env.NODE_ENV === "production") {
       require("MOCK_SESSION_SECRET", "build produksi dengan DATA_SOURCE=mock");
     }
-    if (env.USE_LLM) require("ANTHROPIC_API_KEY", "USE_LLM=true");
+    // Real data needs a real key; mock data falls back to the demo provider.
+    if ((env.USE_LLM || env.AI_COACH) && env.DATA_SOURCE === "supabase") {
+      const reason = `USE_LLM/AI_COACH dengan AI_PROVIDER=${env.AI_PROVIDER}`;
+      require(env.AI_PROVIDER === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY", reason);
+    }
   });
 
 /** Keys where an empty value is meaningful; every other empty value counts as "not set". */

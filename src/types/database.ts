@@ -100,6 +100,44 @@ export type Database = {
           },
         ];
       };
+      coach_pesan: {
+        Row: {
+          business_id: string;
+          created_at: string;
+          id: number;
+          isi: string;
+          peran: string;
+          sumber: string | null;
+          topik: string | null;
+        };
+        Insert: {
+          business_id: string;
+          created_at?: string;
+          id?: never;
+          isi: string;
+          peran: string;
+          sumber?: string | null;
+          topik?: string | null;
+        };
+        Update: {
+          business_id?: string;
+          created_at?: string;
+          id?: never;
+          isi?: string;
+          peran?: string;
+          sumber?: string | null;
+          topik?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coach_pesan_business_id_fkey";
+            columns: ["business_id"];
+            isOneToOne: false;
+            referencedRelation: "businesses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       events: {
         Row: {
           action: string;
@@ -256,6 +294,17 @@ export type Database = {
       is_staff: { Args: never; Returns: boolean };
       umkm_catat: {
         Args: { p_action: string; p_meta: Json; p_token: string };
+        Returns: undefined;
+      };
+      umkm_coach_riwayat: { Args: { p_token: string }; Returns: Json };
+      umkm_coach_simpan: {
+        Args: {
+          p_jawab: string;
+          p_sumber: string;
+          p_tanya: string;
+          p_token: string;
+          p_topik: string | null;
+        };
         Returns: undefined;
       };
       umkm_mulai_paket: {

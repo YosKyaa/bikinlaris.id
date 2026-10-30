@@ -5,6 +5,7 @@ import { addDays, dayNumber } from "@/lib/format";
 
 import {
   EVENT_ACTIONS,
+  type CoachMessage,
   type DueGroup,
   type DueItem,
   type FunnelStep,
@@ -250,6 +251,24 @@ export function eventsCsv(participants: Participant[], events: ResearchEvent[]):
       e.action,
       e.meta ? JSON.stringify(e.meta) : null,
       e.createdAt,
+    ]),
+  );
+}
+
+/** "Tanya coach" conversations, one row per message, for qualitative analysis. */
+export function coachCsv(participants: Participant[], messages: CoachMessage[]): string {
+  const codes = new Map(participants.map((p) => [p.business.id, p.business.code]));
+  return toCsv(
+    ["id", "kode", "business_id", "peran", "topik", "isi", "sumber", "created_at"],
+    messages.map((m) => [
+      m.id,
+      codes.get(m.businessId) ?? null,
+      m.businessId,
+      m.role,
+      m.topic,
+      m.text,
+      m.source,
+      m.createdAt,
     ]),
   );
 }

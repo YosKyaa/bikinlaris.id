@@ -4,6 +4,8 @@ import type { Json } from "@/types/database";
 
 import type {
   BusinessMap,
+  CoachHistory,
+  CoachMessage,
   EventAction,
   EventMeta,
   NewParticipant,
@@ -57,6 +59,18 @@ export interface OwnerStore {
   reset(token: string): Promise<void>;
   /** Passive research log. `hasil_buka` is stored at most once per day. */
   log(token: string, action: EventAction, meta: EventMeta | null): Promise<void>;
+  /** "Tanya coach": recent messages and today's question count. */
+  coachHistory(token: string): Promise<CoachHistory>;
+  /** Stores one question with its answer, and logs `coach_tanya`. */
+  saveCoachExchange(token: string, exchange: CoachExchange): Promise<void>;
+}
+
+export interface CoachExchange {
+  question: string;
+  topic: string | null;
+  answer: string;
+  /** Provider and model that answered. */
+  source: string;
 }
 
 export type SignInResult =
@@ -97,6 +111,8 @@ export interface StaffStore {
   ): Promise<boolean>;
   listEvents(businessId?: string): Promise<ResearchEvent[]>;
   logEvent(businessId: string, action: EventAction, meta: EventMeta | null): Promise<void>;
+  /** Coach conversations, oldest first; one participant or everyone (CSV). */
+  listCoachMessages(businessId?: string): Promise<CoachMessage[]>;
 
   listTeam(): Promise<{ members: TeamMember[]; invites: TeamInvite[] }>;
   invite(email: string, role: TeamInvite["role"]): Promise<InviteResult>;

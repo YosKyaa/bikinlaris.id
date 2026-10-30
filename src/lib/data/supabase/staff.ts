@@ -5,11 +5,12 @@ import { ROUTES } from "@/lib/auth/constants";
 import { createClient } from "@/lib/supabase/server";
 
 import type { SignUpResult, StaffStore } from "../source";
-import type { Participant, ResearchEvent, StaffUser } from "../types";
+import type { CoachMessage, Participant, ResearchEvent, StaffUser } from "../types";
 import {
   fromParticipant,
   metaToJson,
   toBusiness,
+  toCoachMessage,
   toDiagnosis,
   toEvent,
   toInvite,
@@ -205,6 +206,22 @@ export const supabaseStaffStore: StaffStore = {
       if (error) throw error;
       events.push(...data.map(toEvent));
       if (data.length < PAGE_SIZE) return events;
+    }
+  },
+
+  async listCoachMessages(businessId) {
+    const supabase = await createClient();
+    const messages: CoachMessage[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const query = supabase
+        .from("coach_pesan")
+        .select("*")
+        .order("id")
+        .range(from, from + PAGE_SIZE - 1);
+      const { data, error } = await (businessId ? query.eq("business_id", businessId) : query);
+      if (error) throw error;
+      messages.push(...data.map(toCoachMessage));
+      if (data.length < PAGE_SIZE) return messages;
     }
   },
 

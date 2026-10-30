@@ -5,7 +5,10 @@ import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";
 
+import type { ComponentProps } from "react";
+
 import { BusinessMap } from "./business-map";
+import { CoachPanel } from "./coach-panel";
 import { PackActions, PackStickyActions, PackViewTracker } from "./pack-actions";
 import { FirstStepCard, LaterSops, PackGuide, PackStatusCard, ProblemList } from "./pack-details";
 import { SopDocument } from "./sop-document";
@@ -16,10 +19,12 @@ interface PackViewProps {
   pack: Pack;
   locationLabel: string;
   whatsAppUrl: string;
+  /** "Tanya coach", or null when the coach is off. */
+  coach: ComponentProps<typeof CoachPanel> | null;
 }
 
 /** The peak of the journey: calm completion, one clear first step, then the documents. */
-export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackViewProps) {
+export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: PackViewProps) {
   const documents = pack.sops.map((packSop, index) => {
     const sop = getSop(packSop.sopId);
     const props = {
@@ -97,6 +102,8 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl }: PackVie
           </div>
         </>
       )}
+
+      {coach && pack.sops.length > 0 ? <CoachPanel {...coach} /> : null}
 
       <div className="print:hidden">
         <BusinessMap map={pack.map} hardest={pack.hardestSection} />

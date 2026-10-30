@@ -111,6 +111,7 @@ export const EVENT_ACTIONS = [
   "kirim_wa",
   "cetak",
   "diagnosa_ulang",
+  "coach_tanya",
 ] as const;
 export type EventAction = (typeof EVENT_ACTIONS)[number];
 
@@ -122,6 +123,33 @@ export interface ResearchEvent {
   action: EventAction;
   meta: EventMeta | null;
   createdAt: string;
+}
+
+/** "Tanya coach": who wrote a message. */
+export const COACH_ROLES = ["pemilik", "coach"] as const;
+export type CoachRole = (typeof COACH_ROLES)[number];
+
+/** One message as the owner sees it in the coach panel. */
+export interface CoachTurn {
+  id: number;
+  role: CoachRole;
+  text: string;
+  createdAt: string;
+}
+
+/** Recent conversation plus how many questions the owner asked today (WIB), for the limit. */
+export interface CoachHistory {
+  turns: CoachTurn[];
+  askedToday: number;
+}
+
+/** One message as the research team sees it (panel, CSV). */
+export interface CoachMessage extends CoachTurn {
+  businessId: string;
+  /** Suggested-question key, or null for a question typed by the owner. */
+  topic: string | null;
+  /** AI provider and model that wrote a coach answer, e.g. "openai:gpt-6-luna". */
+  source: string | null;
 }
 
 /** Input for a new participant, entered by the enumerator. */

@@ -39,6 +39,11 @@ export const mockStaffStore: StaffStore = {
     return { ok: true, user: toUser(member) };
   },
 
+  async listCoachMessages(businessId) {
+    const all = store().coach;
+    return businessId ? all.filter((m) => m.businessId === businessId) : [...all];
+  },
+
   /** Google sign-in needs Supabase; the demo uses e-mail and password only. */
   async googleSignInUrl() {
     return null;

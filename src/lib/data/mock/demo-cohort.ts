@@ -2,6 +2,7 @@ import "server-only";
 
 import { diagnosisBank, type SectionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
+import { COACH_TOPICS, type CoachTopic } from "@/lib/coach/rules";
 import { rules } from "@/lib/diagnosis/bank";
 import { buildPack, computeMap, hardestCandidates } from "@/lib/diagnosis/scoring";
 import { addDays, daysBetween } from "@/lib/format";
@@ -59,6 +60,7 @@ const SHARE_SENT = 0.85;
 const SHARE_DONE = 0.75;
 const SHARE_PAUSED = 0.12;
 const SHARE_BY_ADMIN = 0.3;
+const SHARE_COACH = 0.4;
 
 /** Small deterministic generator (LCG), so the demo looks the same on every restart. */
 function random(seed: number) {
@@ -92,6 +94,8 @@ export interface DemoParticipant {
   sentAt: string | null;
   doneAt: string | null;
   events: DemoEvent[];
+  /** Suggested questions put to the coach (answered with the demo answer). */
+  coach: { topic: CoachTopic; at: string }[];
 }
 
 const at = (date: string, minutes: number) => {
@@ -149,6 +153,7 @@ export function demoCohort(today: string): DemoParticipant[] {
       sentAt: null,
       doneAt: null,
       events: [{ action: "profil_selesai", meta: null, at: at(joinedOn, 0) }],
+      coach: [],
     };
     if (rng.chance(SHARE_NOT_STARTED)) return base;
 
@@ -207,9 +212,16 @@ export function demoCohort(today: string): DemoParticipant[] {
     });
     if (rng.chance(0.6)) events.push({ action: "kirim_wa", meta: null, at: at(startedOn, 50) });
     if (rng.chance(0.3)) events.push({ action: "cetak", meta: null, at: at(startedOn, 55) });
+    const coach = rng.chance(SHARE_COACH)
+      ? Array.from({ length: rng.between(1, 3) }, (_, i) => ({
+          topic: rng.pick(COACH_TOPICS),
+          at: at(addDays(startedOn, Math.min(age, rng.between(0, 10))), 120 + i),
+        }))
+      : [];
 
     return {
       ...base,
+      coach,
       answers,
       hardest,
       startedAt,

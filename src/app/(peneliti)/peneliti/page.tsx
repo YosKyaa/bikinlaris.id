@@ -9,6 +9,7 @@ import { ResearchFunnel } from "@/components/organisms/research-funnel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
+import { isCoachEnabled } from "@/lib/ai";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import {
@@ -110,6 +111,14 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
               {id.researcher.export.events}
             </a>
           </Button>
+          {isCoachEnabled() ? (
+            <Button asChild variant="outline" className="bg-background">
+              <a href={ROUTES.researcherExport("coach")} download>
+                <DownloadIcon aria-hidden />
+                {id.researcher.export.coach}
+              </a>
+            </Button>
+          ) : null}
         </div>
       </section>
     </div>

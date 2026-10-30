@@ -4,7 +4,7 @@ import { addDays, todayIso } from "@/lib/format";
 
 import type { OwnerStore } from "../source";
 import type { Diagnosis, OwnerState, Pack } from "../types";
-import { newId, pushEvent, store } from "./store";
+import { COACH_HISTORY_SHOWN, newId, pushCoach, pushEvent, store } from "./store";
 
 function businessIdOf(token: string): string {
   const businessId = store().tokens.get(token);
@@ -112,5 +112,31 @@ export const mockOwnerStore: OwnerStore = {
       if (already) return;
     }
     pushEvent(s, businessId, action, meta);
+  },
+
+  async coachHistory(token) {
+    const s = store();
+    const businessId = businessIdOf(token);
+    const own = s.coach.filter((m) => m.businessId === businessId);
+    const today = todayIso();
+    return {
+      turns: own.slice(-COACH_HISTORY_SHOWN).map(({ id, role, text, createdAt }) => ({
+        id,
+        role,
+        text,
+        createdAt,
+      })),
+      askedToday: own.filter(
+        (m) => m.role === "pemilik" && todayIso(new Date(m.createdAt)) === today,
+      ).length,
+    };
+  },
+
+  async saveCoachExchange(token, exchange) {
+    const s = store();
+    const businessId = businessIdOf(token);
+    pushCoach(s, businessId, "pemilik", exchange.question, exchange.topic, null);
+    pushCoach(s, businessId, "coach", exchange.answer, exchange.topic, exchange.source);
+    pushEvent(s, businessId, "coach_tanya", { topik: exchange.topic });
   },
 };

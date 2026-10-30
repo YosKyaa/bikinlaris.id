@@ -29,7 +29,8 @@ export const ROUTES = {
   researcherBusiness: (businessId: string) => `/peneliti/umkm/${businessId}`,
   editParticipant: (businessId: string) => `/peneliti/umkm/${businessId}/ubah`,
   team: "/peneliti/tim",
-  researcherExport: (table: "ringkasan" | "events") => `/api/peneliti/ekspor?tabel=${table}`,
+  researcherExport: (table: "ringkasan" | "events" | "coach") =>
+    `/api/peneliti/ekspor?tabel=${table}`,
 } as const;
 
 /** Owner pages: reached through the private link, never through a login form. */

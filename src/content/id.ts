@@ -14,8 +14,15 @@ import type {
   YearsRunning,
 } from "@/lib/validations/business";
 import type { ParticipantFilter } from "@/lib/data/research";
+import type { CoachTopic } from "@/lib/coach/rules";
 import type { ActiveDayBucket, AlertKind, DurationBucket } from "@/lib/data/monitoring/types";
-import type { EventAction, FunnelStepKey, ParticipantStage, StaffRole } from "@/lib/data/types";
+import type {
+  CoachRole,
+  EventAction,
+  FunnelStepKey,
+  ParticipantStage,
+  StaffRole,
+} from "@/lib/data/types";
 
 // [KONFIRMASI] Durasi: spec menulis ~8 menit, HANDOVER.md ±10 menit.
 const DURATION_MINUTES = 10;
@@ -733,6 +740,7 @@ export const id = {
       body: "Satu baris per UMKM, dengan kode peserta untuk digabung dengan jawaban kuesioner.",
       summary: "Unduh ringkasan (CSV)",
       events: "Unduh log aktivitas (CSV)",
+      coach: "Unduh percakapan coach (CSV)",
     },
     actions: {
       startHere: "Mulai cek usaha di HP ini",
@@ -803,6 +811,9 @@ export const id = {
       eventTime: "Waktu",
       eventAction: "Aktivitas",
       eventMeta: "Keterangan",
+      coach: "Percakapan coach",
+      noCoach: "Pemilik belum bertanya ke coach.",
+      coachRoles: { pemilik: "Pemilik", coach: "Coach" } satisfies Record<CoachRole, string>,
     },
     events: {
       login: "Buka tautan",
@@ -816,9 +827,44 @@ export const id = {
       kirim_wa: "Kirim ke WhatsApp",
       cetak: "Cetak",
       diagnosa_ulang: "Ulang cek usaha",
+      coach_tanya: "Tanya coach",
     } satisfies Record<EventAction, string>,
     forbidden: "Halaman ini khusus tim peneliti.",
     markFailed: "Status belum tersimpan. Coba lagi.",
+  },
+
+  coach: {
+    title: "Tanya coach soal SOP Anda",
+    body: "Coach AI menjawab berdasarkan paket SOP usaha Anda. Jawabannya bisa keliru. Keputusan tetap di tangan Anda.",
+    you: "Anda",
+    coach: "Coach",
+    suggestionsLabel: "Contoh pertanyaan",
+    suggestions: {
+      mulai: "SOP mana yang sebaiknya saya mulai dulu?",
+      karyawan: "Karyawan saya susah diajak ikut SOP. Bagaimana?",
+      waktu: "Saya tidak sempat mengerjakan semuanya. Mana yang paling penting?",
+      ramai: "Kalau sedang ramai, apa yang tetap harus dijalankan?",
+    } satisfies Record<CoachTopic, string>,
+    inputLabel: "Pertanyaan Anda",
+    placeholder: "Tulis pertanyaan tentang usaha atau SOP Anda",
+    counter: (length: number, max: number) => `${length}/${max} huruf`,
+    send: "Kirim pertanyaan",
+    pending: "Coach sedang menulis jawaban…",
+    remaining: (n: number) =>
+      n > 0
+        ? `Sisa ${n} pertanyaan hari ini.`
+        : "Pertanyaan hari ini sudah habis. Coba lagi besok.",
+    consent: "Pertanyaan dan jawaban disimpan untuk penelitian Jakarta Global University.",
+    demoAnswer:
+      "Ini contoh jawaban di mode contoh. Mulai dari SOP 1 di paket Anda. Kerjakan bagian Siapkan dulu hari ini. Setelah itu, coret tabel 14 hari setiap tugas selesai.",
+    errors: {
+      empty: "Tulis pertanyaannya dulu.",
+      tooLong: (max: number) => `Pertanyaan terlalu panjang. Paling banyak ${max} huruf.`,
+      limit: "Pertanyaan hari ini sudah habis. Coba lagi besok.",
+      busy: "Coach sedang sibuk. Coba lagi beberapa menit lagi.",
+      failed: "Coach belum bisa menjawab. Periksa internet Anda, lalu coba lagi.",
+      off: "Coach belum tersedia untuk paket ini.",
+    },
   },
 
   monitoring: {
@@ -952,6 +998,9 @@ export const id = {
       printed: "Mencetak atau menyimpan PDF",
       sopsOpened: "SOP dibuka per UMKM",
       sopsOpenedHint: "Median, dari paling banyak 5 SOP",
+      askedCoach: "Bertanya ke coach AI",
+      coachQuestions: "Pertanyaan ke coach",
+      coachQuestionsHint: "Jumlah semua pertanyaan",
       activeTitle: "Berapa hari paket dibuka",
       activeBody: "Jumlah hari berbeda saat pemilik membuka halaman paket.",
       activeDays: {

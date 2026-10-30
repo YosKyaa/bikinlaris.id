@@ -39,6 +39,20 @@ export function EngagementOverview({ engagement }: { engagement: Engagement }) {
           value={sops === null ? null : DECIMAL.format(sops)}
           hint={copy.sopsOpenedHint}
         />
+        {engagement.coachQuestions > 0 ? (
+          <>
+            <StatCard
+              label={copy.askedCoach}
+              value={share(engagement.askedCoach)}
+              hint={of(engagement.askedCoach)}
+            />
+            <StatCard
+              label={copy.coachQuestions}
+              value={engagement.coachQuestions}
+              hint={copy.coachQuestionsHint}
+            />
+          </>
+        ) : null}
       </div>
       <h3 className="mt-6 font-semibold">{copy.activeTitle}</h3>
       <p className="text-sm text-muted-foreground">{copy.activeBody}</p>

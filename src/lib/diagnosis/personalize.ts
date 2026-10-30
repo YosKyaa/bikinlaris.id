@@ -1,10 +1,9 @@
 import "server-only";
 
-import Anthropic from "@anthropic-ai/sdk";
-import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 
 import { id } from "@/content/id";
+import { failureOf, getAiProvider } from "@/lib/ai";
 import type { PackResult } from "@/lib/data/source";
 import type { Business, Diagnosis, Pack, PackSop } from "@/lib/data/types";
 import { env } from "@/lib/env";
@@ -13,10 +12,10 @@ import { toJson } from "@/lib/json";
 import { getProblem, getQuestion, getSection, getSop } from "./bank";
 
 /**
- * SOP personalisation (spec `claude_api`, docs/keputusan.md: one call per diagnosis, Sonnet,
- * template fallback). Claude only rewrites the "why" text and the task wording so they mention
- * this business. SOPs, tasks, ids and targets never change: ids are checked before merging,
- * and anything off falls back to the bank.json template text. Server-side only.
+ * SOP personalisation (spec `claude_api`, docs/keputusan.md: one call per diagnosis, template
+ * fallback). The AI (provider from AI_PROVIDER) only rewrites the "why" text and the task wording
+ * so they mention this business. SOPs, tasks, ids and targets never change: ids are checked before
+ * merging, and anything off falls back to the bank.json template text. Server-side only.
  */
 
 /** spec: "kalau gagal/timeout 15 detik, pakai template". No retries, so 15 s is the whole budget. */
@@ -24,8 +23,7 @@ const TIMEOUT_MS = 15_000;
 const MAX_TOKENS = 6_000;
 const WHY_MAX_LENGTH = 320;
 const TASK_MAX_LENGTH = 160;
-/** Refusals are rerouted server-side to a model that can answer (beta). */
-const FALLBACK_BETA = "server-side-fallback-2026-07-01";
+const OUTPUT_NAME = "paket_sop";
 
 const SYSTEM_PROMPT = `Anda menulis ulang teks paket SOP untuk satu usaha kecil (UMKM) peserta penelitian bikinlaris.id. Pembacanya pemilik usaha yang bukan orang teknologi, membaca dari HP.
 
@@ -115,47 +113,30 @@ const template = (pack: Pack, failure?: string): PackResult => ({
   raw: failure ? toJson({ gagal: failure }) : null,
 });
 
-function failureReason(error: unknown): string {
-  if (error instanceof Anthropic.APIConnectionTimeoutError) return "waktu_habis";
-  if (error instanceof Anthropic.APIConnectionError) return "koneksi";
-  if (error instanceof Anthropic.RateLimitError) return "batas_pemakaian";
-  if (error instanceof Anthropic.AuthenticationError) return "kunci_api";
-  if (error instanceof Anthropic.APIError) return `api_${error.status ?? "tanpa_status"}`;
-  return "lainnya";
-}
-
 export async function personalizePack(
   business: Business,
   diagnosis: Diagnosis,
   pack: Pack,
 ): Promise<PackResult> {
-  if (!env.USE_LLM || !env.ANTHROPIC_API_KEY || pack.sops.length === 0) return template(pack);
+  const provider = env.USE_LLM ? getAiProvider() : null;
+  if (!provider || pack.sops.length === 0) return template(pack);
 
-  const client = new Anthropic({
-    apiKey: env.ANTHROPIC_API_KEY,
-    timeout: TIMEOUT_MS,
-    maxRetries: 0,
-  });
   try {
-    const response = await client.beta.messages.parse({
-      model: env.ANTHROPIC_MODEL,
-      max_tokens: MAX_TOKENS,
-      betas: [FALLBACK_BETA],
-      fallbacks: "default",
-      system: SYSTEM_PROMPT,
-      output_config: { effort: "low", format: betaZodOutputFormat(outputSchema) },
-      messages: [{ role: "user", content: JSON.stringify(promptInput(business, diagnosis, pack)) }],
+    const output = await provider.generateJson({
+      instructions: SYSTEM_PROMPT,
+      input: JSON.stringify(promptInput(business, diagnosis, pack)),
+      schema: outputSchema,
+      name: OUTPUT_NAME,
+      maxOutputTokens: MAX_TOKENS,
+      timeoutMs: TIMEOUT_MS,
     });
-    if (response.stop_reason === "refusal") return template(pack, "ditolak");
-    const output = response.parsed_output;
-    if (!output) return template(pack, "format");
     const sops = merge(pack, output);
     const changed = sops.some((sop) => sop.whyText !== null || sop.taskTexts !== null);
     return changed
-      ? { sops, source: "llm", raw: toJson(output) }
+      ? { sops, source: "llm", raw: toJson({ ...output, model: provider.label }) }
       : template(pack, "id_tidak_cocok");
   } catch (error) {
     // Whatever went wrong, the owner still gets the template pack.
-    return template(pack, failureReason(error));
+    return template(pack, failureOf(error));
   }
 }
