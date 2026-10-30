@@ -329,6 +329,14 @@ export const id = {
       keluar: "Anda sudah keluar.",
       konfirmasi: "Akun dibuat. Buka email Anda, klik tautan konfirmasi, lalu masuk di sini.",
       terkonfirmasi: "Email sudah dikonfirmasi. Silakan masuk.",
+      googleBelumDiundang:
+        "Akun Google ini belum diundang ke tim. Minta admin mengundang alamat Gmail Anda.",
+      googleGagal: "Masuk dengan Google belum berhasil. Coba lagi, atau masuk dengan email.",
+    },
+    google: {
+      button: "Masuk dengan Google",
+      hint: "Untuk email Google yang sudah diundang admin. Tidak perlu kode undangan.",
+      divider: "atau dengan email dan sandi",
     },
     mockHint: (password: string) =>
       `Mode contoh. Akun tim: peneliti@bikinlaris.id (enumerator) dan admin@bikinlaris.id (admin), sandi ${password}. Tautan UMKM contoh: /u/demo (paket jadi) dan /u/coba (belum mulai).`,
@@ -388,19 +396,43 @@ export const id = {
       ownerRole: { label: "Peran pemilik di usaha ini" },
     },
     choose: "Pilih salah satu",
+    /** Headings inside the long dropdowns. "other" has no heading (a separator instead). */
+    optionGroups: {
+      location: { jawaBarat: "Jawa Barat", jakarta: "DKI Jakarta", banten: "Banten" },
+      sector: { food: "Makanan dan minuman", goods: "Barang", services: "Jasa" },
+    },
     options: {
       location: {
         depok: "Depok",
-        bekasi: "Bekasi",
         kota_bogor: "Kota Bogor",
         kab_bogor: "Kabupaten Bogor",
+        bekasi: "Kota Bekasi",
+        kab_bekasi: "Kabupaten Bekasi",
+        jakarta_selatan: "Jakarta Selatan",
+        jakarta_timur: "Jakarta Timur",
+        jakarta_pusat: "Jakarta Pusat",
+        jakarta_barat: "Jakarta Barat",
+        jakarta_utara: "Jakarta Utara",
+        kota_tangerang: "Kota Tangerang",
+        tangsel: "Tangerang Selatan",
+        kab_tangerang: "Kabupaten Tangerang",
         lainnya: "Lainnya",
       } satisfies Record<Location, string>,
+      // [KONFIRMASI] Samakan dengan pilihan jenis usaha di bagian B kuesioner.
       sector: {
-        kuliner: "Kuliner",
-        retail: "Retail atau perdagangan",
-        jasa: "Jasa",
-        produksi_rumahan: "Produksi rumahan",
+        kuliner: "Kuliner (makanan dan minuman)",
+        produksi_rumahan: "Produksi rumahan (kue, makanan kemasan)",
+        retail: "Toko, warung, atau perdagangan",
+        fashion: "Fashion, jahit, dan konveksi",
+        kerajinan: "Kerajinan tangan",
+        pertanian: "Pertanian, peternakan, atau perikanan",
+        kecantikan: "Salon, barbershop, dan kecantikan",
+        laundry: "Laundry",
+        otomotif: "Bengkel dan otomotif",
+        elektronik: "Servis HP dan elektronik",
+        percetakan: "Percetakan dan fotokopi",
+        pendidikan: "Les dan pendidikan",
+        jasa: "Jasa lainnya",
         lainnya: "Lainnya",
       } satisfies Record<Sector, string>,
       yearsRunning: {

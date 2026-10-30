@@ -39,6 +39,15 @@ export const mockStaffStore: StaffStore = {
     return { ok: true, user: toUser(member) };
   },
 
+  /** Google sign-in needs Supabase; the demo uses e-mail and password only. */
+  async googleSignInUrl() {
+    return null;
+  },
+
+  async finishGoogleSignIn() {
+    return { ok: false, reason: "invalid" };
+  },
+
   async signUp({ name, email, password, inviteCode }) {
     const s = store();
     if (s.staff.has(email)) return { ok: false, reason: "exists" };

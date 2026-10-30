@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type ComponentProps } from "react";
+import { Fragment, useState, useTransition, type ComponentProps } from "react";
 import { Controller, useForm, type FieldError as HookFieldError } from "react-hook-form";
 
 import { InlineError } from "@/components/molecules/inline-error";
@@ -20,7 +20,10 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -29,11 +32,11 @@ import { createParticipantAction, updateParticipantAction } from "@/lib/actions/
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import {
   EMPLOYEE_COUNTS,
-  LOCATIONS,
+  LOCATION_GROUPS,
   NAME_MAX_LENGTH,
   OWNER_ROLES,
   PRODUCT_MAX_LENGTH,
-  SECTORS,
+  SECTOR_GROUPS,
   YEARS_RUNNING,
 } from "@/lib/validations/business";
 import { participantSchema, type ParticipantInput } from "@/lib/validations/participant";
@@ -41,16 +44,18 @@ import { participantSchema, type ParticipantInput } from "@/lib/validations/part
 type SelectKey = "sector" | "location" | "yearsRunning" | "employees" | "ownerRole";
 type TextKey = "ownerName" | "whatsapp" | "name" | "product";
 
-const SELECT_OPTIONS: Record<SelectKey, readonly string[]> = {
-  sector: SECTORS,
-  location: LOCATIONS,
-  yearsRunning: YEARS_RUNNING,
-  employees: EMPLOYEE_COUNTS,
-  ownerRole: OWNER_ROLES,
+/** Option lists per dropdown. Long lists are grouped; short ones are a single group. */
+const SELECT_GROUPS: Record<SelectKey, Record<string, readonly string[]>> = {
+  sector: SECTOR_GROUPS,
+  location: LOCATION_GROUPS,
+  yearsRunning: { all: YEARS_RUNNING },
+  employees: { all: EMPLOYEE_COUNTS },
+  ownerRole: { all: OWNER_ROLES },
 };
 
 const copy = id.participant;
 const profile = id.profile;
+const groupLabels: Partial<Record<SelectKey, Record<string, string>>> = profile.optionGroups;
 
 function errorText(error: HookFieldError | undefined): string | undefined {
   if (!error?.message) return undefined;
@@ -140,11 +145,22 @@ export function ParticipantForm({ businessId, defaults }: ParticipantFormProps) 
                 <SelectValue placeholder={profile.choose} />
               </SelectTrigger>
               <SelectContent>
-                {SELECT_OPTIONS[key].map((value) => (
-                  <SelectItem key={value} value={value}>
-                    {labels[value]}
-                  </SelectItem>
-                ))}
+                {Object.entries(SELECT_GROUPS[key]).map(([group, values], index) => {
+                  const heading = groupLabels[key]?.[group];
+                  return (
+                    <Fragment key={group}>
+                      {index > 0 ? <SelectSeparator /> : null}
+                      <SelectGroup>
+                        {heading ? <SelectLabel>{heading}</SelectLabel> : null}
+                        {values.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            {labels[value]}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </Fragment>
+                  );
+                })}
               </SelectContent>
             </Select>
             <FieldError>{error}</FieldError>

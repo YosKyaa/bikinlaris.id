@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { ALL, FILTER_PARAMS, type MonitoringFilters as Filters } from "@/lib/data/monitoring";
-import { LOCATIONS } from "@/lib/validations/business";
+import { LOCATION_GROUPS } from "@/lib/validations/business";
+
+const groupLabels: Record<string, string> = id.profile.optionGroups.location;
 
 interface MonitoringFiltersProps {
   filters: Filters;
@@ -39,11 +41,21 @@ export function MonitoringFilters({ filters, members, shown, total }: Monitoring
           className={SELECT_CLASS}
         >
           <option value={ALL}>{copy.all}</option>
-          {LOCATIONS.map((location) => (
-            <option key={location} value={location}>
-              {id.profile.options.location[location]}
-            </option>
-          ))}
+          {Object.entries(LOCATION_GROUPS).map(([group, locations]) => {
+            const options = locations.map((location) => (
+              <option key={location} value={location}>
+                {id.profile.options.location[location]}
+              </option>
+            ));
+            const label = groupLabels[group];
+            return label ? (
+              <optgroup key={group} label={label}>
+                {options}
+              </optgroup>
+            ) : (
+              options
+            );
+          })}
         </select>
       </label>
       <label className="flex flex-col gap-1.5 text-sm font-medium">

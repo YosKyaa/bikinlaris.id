@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { GoogleSignIn } from "@/components/molecules/google-sign-in";
 import { SignUpForm } from "@/components/organisms/sign-up-form";
 import { FocusLayout } from "@/components/templates/focus-layout";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { MOCK_INVITE } from "@/lib/data/mock/store";
 import { getStaffUser } from "@/lib/data/staff-session";
-import { isMockData } from "@/lib/env";
+import { isGoogleLogin, isMockData } from "@/lib/env";
 
 export const metadata: Metadata = { title: id.signUp.title };
 
@@ -24,6 +25,7 @@ export default async function SignUpPage() {
           <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
           <p className="text-muted-foreground">{copy.subtitle}</p>
         </header>
+        {isGoogleLogin ? <GoogleSignIn href={ROUTES.googleLogin} /> : null}
         <SignUpForm />
         <p className="flex flex-wrap items-center gap-x-1 text-muted-foreground">
           {copy.haveAccount}

@@ -37,6 +37,14 @@ const serverEnvSchema = z
     SURVEY_URL: z.url().optional(),
     /** Empty string = do not append the participant code to the questionnaire link. */
     SURVEY_CODE_PARAM: z.string().default(DEFAULT_SURVEY_CODE_PARAM),
+    /**
+     * "true" shows "Masuk dengan Google" for the team. Turn on only after the Google provider
+     * is enabled in Supabase (docs/SUPABASE.md); ignored with DATA_SOURCE=mock.
+     */
+    GOOGLE_LOGIN: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
     /** Fieldwork deadline (yyyy-mm-dd, WIB) used by the monitoring page's projections. */
     RESEARCH_DEADLINE: z.iso.date().default(DEFAULT_RESEARCH_DEADLINE),
   })
@@ -78,4 +86,5 @@ const DEV_MOCK_SECRET = "dev-only-mock-session-secret-not-for-production";
 
 export const mockSessionSecret = env.MOCK_SESSION_SECRET ?? DEV_MOCK_SECRET;
 export const isMockData = env.DATA_SOURCE === "mock";
+export const isGoogleLogin = env.GOOGLE_LOGIN && !isMockData;
 export const isProduction = env.NODE_ENV === "production";

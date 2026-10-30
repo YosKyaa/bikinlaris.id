@@ -86,6 +86,36 @@ export const supabaseStaffStore: StaffStore = {
     return { ok: true, user };
   },
 
+  async googleSignInUrl(callbackUrl) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl,
+        // Shared phones in the field: always let the person pick the account.
+        queryParams: { prompt: "select_account" },
+        skipBrowserRedirect: true,
+      },
+    });
+    return error ? null : data.url;
+  },
+
+  /**
+   * New Google accounts only get through the handle_new_staff trigger when the verified Google
+   * e-mail has a pending invite; existing team members are linked to Google by e-mail.
+   */
+  async finishGoogleSignIn(code) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) return { ok: false, reason: "invalid" };
+    const user = await staffById(supabase, data.user.id);
+    if (!user) {
+      await supabase.auth.signOut();
+      return { ok: false, reason: "notStaff" };
+    }
+    return { ok: true, user };
+  },
+
   async signUp({ name, email, password, inviteCode }): Promise<SignUpResult> {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signUp({

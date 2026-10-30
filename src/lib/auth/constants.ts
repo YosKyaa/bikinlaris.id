@@ -19,6 +19,10 @@ export const ROUTES = {
   login: "/masuk",
   signUp: "/daftar",
   authConfirm: "/auth/konfirmasi",
+  /** Starts "Masuk dengan Google" (GET, so it is a plain link). */
+  googleLogin: "/auth/google",
+  /** Google comes back here through Supabase with a one-time code. */
+  authCallback: "/auth/callback",
   researcher: "/peneliti",
   monitoring: "/peneliti/pantauan",
   newParticipant: "/peneliti/umkm/baru",
@@ -38,6 +42,11 @@ export const NOTICE_PARAM = "info";
 
 /** Private link tokens: 32 hex characters in Supabase, short readable words in mock mode. */
 export const OWNER_TOKEN_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
+
+/** Only paths inside the researcher panel are accepted as the post-login target. */
+export function safeNextPath(next: string | null | undefined): string | null {
+  return next && next.startsWith(ROUTES.researcher) ? next : null;
+}
 
 export function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
   return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));

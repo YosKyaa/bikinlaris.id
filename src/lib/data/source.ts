@@ -74,6 +74,10 @@ export type QuestionnaireField = "sent" | "done";
 export interface StaffStore {
   currentUser(): Promise<StaffUser | null>;
   signIn(email: string, password: string): Promise<SignInResult>;
+  /** Google sign-in address for this team login, or null when not available (mock data). */
+  googleSignInUrl(callbackUrl: string): Promise<string | null>;
+  /** Completes Google sign-in with the one-time code from the callback. */
+  finishGoogleSignIn(code: string): Promise<SignInResult>;
   signUp(input: {
     name: string;
     email: string;

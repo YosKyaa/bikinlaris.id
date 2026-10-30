@@ -13,9 +13,19 @@ const FIELDS: { field: Field; tone: "single" | "ordinal" }[] = [
   { field: "employees", tone: "ordinal" },
 ];
 
-function rowsOf(field: Field, rows: CountRow[]) {
+/**
+ * Ordered scales keep every step (a zero is information). Long nominal lists (14 locations,
+ * 14 sectors) show only the filled options, largest first; the CSV keeps every code.
+ */
+function rowsOf(field: Field, rows: CountRow[], tone: "single" | "ordinal") {
   const labels: Record<string, string> = id.profile.options[field];
-  return rows.map((row) => ({ key: row.key, label: labels[row.key] ?? row.key, value: row.value }));
+  const shown =
+    tone === "ordinal" ? rows : rows.filter((r) => r.value > 0).sort((a, b) => b.value - a.value);
+  return shown.map((row) => ({
+    key: row.key,
+    label: labels[row.key] ?? row.key,
+    value: row.value,
+  }));
 }
 
 /** Who is in the sample (questionnaire part B), as small multiples of bar lists. */
@@ -27,7 +37,7 @@ export function SampleProfile({ profile, total }: { profile: Profile; total: num
         {FIELDS.map(({ field, tone }) => (
           <div key={field}>
             <h3 className="mb-3 font-semibold">{id.profile.fields[field].label}</h3>
-            <BarList tone={tone} total={total} rows={rowsOf(field, profile[field])} />
+            <BarList tone={tone} total={total} rows={rowsOf(field, profile[field], tone)} />
           </div>
         ))}
       </div>

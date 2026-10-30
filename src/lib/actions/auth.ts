@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { id } from "@/content/id";
-import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
+import { NOTICE_PARAM, ROUTES, safeNextPath } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import type { SignInResult, SignUpResult } from "@/lib/data/source";
 import { loginSchema, signUpSchema } from "@/lib/validations/auth";
@@ -14,11 +14,6 @@ export interface LoginState {
   email: string;
   fieldErrors: { email?: string; password?: string };
   error: string | null;
-}
-
-/** Only paths inside the researcher panel are accepted as the post-login target. */
-function safeNext(next: string | undefined): string | null {
-  return next && next.startsWith(ROUTES.researcher) ? next : null;
 }
 
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -49,7 +44,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
       result.reason === "notStaff" ? id.auth.errors.notStaff : id.auth.errors.invalidCredentials;
     return { email, fieldErrors: {}, error };
   }
-  redirect(safeNext(parsed.data.next) ?? ROUTES.researcher);
+  redirect(safeNextPath(parsed.data.next) ?? ROUTES.researcher);
 }
 
 type SignUpField = "name" | "email" | "inviteCode" | "password";
