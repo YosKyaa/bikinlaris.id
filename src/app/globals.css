@@ -34,6 +34,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-viz-series-1: var(--viz-series-1);
+  --color-viz-series-2: var(--viz-series-2);
+  --color-viz-series-3: var(--viz-series-3);
+  --color-viz-good: var(--viz-good);
+  --color-viz-warning: var(--viz-warning);
+  --color-viz-critical: var(--viz-critical);
+  --color-viz-track: var(--viz-track);
+  --color-viz-axis: var(--viz-axis);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -74,6 +82,29 @@
   --accent-foreground: var(--foreground);
   --input: var(--border);
   --ring: var(--primary);
+
+  /*
+   * Chart palette (monitoring page). Checked with the dataviz validator on the white surface,
+   * see docs/PERUBAHAN.md. Light only, like the rest of the app.
+   * Series 1–3, in this order: categorical, CVD-safe as neighbours, all ≥ 3:1 on white.
+   */
+  --viz-series-1: oklch(0.527 0.137 150.07); /* #15803D, = --primary; one-series charts */
+  --viz-series-2: oklch(0.575 0.163 255.53); /* #2A78D6 */
+  --viz-series-3: oklch(0.671 0.175 40.64); /* #EB6834 */
+  /* Ordinal ramp for ordered categories (funnel stages, size bands): one hue, light → dark. */
+  --viz-ramp-1: oklch(0.741 0.151 149.85); /* #5AC576, 2.17:1 on white (values are labelled) */
+  --viz-ramp-2: oklch(0.671 0.139 150.09); /* #4BAD66 */
+  --viz-ramp-3: oklch(0.602 0.129 150.22); /* #3C9656 */
+  --viz-ramp-4: oklch(0.535 0.12 149.99); /* #2E8046 */
+  --viz-ramp-5: oklch(0.465 0.109 150.23); /* #1F6A37 */
+  --viz-ramp-6: oklch(0.4 0.101 149.9); /* #105628 */
+  --viz-ramp-7: oklch(0.332 0.091 149.86); /* #01421A */
+  /* Status fills for section colours in stacked bars. Always shown with a word label. */
+  --viz-good: oklch(0.621 0.207 142.56); /* #0CA30C, label in --foreground (5.1:1) */
+  --viz-warning: oklch(0.811 0.164 78.46); /* #FAB219, label in --foreground (9.3:1) */
+  --viz-critical: oklch(0.575 0.186 25.23); /* #D03B3B, label in white (4.8:1) */
+  --viz-track: var(--success-soft); /* unfilled part of a meter */
+  --viz-axis: var(--brand-deep-muted); /* baseline; gridlines use --border */
 }
 
 @layer base {

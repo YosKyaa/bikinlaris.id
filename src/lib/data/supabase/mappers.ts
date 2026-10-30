@@ -48,6 +48,8 @@ const businessRowSchema = z.object({
   jumlah_karyawan: z.enum(EMPLOYEE_COUNTS),
   peran: z.enum(OWNER_ROLES),
   created_at: z.string(),
+  /** Staff rows only: umkm_state strips it from the owner's view. */
+  created_by: z.string().nullable().optional(),
 });
 
 export function toBusiness(row: unknown): Business {
@@ -65,6 +67,7 @@ export function toBusiness(row: unknown): Business {
     employees: r.jumlah_karyawan,
     ownerRole: r.peran,
     createdAt: r.created_at,
+    createdBy: r.created_by ?? null,
   };
 }
 

@@ -14,6 +14,7 @@ import type {
   YearsRunning,
 } from "@/lib/validations/business";
 import type { ParticipantFilter } from "@/lib/data/research";
+import type { ActiveDayBucket, AlertKind, DurationBucket } from "@/lib/data/monitoring/types";
 import type { EventAction, FunnelStepKey, ParticipantStage, StaffRole } from "@/lib/data/types";
 
 // [KONFIRMASI] Durasi: spec menulis ~8 menit, HANDOVER.md ±10 menit.
@@ -630,9 +631,12 @@ export const id = {
     mockBanner: "Mode contoh: data di halaman ini adalah data contoh, bukan data lapangan.",
     menu: {
       participants: "Daftar UMKM",
+      monitoring: "Pantauan riset",
       newParticipant: "Tambah UMKM",
       team: "Tim peneliti",
       logout: "Keluar",
+      sections: "Bagian panel",
+      tasks: "Tugas",
     },
     funnel: {
       title: "Perjalanan peserta",
@@ -783,6 +787,178 @@ export const id = {
     } satisfies Record<EventAction, string>,
     forbidden: "Halaman ini khusus tim peneliti.",
     markFailed: "Status belum tersimpan. Coba lagi.",
+  },
+
+  monitoring: {
+    title: "Pantauan riset",
+    subtitle: "Kemajuan sampel, UMKM yang perlu dibantu, dan gambaran hasil cek usaha.",
+    asOf: (date: string) => `Data per ${date}.`,
+    print: "Cetak halaman ini",
+    tableToggle: "Lihat sebagai tabel",
+    percent: (value: number) => `${value}%`,
+    ofTotal: (part: number, whole: number) => `${part} dari ${whole}`,
+    filters: {
+      label: "Saring pantauan",
+      location: "Lokasi",
+      staff: "Pendamping",
+      all: "Semua",
+      apply: "Terapkan saringan",
+      reset: "Hapus saringan",
+      showing: (shown: number, total: number) => `Menampilkan ${shown} dari ${total} UMKM.`,
+    },
+    empty: {
+      title: "Belum ada data untuk dipantau",
+      body: "Grafik di halaman ini terisi sendiri setelah UMKM pertama ditambahkan.",
+      filteredTitle: "Tidak ada UMKM untuk saringan ini",
+      filteredBody: "Ubah atau hapus saringan untuk melihat data lain.",
+      noPacks: "Belum ada paket SOP. Bagian ini terisi setelah UMKM selesai cek usaha.",
+    },
+    sample: {
+      title: "Kemajuan sampel",
+      body: "Responden kuesioner hari ke-30, untuk analisis SEM-PLS.",
+      hero: "Kuesioner sudah diisi",
+      meter: "Responden dibandingkan dengan batas minimal sampel",
+      done: "Sudah mengisi",
+      reachable: "Paling banyak bisa mengisi sebelum tenggat",
+      threshold: (n: number, pMin: string) => `${n} responden (p_min ${pMin})`,
+      thresholdsNote:
+        "Batas minimal sampel SEM-PLS, metode inverse square root (Kock & Hadaya, 2018).",
+      deadline: (date: string) => `Tenggat kuesioner: ${date}.`,
+      reachableTile: "Bisa dikuesioner sebelum tenggat",
+      reachableHint: "Paket yang hari ke-30-nya jatuh sebelum tenggat",
+      lastPackTile: "Batas membuat paket",
+      lastPackHint: (days: number) =>
+        days > 0 ? `${days} hari lagi` : days === 0 ? "Hari ini" : `Sudah lewat ${-days} hari`,
+      paceTile: "Paket baru per minggu",
+      paceHint: (weeks: number) => `Rata-rata ${weeks} minggu terakhir`,
+      next: (missing: number, n: number, date: string) =>
+        `Perlu ${missing} paket lagi, paling lambat ${date}, agar sampel bisa mencapai ${n}.`,
+      late: (n: number) =>
+        `Batas membuat paket sudah lewat. Sampel belum bisa mencapai ${n} sebelum tenggat.`,
+      reached: "Semua batas minimal sampel bisa tercapai sebelum tenggat.",
+      assumption: "Hitungan ini menganggap semua peserta mengisi kuesioner.",
+    },
+    timeline: {
+      title: "Paket dan hari ke-30 dari waktu ke waktu",
+      body: "Jumlah kumulatif. Garis hari ke-30 sudah diketahui ke depan karena mengikuti tanggal paket.",
+      series: {
+        packs: "Paket SOP dibuat",
+        day30: "Sampai hari ke-30",
+        done: "Kuesioner diisi",
+      },
+      today: "Hari ini",
+      deadline: "Tenggat",
+      future: "Ke depan",
+      chart: "Grafik jumlah kumulatif paket, hari ke-30, dan kuesioner per tanggal",
+      keys: "Geser atau tekan panah kiri dan kanan untuk membaca tiap tanggal.",
+      caption: "Jumlah kumulatif tiap minggu",
+      date: "Tanggal",
+    },
+    alerts: {
+      title: "Perlu tindakan",
+      body: "UMKM yang menunggu langkah dari tim. Yang paling lama menunggu ada di atas.",
+      none: "Tidak ada UMKM yang perlu dibantu saat ini.",
+      more: (n: number) => `dan ${n} lainnya`,
+      kinds: {
+        sendOverdue: {
+          title: "Kuesioner terlambat dikirim",
+          body: "Hari ke-30 sudah lewat. Kirim kuesionernya hari ini.",
+          days: (n: number) => `lewat ${n} hari`,
+        },
+        awaitingAnswer: {
+          title: "Kuesioner belum diisi",
+          body: "Sudah dikirim, belum ada jawaban. Tanyakan apakah ada kendala.",
+          days: (n: number) => `dikirim ${n} hari lalu`,
+        },
+        stalled: {
+          title: "Cek usaha terhenti",
+          body: "Sudah mulai menjawab, lalu berhenti. Ajak lanjut lewat tautan yang sama.",
+          days: (n: number) => `diam ${n} hari`,
+        },
+        notStarted: {
+          title: "Belum mulai cek usaha",
+          body: "Tautan sudah dibuat, belum ada jawaban. Kirim ulang tautannya.",
+          days: (n: number) => `${n} hari sejak ditambahkan`,
+        },
+        packStuck: {
+          title: "Paket belum tersusun",
+          body: "Halaman penyusunan tertutup. Minta pemilik membuka tautannya lagi.",
+          days: (n: number) => (n === 0 ? "sejak hari ini" : `sejak ${n} hari lalu`),
+        },
+      } satisfies Record<AlertKind, { title: string; body: string; days: (n: number) => string }>,
+    },
+    funnelDrop: (n: number) => `${n} belum sampai tahap ini`,
+    health: {
+      title: "Kondisi usaha per bagian",
+      body: (n: number) => `Hasil cek usaha dari ${n} paket. Paling banyak merah di atas.`,
+      caption: "Jumlah UMKM per warna di tiap bagian",
+      section: "Bagian",
+    },
+    hardest: {
+      title: "Bagian yang paling bikin repot",
+      body: "Pilihan pemilik di akhir cek usaha.",
+    },
+    problems: {
+      title: "Masalah yang paling sering muncul",
+      body: (n: number) => `${n} masalah teratas dari semua paket.`,
+    },
+    sops: {
+      title: "SOP yang masuk paket dan dibuka",
+      body: "Panjang batang adalah jumlah paket berisi SOP itu. Bagian gelap adalah yang sudah dibuka pemilik.",
+      opened: "Dibuka",
+      notOpened: "Belum dibuka",
+      row: (opened: number, assigned: number) => `${opened} dari ${assigned} dibuka`,
+      caption: "Jumlah paket dan pembukaan per SOP",
+      sop: "SOP",
+      assigned: "Masuk paket",
+    },
+    engagement: {
+      title: "Pemakaian paket",
+      body: "Data pasif dari aplikasi. Pelengkap kuesioner bagian C, bukan pengganti.",
+      reopened: "Membuka paket lagi setelah hari pertama",
+      sharedWa: "Mengirim paket ke WhatsApp",
+      printed: "Mencetak atau menyimpan PDF",
+      sopsOpened: "SOP dibuka per UMKM",
+      sopsOpenedHint: "Median, dari paling banyak 5 SOP",
+      activeTitle: "Berapa hari paket dibuka",
+      activeBody: "Jumlah hari berbeda saat pemilik membuka halaman paket.",
+      activeDays: {
+        one: "1 hari",
+        two: "2 hari",
+        threeToFive: "3–5 hari",
+        sixPlus: "6 hari atau lebih",
+      } satisfies Record<ActiveDayBucket, string>,
+    },
+    duration: {
+      title: "Lama cek usaha",
+      body: "Dari jawaban pertama sampai selesai. Yang lama biasanya dilanjut di lain waktu.",
+      median: "Median",
+      of: (n: number) => `dari ${n} cek usaha yang selesai`,
+      buckets: {
+        under5: "Kurang dari 5 menit",
+        "5to10": "5–10 menit",
+        "10to15": "10–15 menit",
+        "15to30": "15–30 menit",
+        over30: "30 menit atau lebih",
+      } satisfies Record<DurationBucket, string>,
+      sources: "Sumber teks SOP",
+      template: "Teks template",
+      llm: "Dipersonalisasi Claude",
+    },
+    profile: {
+      title: "Profil sampel",
+      body: "Sebaran UMKM peserta. Sama dengan bagian B kuesioner.",
+    },
+    team: {
+      title: "Per pendamping",
+      body: "UMKM yang ditambahkan tiap anggota tim dan kemajuannya.",
+      caption: "Jumlah UMKM per pendamping",
+      member: "Pendamping",
+      added: "Ditambahkan",
+      packs: "Paket dibuat",
+      done: "Kuesioner diisi",
+      unknown: "Tidak tercatat",
+    },
   },
 
   team: {

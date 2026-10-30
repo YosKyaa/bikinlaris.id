@@ -23,6 +23,8 @@ export interface Business extends BusinessProfile {
   /** WhatsApp number in international format without "+", e.g. "6281234567890". */
   whatsapp: string;
   createdAt: string;
+  /** Team member who added the participant; null when that account was removed. */
+  createdBy: string | null;
 }
 
 export type Answers = Partial<Record<QuestionId, StoredAnswer>>;

@@ -1,3 +1,4 @@
+import { PanelTabs } from "@/components/molecules/panel-tabs";
 import { AccountMenu } from "@/components/organisms/account-menu";
 import { AppShell } from "@/components/templates/app-shell";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,8 +13,17 @@ export default async function ResearcherLayout({ children }: LayoutProps<"/">) {
   const menu = id.researcher.menu;
   const links = [
     { label: menu.participants, href: ROUTES.researcher },
+    { label: menu.monitoring, href: ROUTES.monitoring },
     { label: menu.newParticipant, href: ROUTES.newParticipant },
     ...(user.role === "admin" ? [{ label: menu.team, href: ROUTES.team }] : []),
+  ];
+  const tabs = [
+    {
+      label: menu.tasks,
+      href: ROUTES.researcher,
+      matches: [ROUTES.newParticipant, ROUTES.researcherBusiness("")],
+    },
+    { label: menu.monitoring, href: ROUTES.monitoring, matches: [] },
   ];
 
   return (
@@ -29,6 +39,7 @@ export default async function ResearcherLayout({ children }: LayoutProps<"/">) {
         />
       }
     >
+      <PanelTabs label={menu.sections} tabs={tabs} />
       {children}
       <Toaster position="top-center" />
     </AppShell>

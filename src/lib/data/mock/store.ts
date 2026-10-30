@@ -19,6 +19,7 @@ import type {
   StaffRole,
   TeamInvite,
 } from "../types";
+import { demoCohort, type DemoParticipant } from "./demo-cohort";
 
 /**
  * In-memory demo data (DATA_SOURCE=mock). Lives on globalThis so it survives dev hot reloads;
@@ -275,6 +276,8 @@ function seed(): MockStore {
   ].entries()) {
     s.staff.set(member.email, { ...member, id: seedId(900 + index), password: MOCK_PASSWORD });
   }
+  const enumeratorId = seedId(900);
+  const adminId = seedId(901);
 
   SEED.forEach((item, index) => {
     const businessId = seedId(index + 1);
@@ -286,6 +289,7 @@ function seed(): MockStore {
       ownerName: item.ownerName,
       whatsapp: `6281200000${String(index + 1).padStart(3, "0")}`,
       createdAt: at(joinedOn, "09:00"),
+      createdBy: enumeratorId,
     });
     s.tokens.set(item.token, businessId);
     pushEvent(
@@ -336,5 +340,52 @@ function seed(): MockStore {
       pushEvent(s, businessId, action, null, at(startedOn, "09:18"));
     }
   });
+
+  demoCohort(today).forEach((item, index) => {
+    seedDemoParticipant(s, item, SEED.length + index + 1, item.byAdmin ? adminId : enumeratorId);
+  });
   return s;
+}
+
+/** One generated participant from demo-cohort.ts, with its diagnosis, pack and events. */
+function seedDemoParticipant(s: MockStore, item: DemoParticipant, n: number, createdBy: string) {
+  const businessId = seedId(n);
+  s.businesses.set(businessId, {
+    ...item.profile,
+    id: businessId,
+    code: nextCode(s),
+    ownerName: item.ownerName,
+    whatsapp: `6281200000${String(n).padStart(3, "0")}`,
+    createdAt: at(item.joinedOn, "08:30"),
+    createdBy,
+  });
+  s.tokens.set(`demo-${n}`, businessId);
+  for (const event of item.events) pushEvent(s, businessId, event.action, event.meta, event.at);
+  if (!item.answers || !item.startedAt) return;
+
+  const diagnosisId = seedId(100 + n);
+  s.diagnoses.set(businessId, {
+    id: diagnosisId,
+    businessId,
+    answers: item.answers,
+    hardestSection: item.hardest,
+    startedAt: item.startedAt,
+    completedAt: item.completedAt,
+  });
+  if (!item.hardest || !item.packOn || !item.completedAt) return;
+
+  s.packs.set(businessId, {
+    id: seedId(200 + n),
+    businessId,
+    diagnosisId,
+    hardestSection: item.hardest,
+    ...buildPack(item.answers, item.hardest),
+    createdOn: item.packOn,
+    followUpOn: addDays(item.packOn, rules.followUpDays),
+    source: "template",
+    status: "siap",
+    generationStartedAt: item.completedAt,
+    questionnaireSentAt: item.sentAt,
+    questionnaireDoneAt: item.doneAt,
+  });
 }

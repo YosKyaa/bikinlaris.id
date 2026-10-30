@@ -6,6 +6,11 @@ import { z } from "zod";
 const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5-5";
 /** Query parameter that carries the participant code into the questionnaire link. */
 const DEFAULT_SURVEY_CODE_PARAM = "kode";
+/**
+ * [KONFIRMASI] Last day for day-30 questionnaires. docs/konteks-riset.md: "kuesioner hari ke-30
+ * harus selesai paling lambat awal Desember". Override with RESEARCH_DEADLINE, no code change.
+ */
+const DEFAULT_RESEARCH_DEADLINE = "2026-12-01";
 
 /**
  * Server environment, validated once at import. A missing required variable throws,
@@ -32,6 +37,8 @@ const serverEnvSchema = z
     SURVEY_URL: z.url().optional(),
     /** Empty string = do not append the participant code to the questionnaire link. */
     SURVEY_CODE_PARAM: z.string().default(DEFAULT_SURVEY_CODE_PARAM),
+    /** Fieldwork deadline (yyyy-mm-dd, WIB) used by the monitoring page's projections. */
+    RESEARCH_DEADLINE: z.iso.date().default(DEFAULT_RESEARCH_DEADLINE),
   })
   .superRefine((env, ctx) => {
     const require = (key: keyof typeof env, reason: string) => {

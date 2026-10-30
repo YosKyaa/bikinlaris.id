@@ -68,11 +68,13 @@ export const mockStaffStore: StaffStore = {
     const s = store();
     const businessId = newId();
     const token = randomBytes(TOKEN_BYTES).toString("hex");
+    const email = await readMockSession();
     s.businesses.set(businessId, {
       ...input,
       id: businessId,
       code: nextCode(s),
       createdAt: new Date().toISOString(),
+      createdBy: (email && s.staff.get(email)?.id) || null,
     });
     s.tokens.set(token, businessId);
     const created = participant(businessId);

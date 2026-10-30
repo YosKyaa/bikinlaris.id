@@ -20,6 +20,7 @@ export const ROUTES = {
   signUp: "/daftar",
   authConfirm: "/auth/konfirmasi",
   researcher: "/peneliti",
+  monitoring: "/peneliti/pantauan",
   newParticipant: "/peneliti/umkm/baru",
   researcherBusiness: (businessId: string) => `/peneliti/umkm/${businessId}`,
   editParticipant: (businessId: string) => `/peneliti/umkm/${businessId}/ubah`,

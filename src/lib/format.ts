@@ -43,6 +43,15 @@ export function formatDateShort(isoDate: string): string {
   }).format(new Date(`${isoDate}T00:00:00Z`));
 }
 
+/** "5 Okt", for chart axes. */
+export function formatDayMonth(isoDate: string): string {
+  return new Intl.DateTimeFormat(LOCALE, {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${isoDate}T00:00:00Z`));
+}
+
 export function formatDateTime(isoDateTime: string): string {
   return new Intl.DateTimeFormat(LOCALE, {
     day: "numeric",
