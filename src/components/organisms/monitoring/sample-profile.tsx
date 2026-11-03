@@ -2,8 +2,12 @@ import { BarList } from "@/components/molecules/bar-list";
 import { ChartCard } from "@/components/molecules/chart-card";
 import { id } from "@/content/id";
 import type { CountRow, SampleProfile as Profile } from "@/lib/data/monitoring";
+import { regencyName } from "@/lib/wilayah";
 
 type Field = keyof Profile;
+
+/** Kab/kota shown by name; the rest of Indonesia is summed into one row. */
+const TOP_LOCATIONS = 8;
 
 /** Ordered answer scales get the ordinal ramp; locations and sectors are nominal. */
 const FIELDS: { field: Field; tone: "single" | "ordinal" }[] = [
@@ -14,18 +18,28 @@ const FIELDS: { field: Field; tone: "single" | "ordinal" }[] = [
 ];
 
 /**
- * Ordered scales keep every step (a zero is information). Long nominal lists (14 locations,
- * 14 sectors) show only the filled options, largest first; the CSV keeps every code.
+ * Ordered scales keep every step (a zero is information). Nominal lists show only the filled
+ * options, largest first; locations stop at the top few plus one "N kab/kota lain" row.
+ * The CSV keeps every code.
  */
 function rowsOf(field: Field, rows: CountRow[], tone: "single" | "ordinal") {
-  const labels: Record<string, string> = id.profile.options[field];
+  const label = (key: string): string =>
+    field === "location"
+      ? regencyName(key)
+      : ((id.profile.options[field] as Record<string, string>)[key] ?? key);
   const shown =
     tone === "ordinal" ? rows : rows.filter((r) => r.value > 0).sort((a, b) => b.value - a.value);
-  return shown.map((row) => ({
-    key: row.key,
-    label: labels[row.key] ?? row.key,
-    value: row.value,
-  }));
+  const named = shown.map((row) => ({ key: row.key, label: label(row.key), value: row.value }));
+  if (field !== "location" || named.length <= TOP_LOCATIONS) return named;
+  const rest = named.slice(TOP_LOCATIONS);
+  return [
+    ...named.slice(0, TOP_LOCATIONS),
+    {
+      key: "lain",
+      label: id.monitoring.profile.otherPlaces(rest.length),
+      value: rest.reduce((sum, row) => sum + row.value, 0),
+    },
+  ];
 }
 
 /** Who is in the sample (questionnaire part B), as small multiples of bar lists. */

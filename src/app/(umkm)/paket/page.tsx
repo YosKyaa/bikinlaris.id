@@ -14,6 +14,7 @@ import { data } from "@/lib/data";
 import { resolveOwnerStep } from "@/lib/data/flow";
 import { requireOwnerState } from "@/lib/data/owner-session";
 import { buildWhatsAppText, whatsAppUrl } from "@/lib/diagnosis/whatsapp";
+import { regencyName } from "@/lib/wilayah";
 
 export const metadata: Metadata = { title: id.pack.eyebrow };
 
@@ -44,7 +45,7 @@ export default async function PackPage() {
   const profile = [
     { label: fields.name.label, value: business.name },
     { label: fields.product.label, value: business.product },
-    { label: fields.location.label, value: options.location[business.location] },
+    { label: fields.location.label, value: regencyName(business.location) },
     { label: fields.sector.label, value: options.sector[business.sector] },
     { label: fields.yearsRunning.label, value: options.yearsRunning[business.yearsRunning] },
     { label: fields.employees.label, value: options.employees[business.employees] },
@@ -68,7 +69,7 @@ export default async function PackPage() {
       <PackView
         business={business}
         pack={pack}
-        locationLabel={options.location[business.location]}
+        locationLabel={regencyName(business.location)}
         whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack))}
         coach={await loadCoach(state.token)}
       />

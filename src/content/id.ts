@@ -6,13 +6,7 @@
  * Daftarnya dirangkum di docs/AUDIT.md.
  */
 import type { SectionColor } from "./diagnosis.types";
-import type {
-  EmployeeCount,
-  Location,
-  OwnerRole,
-  Sector,
-  YearsRunning,
-} from "@/lib/validations/business";
+import type { EmployeeCount, OwnerRole, Sector, YearsRunning } from "@/lib/validations/business";
 import type { ParticipantFilter } from "@/lib/data/research";
 import type { CoachTopic } from "@/lib/coach/rules";
 import type { ActiveDayBucket, AlertKind, DurationBucket } from "@/lib/data/monitoring/types";
@@ -451,28 +445,22 @@ export const id = {
       ownerRole: { label: "Peran pemilik di usaha ini" },
     },
     choose: "Pilih salah satu",
+    /** Lokasi: Provinsi → Kabupaten/Kota (content/wilayah.ts). */
+    locationPicker: {
+      province: "Provinsi",
+      regency: "Kabupaten/Kota",
+      chooseProvince: "Pilih provinsi",
+      chooseProvinceFirst: "Pilih provinsi dulu",
+      featured: "Sering dipilih",
+      allProvinces: "Provinsi lain",
+    },
+    /** Rows stored before the full list existed. */
+    otherLocation: "Lainnya",
     /** Headings inside the long dropdowns. "other" has no heading (a separator instead). */
     optionGroups: {
-      location: { jawaBarat: "Jawa Barat", jakarta: "DKI Jakarta", banten: "Banten" },
       sector: { food: "Makanan dan minuman", goods: "Barang", services: "Jasa" },
     },
     options: {
-      location: {
-        depok: "Depok",
-        kota_bogor: "Kota Bogor",
-        kab_bogor: "Kabupaten Bogor",
-        bekasi: "Kota Bekasi",
-        kab_bekasi: "Kabupaten Bekasi",
-        jakarta_selatan: "Jakarta Selatan",
-        jakarta_timur: "Jakarta Timur",
-        jakarta_pusat: "Jakarta Pusat",
-        jakarta_barat: "Jakarta Barat",
-        jakarta_utara: "Jakarta Utara",
-        kota_tangerang: "Kota Tangerang",
-        tangsel: "Tangerang Selatan",
-        kab_tangerang: "Kabupaten Tangerang",
-        lainnya: "Lainnya",
-      } satisfies Record<Location, string>,
       // [KONFIRMASI] Samakan dengan pilihan jenis usaha di bagian B kuesioner.
       sector: {
         kuliner: "Kuliner (makanan dan minuman)",
@@ -1076,6 +1064,7 @@ export const id = {
     profile: {
       title: "Profil sampel",
       body: "Sebaran UMKM peserta. Sama dengan bagian B kuesioner.",
+      otherPlaces: (n: number) => `${n} kab/kota lain`,
     },
     team: {
       title: "Per pendamping",

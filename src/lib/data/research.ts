@@ -1,7 +1,9 @@
 import { diagnosisBank } from "@/content/diagnosis";
+import { SECTOR_KBLI } from "@/content/kbli";
 import { sections } from "@/lib/diagnosis/bank";
 import { answeredCount } from "@/lib/diagnosis/scoring";
 import { addDays, dayNumber } from "@/lib/format";
+import { provinceName, regencyName } from "@/lib/wilayah";
 
 import {
   EVENT_ACTIONS,
@@ -174,7 +176,11 @@ export function summaryCsv(
     "wa",
     "produk",
     "lokasi",
+    "lokasi_nama",
+    "provinsi",
     "sektor",
+    "kbli_kategori",
+    "kbli_golongan_pokok",
     "lama_usaha",
     "jumlah_karyawan",
     "peran",
@@ -214,7 +220,11 @@ export function summaryCsv(
       b.whatsapp,
       b.product,
       b.location,
+      regencyName(b.location),
+      provinceName(b.location),
       b.sector,
+      SECTOR_KBLI[b.sector].kategori,
+      SECTOR_KBLI[b.sector].golongan,
       b.yearsRunning,
       b.employees,
       b.ownerRole,

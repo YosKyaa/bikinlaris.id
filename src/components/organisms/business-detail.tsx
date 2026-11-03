@@ -17,6 +17,7 @@ import { ROUTES } from "@/lib/auth/constants";
 import type { Participant, ResearchEvent } from "@/lib/data/types";
 import { getSop } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate, formatDateTime } from "@/lib/format";
+import { regencyName } from "@/lib/wilayah";
 
 import { BusinessMap } from "./business-map";
 
@@ -36,7 +37,7 @@ export function BusinessDetail({
     [copy.owner, business.ownerName],
     [copy.whatsapp, `+${business.whatsapp}`],
     [fields.product.label, business.product],
-    [fields.location.label, options.location[business.location]],
+    [fields.location.label, regencyName(business.location)],
     [fields.sector.label, options.sector[business.sector]],
     [fields.yearsRunning.label, options.yearsRunning[business.yearsRunning]],
     [fields.employees.label, options.employees[business.employees]],

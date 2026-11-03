@@ -9,13 +9,12 @@ import {
   SELF_SIGNUP_FILTER,
   type MonitoringFilters as Filters,
 } from "@/lib/data/monitoring";
-import { LOCATION_GROUPS } from "@/lib/validations/business";
-
-const groupLabels: Record<string, string> = id.profile.optionGroups.location;
 
 interface MonitoringFiltersProps {
   filters: Filters;
   members: { id: string; label: string }[];
+  /** Kab/kota that have participants, grouped by province (not all 514). */
+  locations: { province: string; options: { code: string; label: string }[] }[];
   shown: number;
   total: number;
 }
@@ -27,7 +26,13 @@ const SELECT_CLASS =
  * One filter row above everything it scopes. A plain GET form: works without JavaScript and
  * the filtered view can be shared as a link.
  */
-export function MonitoringFilters({ filters, members, shown, total }: MonitoringFiltersProps) {
+export function MonitoringFilters({
+  filters,
+  members,
+  locations,
+  shown,
+  total,
+}: MonitoringFiltersProps) {
   const copy = id.monitoring.filters;
   const filtered = filters.location !== ALL || filters.staffId !== ALL;
 
@@ -46,21 +51,15 @@ export function MonitoringFilters({ filters, members, shown, total }: Monitoring
           className={SELECT_CLASS}
         >
           <option value={ALL}>{copy.all}</option>
-          {Object.entries(LOCATION_GROUPS).map(([group, locations]) => {
-            const options = locations.map((location) => (
-              <option key={location} value={location}>
-                {id.profile.options.location[location]}
-              </option>
-            ));
-            const label = groupLabels[group];
-            return label ? (
-              <optgroup key={group} label={label}>
-                {options}
-              </optgroup>
-            ) : (
-              options
-            );
-          })}
+          {locations.map((group) => (
+            <optgroup key={group.province} label={group.province}>
+              {group.options.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </select>
       </label>
       <label className="flex flex-col gap-1.5 text-sm font-medium">

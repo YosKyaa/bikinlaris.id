@@ -1,28 +1,25 @@
 import { z } from "zod";
 
+import { OTHER_LOCATION, REGENCY_CODES, type RegencyCode } from "@/lib/wilayah";
+
 /**
  * Business profile (spec `data_model.businesses`, = Bagian B of the questionnaire).
- * Option values are stable codes stored in the database; labels live in content/id.ts.
- * "<1 tahun" is intentionally absent (konteks-riset.md).
+ * Option values are stable codes stored in the database; labels live in content/id.ts
+ * (locations: content/wilayah.ts). "<1 tahun" is intentionally absent (konteks-riset.md).
  *
- * Locations and sectors were widened on 30 Oktober 2026 (docs/PERUBAHAN.md). Old codes keep
- * their place: "bekasi" now reads "Kota Bekasi", "jasa" reads "Jasa lainnya". The database
- * CHECK constraints list the same codes (supabase/migrations/20261030000000_*.sql).
+ * Sectors were widened on 30 Oktober 2026 ("jasa" now reads "Jasa lainnya"); each maps to a
+ * KBLI 2020 code for the research export (content/kbli.ts). Locations became Kemendagri codes on
+ * 3 November 2026 (supabase/migrations/20261103010000_*.sql rewrote the stored rows).
  */
 
-/** Grouped for the form; LOCATIONS is the flat list in the same order. */
-export const LOCATION_GROUPS = {
-  jawaBarat: ["depok", "kota_bogor", "kab_bogor", "bekasi", "kab_bekasi"],
-  jakarta: ["jakarta_selatan", "jakarta_timur", "jakarta_pusat", "jakarta_barat", "jakarta_utara"],
-  banten: ["kota_tangerang", "tangsel", "kab_tangerang"],
-  other: ["lainnya"],
-} as const;
-export const LOCATIONS = [
-  ...LOCATION_GROUPS.jawaBarat,
-  ...LOCATION_GROUPS.jakarta,
-  ...LOCATION_GROUPS.banten,
-  ...LOCATION_GROUPS.other,
-] as const;
+/**
+ * Location = Kemendagri kab/kota code ("32.76" = Kota Depok), all of Indonesia (content/wilayah.ts),
+ * chosen as Provinsi → Kabupaten/Kota. "lainnya" only exists on rows from before 3 November 2026.
+ */
+export const LOCATIONS = [...REGENCY_CODES, OTHER_LOCATION] as [
+  RegencyCode | typeof OTHER_LOCATION,
+  ...(RegencyCode | typeof OTHER_LOCATION)[],
+];
 
 export const SECTOR_GROUPS = {
   food: ["kuliner", "produksi_rumahan"],

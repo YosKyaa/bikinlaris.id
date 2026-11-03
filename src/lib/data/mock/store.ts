@@ -158,7 +158,7 @@ const PARTIAL_ANSWERS: Answers = Object.fromEntries(
 const DEMO_PROFILE: BusinessProfile = {
   name: "Dapur Bu Rini",
   product: "nasi box",
-  location: "depok",
+  location: "32.76",
   sector: "kuliner",
   yearsRunning: "3_5",
   employees: "1_4",
@@ -193,7 +193,7 @@ const SEED: SeedBusiness[] = [
       ...DEMO_PROFILE,
       name: "Katering Mbak Sari",
       product: "katering harian",
-      location: "bekasi",
+      location: "32.75",
     },
     answers: ALT_ANSWERS,
     hardest: "pesanan",
@@ -207,7 +207,7 @@ const SEED: SeedBusiness[] = [
       name: "Jahit Pak Udin",
       product: "jahit dan permak",
       sector: "jasa",
-      location: "kota_bogor",
+      location: "32.71",
       employees: "tanpa",
     },
     answers: DEMO_ANSWERS,
@@ -223,7 +223,7 @@ const SEED: SeedBusiness[] = [
       name: "Kue Nenek Ani",
       product: "kue basah",
       sector: "produksi_rumahan",
-      location: "kab_bogor",
+      location: "32.01",
     },
     answers: ALT_ANSWERS,
     hardest: "stok",
@@ -250,7 +250,7 @@ const SEED: SeedBusiness[] = [
       ...DEMO_PROFILE,
       name: "Warung Kopi Pak Darto",
       product: "kopi dan gorengan",
-      location: "bekasi",
+      location: "32.75",
       employees: "tanpa",
     },
     answers: ALT_ANSWERS,
@@ -268,7 +268,7 @@ const SEED: SeedBusiness[] = [
   {
     token: MOCK_FRESH_TOKEN,
     ownerName: "Mira",
-    profile: { ...DEMO_PROFILE, name: "Seblak Teh Mira", product: "seblak", location: "bekasi" },
+    profile: { ...DEMO_PROFILE, name: "Seblak Teh Mira", product: "seblak", location: "32.75" },
   },
 ];
 

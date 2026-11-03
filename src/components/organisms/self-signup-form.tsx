@@ -7,6 +7,7 @@ import { Controller, useForm, type FieldError as HookFieldError } from "react-ho
 
 import { ChoiceChips } from "@/components/molecules/choice-chips";
 import { InlineError } from "@/components/molecules/inline-error";
+import { LocationPicker } from "@/components/molecules/location-picker";
 import { ProfileSelectItems } from "@/components/molecules/profile-select-items";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,7 +27,6 @@ import { registerBusinessAction } from "@/lib/actions/signup";
 import { ROUTES } from "@/lib/auth/constants";
 import {
   EMPLOYEE_COUNTS,
-  LOCATION_GROUPS,
   NAME_MAX_LENGTH,
   OWNER_ROLES,
   PRODUCT_MAX_LENGTH,
@@ -118,18 +118,18 @@ export function SelfSignupForm() {
     );
   }
 
-  function selectField(key: "sector" | "location", groups: Record<string, readonly string[]>) {
-    const error = errorText(errors[key]);
+  function sectorField() {
+    const error = errorText(errors.sector);
     return (
       <Controller
         control={form.control}
-        name={key}
+        name="sector"
         render={({ field }) => (
           <Field data-invalid={Boolean(error)}>
-            <FieldLabel htmlFor={`daftar-${key}`}>{profile.fields[key].label}</FieldLabel>
+            <FieldLabel htmlFor="daftar-sector">{profile.fields.sector.label}</FieldLabel>
             <Select value={field.value ?? ""} onValueChange={field.onChange} name={field.name}>
               <SelectTrigger
-                id={`daftar-${key}`}
+                id="daftar-sector"
                 ref={field.ref}
                 aria-invalid={Boolean(error)}
                 className="h-12 w-full"
@@ -138,9 +138,9 @@ export function SelfSignupForm() {
               </SelectTrigger>
               <SelectContent>
                 <ProfileSelectItems
-                  groups={groups}
-                  labels={profile.options[key]}
-                  groupLabels={profile.optionGroups[key]}
+                  groups={SECTOR_GROUPS}
+                  labels={profile.options.sector}
+                  groupLabels={profile.optionGroups.sector}
                 />
               </SelectContent>
             </Select>
@@ -166,8 +166,19 @@ export function SelfSignupForm() {
         <FieldGroup>
           {textField("name", { autoComplete: "organization", maxLength: NAME_MAX_LENGTH })}
           {textField("product", { autoComplete: "off", maxLength: PRODUCT_MAX_LENGTH })}
-          {selectField("sector", SECTOR_GROUPS)}
-          {selectField("location", LOCATION_GROUPS)}
+          {sectorField()}
+          <Controller
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <LocationPicker
+                idPrefix="daftar-location"
+                value={field.value}
+                onChange={field.onChange}
+                error={errorText(errors.location)}
+              />
+            )}
+          />
         </FieldGroup>
       </FieldSet>
 

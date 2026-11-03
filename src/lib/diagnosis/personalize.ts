@@ -8,6 +8,7 @@ import type { PackResult } from "@/lib/data/source";
 import type { Business, Diagnosis, Pack, PackSop } from "@/lib/data/types";
 import { env } from "@/lib/env";
 import { toJson } from "@/lib/json";
+import { regencyName } from "@/lib/wilayah";
 
 import { getProblem, getQuestion, getSection, getSop } from "./bank";
 
@@ -55,7 +56,7 @@ function promptInput(business: Business, diagnosis: Diagnosis, pack: Pack) {
       nama: business.name,
       produk: business.product,
       jenis: options.sector[business.sector],
-      lokasi: options.location[business.location],
+      lokasi: regencyName(business.location),
       karyawan: options.employees[business.employees],
     },
     paling_repot: getSection(pack.hardestSection).label,

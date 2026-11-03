@@ -19,6 +19,7 @@ import {
 } from "@/lib/validations/stored";
 import { STAFF_ROLES } from "@/lib/validations/auth";
 import { toJson } from "@/lib/json";
+import { LEGACY_LOCATIONS } from "@/lib/wilayah";
 import type { Json, TableRow } from "@/types/database";
 
 import {
@@ -46,7 +47,11 @@ const businessRowSchema = z.object({
   pemilik: z.string(),
   wa: z.string(),
   produk: z.string(),
-  lokasi: z.enum(LOCATIONS),
+  // Rows from before the Kemendagri codes (if the migration has not run yet) read as their code.
+  lokasi: z.preprocess(
+    (value) => (typeof value === "string" ? (LEGACY_LOCATIONS[value] ?? value) : value),
+    z.enum(LOCATIONS),
+  ),
   sektor: z.enum(SECTORS),
   lama_usaha: z.enum(YEARS_RUNNING),
   jumlah_karyawan: z.enum(EMPLOYEE_COUNTS),

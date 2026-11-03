@@ -8,7 +8,6 @@ import { buildPack, computeMap, hardestCandidates } from "@/lib/diagnosis/scorin
 import { addDays, daysBetween } from "@/lib/format";
 import {
   EMPLOYEE_COUNTS,
-  LOCATIONS,
   OWNER_ROLES,
   SECTORS,
   YEARS_RUNNING,
@@ -54,6 +53,22 @@ const COHORT: [business: string, product: string, owner: string][] = [
 ];
 
 const COHORT_SPAN_DAYS = 56;
+/** Jabodetabek kab/kota (Kemendagri codes), the study area. */
+const DEMO_LOCATIONS = [
+  "32.76",
+  "32.75",
+  "32.16",
+  "32.71",
+  "32.01",
+  "31.71",
+  "31.72",
+  "31.73",
+  "31.74",
+  "31.75",
+  "36.71",
+  "36.74",
+  "36.03",
+] as const;
 const SHARE_NOT_STARTED = 0.08;
 const SHARE_PARTIAL = 0.1;
 const SHARE_SENT = 0.85;
@@ -139,7 +154,7 @@ export function demoCohort(today: string): DemoParticipant[] {
       profile: {
         name,
         product,
-        location: rng.pick(LOCATIONS),
+        location: rng.pick(DEMO_LOCATIONS),
         sector: rng.pick(SECTORS),
         yearsRunning: rng.pick(YEARS_RUNNING),
         employees: rng.pick(EMPLOYEE_COUNTS),

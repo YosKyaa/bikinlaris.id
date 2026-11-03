@@ -9,6 +9,7 @@ import { data } from "@/lib/data";
 import { buildMonitoring, parseMonitoringFilters } from "@/lib/data/monitoring";
 import { env, isMockData } from "@/lib/env";
 import { formatDate, todayIso } from "@/lib/format";
+import { groupByProvince } from "@/lib/wilayah";
 
 export const metadata: Metadata = { title: id.monitoring.title };
 
@@ -55,6 +56,7 @@ export default async function MonitoringPage({ searchParams }: PageProps<"/penel
       <MonitoringFilters
         filters={filters}
         members={team.members.map((m) => ({ id: m.id, label: m.name ?? m.email }))}
+        locations={groupByProvince(participants.map((p) => p.business.location))}
         shown={monitoring.participants}
         total={monitoring.totalParticipants}
       />

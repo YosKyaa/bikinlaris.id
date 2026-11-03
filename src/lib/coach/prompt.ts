@@ -4,6 +4,7 @@ import { id } from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSection, getSop, sections } from "@/lib/diagnosis/bank";
 import { dayNumber } from "@/lib/format";
+import { regencyName } from "@/lib/wilayah";
 
 /**
  * The coach's instructions: how to answer, what is out of scope, and this owner's own pack.
@@ -32,7 +33,7 @@ export function coachInstructions(business: Business, pack: Pack): string {
       nama: business.name,
       produk: business.product,
       jenis: options.sector[business.sector],
-      lokasi: options.location[business.location],
+      lokasi: regencyName(business.location),
       lama: options.yearsRunning[business.yearsRunning],
       karyawan: options.employees[business.employees],
     },

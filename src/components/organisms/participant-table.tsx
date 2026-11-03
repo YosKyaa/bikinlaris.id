@@ -17,6 +17,7 @@ import { ROUTES } from "@/lib/auth/constants";
 import type { ParticipantFilter } from "@/lib/data/research";
 import type { ParticipantRow, ParticipantStage } from "@/lib/data/types";
 import { formatDateShort } from "@/lib/format";
+import { regencyName } from "@/lib/wilayah";
 
 export const STAGE_VARIANT: Record<
   ParticipantStage,
@@ -82,8 +83,7 @@ export function ParticipantTable({
                   {row.businessName}
                 </Link>
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-mono">{row.code}</span> ·{" "}
-                  {id.profile.options.location[row.location]}
+                  <span className="font-mono">{row.code}</span> · {regencyName(row.location)}
                 </div>
               </TableCell>
               <TableCell>{row.ownerName}</TableCell>

@@ -6,6 +6,7 @@ import { useState, useTransition, type ComponentProps } from "react";
 import { Controller, useForm, type FieldError as HookFieldError } from "react-hook-form";
 
 import { InlineError } from "@/components/molecules/inline-error";
+import { LocationPicker } from "@/components/molecules/location-picker";
 import { ProfileSelectItems } from "@/components/molecules/profile-select-items";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,6 @@ import { createParticipantAction, updateParticipantAction } from "@/lib/actions/
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import {
   EMPLOYEE_COUNTS,
-  LOCATION_GROUPS,
   NAME_MAX_LENGTH,
   OWNER_ROLES,
   PRODUCT_MAX_LENGTH,
@@ -33,13 +33,12 @@ import {
 } from "@/lib/validations/business";
 import { participantSchema, type ParticipantInput } from "@/lib/validations/participant";
 
-type SelectKey = "sector" | "location" | "yearsRunning" | "employees" | "ownerRole";
+type SelectKey = "sector" | "yearsRunning" | "employees" | "ownerRole";
 type TextKey = "ownerName" | "whatsapp" | "name" | "product";
 
 /** Option lists per dropdown. Long lists are grouped; short ones are a single group. */
 const SELECT_GROUPS: Record<SelectKey, Record<string, readonly string[]>> = {
   sector: SECTOR_GROUPS,
-  location: LOCATION_GROUPS,
   yearsRunning: { all: YEARS_RUNNING },
   employees: { all: EMPLOYEE_COUNTS },
   ownerRole: { all: OWNER_ROLES },
@@ -173,7 +172,18 @@ export function ParticipantForm({ businessId, defaults }: ParticipantFormProps) 
       <FieldSet>
         <FieldLegend>{profile.groups.people}</FieldLegend>
         <FieldGroup>
-          {selectField("location")}
+          <Controller
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <LocationPicker
+                idPrefix="participant-location"
+                value={field.value}
+                onChange={field.onChange}
+                error={errorText(errors.location)}
+              />
+            )}
+          />
           {selectField("yearsRunning")}
           {selectField("employees")}
           {selectField("ownerRole")}
