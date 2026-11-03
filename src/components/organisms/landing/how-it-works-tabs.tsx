@@ -70,14 +70,16 @@ export function HowItWorksTabs({ steps }: { steps: HowStep[] }) {
               className={cn(
                 "group flex gap-4 rounded-xl border-2 p-4 text-left transition-colors duration-200 sm:p-5",
                 selected
-                  ? "border-primary bg-success-soft shadow-card-hover"
+                  ? "border-primary bg-linear-to-br from-success-soft to-background shadow-card-hover"
                   : "border-border bg-background shadow-card hover:border-primary/40 hover:shadow-card-hover",
               )}
             >
               <span
                 className={cn(
                   "grid size-11 shrink-0 place-items-center rounded-lg text-xl font-bold tabular-nums transition-colors duration-200",
-                  selected ? "bg-primary text-primary-foreground" : "bg-muted text-primary",
+                  selected
+                    ? "bg-linear-135 from-primary to-brand-deep text-primary-foreground"
+                    : "bg-muted text-primary",
                 )}
               >
                 {index + 1}
@@ -99,7 +101,7 @@ export function HowItWorksTabs({ steps }: { steps: HowStep[] }) {
             role="tabpanel"
             aria-labelledby={`${baseId}-tab-${index}`}
             tabIndex={0}
-            className="animate-fade-up rounded-xl border bg-muted/60 p-4 shadow-card sm:p-6"
+            className="animate-fade-up rounded-xl border bg-linear-to-br from-muted to-success-soft p-4 shadow-card sm:p-6"
           >
             <p className="mb-3 text-sm font-semibold text-muted-foreground">
               {id.landing.how.exampleLabel}

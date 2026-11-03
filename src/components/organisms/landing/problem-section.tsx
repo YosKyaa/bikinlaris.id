@@ -5,17 +5,17 @@ import { id } from "@/content/id";
 export function ProblemSection() {
   const copy = id.landing.problems;
   return (
-    <section className="bg-muted">
+    <section className="bg-linear-to-b from-background via-success-soft to-background">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-24">
         <div className="reveal">
-          <Eyebrow>{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
+          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
         </div>
         <ul className="mt-8 space-y-3">
           {copy.items.map((item) => (
             <li
               key={item}
-              className="reveal-left rounded-xl border-l-4 border-primary/30 bg-background px-5 py-4 text-lg font-medium shadow-card transition-[border-color,box-shadow] duration-200 hover:border-primary hover:shadow-card-hover sm:text-xl"
+              className="reveal-left relative overflow-hidden rounded-xl bg-background py-4 pr-5 pl-7 text-lg font-medium shadow-card transition-shadow duration-200 before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-linear-to-b before:from-primary before:to-accent-lime hover:shadow-card-hover sm:text-xl"
             >
               “{item}”
             </li>

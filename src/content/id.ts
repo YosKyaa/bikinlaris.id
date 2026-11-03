@@ -101,8 +101,9 @@ export const id = {
   landing: {
     hero: {
       eyebrow: "Untuk warung, katering, toko, dan usaha jasa",
-      title: (questions: number) =>
-        `Rapikan cara kerja usaha Anda, mulai dari ${questions} pertanyaan.`,
+      // Rendered as titleLead, then titleMark with a highlighter stroke behind it.
+      titleLead: "Rapikan cara kerja usaha Anda, mulai dari",
+      titleMark: (questions: number) => `${questions} pertanyaan.`,
       subtitle:
         "Jawab pertanyaan tentang usaha Anda. Lihat bagian yang perlu dibenahi dulu. Bawa pulang SOP (panduan kerja langkah demi langkah) yang siap dipakai.",
       secondaryCta: "Lihat contoh SOP",
@@ -235,7 +236,7 @@ export const id = {
     },
     closing: {
       title: "Cara kerja yang rapi dimulai dari satu langkah kecil.",
-      body: "Pendamping menemani Anda menjawab pertanyaannya. Hasilnya SOP yang siap ditempel di dinding.",
+      body: "Isi sendiri dari HP, atau bersama pendamping. Hasilnya SOP yang siap ditempel di dinding.",
     },
     footer: {
       // [KONFIRMASI] Redaksi afiliasi.

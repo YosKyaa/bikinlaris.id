@@ -21,6 +21,7 @@
   --color-success-soft: var(--success-soft);
   --color-brand-deep: var(--brand-deep);
   --color-brand-deep-muted: var(--brand-deep-muted);
+  --color-brand-mid: var(--brand-mid);
   --color-accent-lime: var(--accent-lime);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -70,6 +71,8 @@
   --warning-soft: oklch(0.968 0.025 78.92); /* #FEF3E2 */
   --destructive-soft: oklch(0.956 0.019 25.6); /* #FDECEA */
   --brand-deep-muted: oklch(0.848 0.019 161.04); /* #C3D1C9, secondary text on --brand-deep */
+  /* Landing gradients run --brand-deep → --brand-mid. On it: white 7.2:1, --brand-deep-muted 4.6:1, lime 5.6:1. */
+  --brand-mid: oklch(0.445 0.105 153.61); /* #116437 */
 
   /* shadcn aliases mapped onto the tokens above. */
   --card: var(--background);
@@ -215,9 +218,10 @@
     backdrop-filter: saturate(160%) blur(14px);
     border: 1px solid rgb(255 255 255 / 0.6);
   }
-  /* Stronger glass for surfaces that carry body text or controls (contrast stays AA). */
+  /* Stronger glass for surfaces that carry body text or controls: at 93% white, grey text
+   * stays AA (4.8:1) even over black, e.g. the dark parts of the hero photo. */
   .glass-strong {
-    background-color: rgb(255 255 255 / 0.86);
+    background-color: rgb(255 255 255 / 0.93);
     -webkit-backdrop-filter: saturate(160%) blur(16px);
     backdrop-filter: saturate(160%) blur(16px);
     border: 1px solid rgb(255 255 255 / 0.7);
@@ -357,6 +361,31 @@
   }
 }
 
+@keyframes marker-draw {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+/*
+ * Landing gradients (owner request, 3 November 2026; see docs/PERUBAHAN.md). Green family
+ * only, no gradient text. Glows are radial gradients, not blur filters, so they stay cheap
+ * on low-end phones. Green glows never sit behind secondary text (contrast drops below AA).
+ */
+.marker {
+  /* Highlighter stroke behind a few heading words: dark text on lime, 14:1. */
+  background-image: linear-gradient(
+    transparent 58%,
+    color-mix(in oklab, var(--accent-lime) 70%, transparent) 58%,
+    color-mix(in oklab, var(--accent-lime) 70%, transparent) 94%,
+    transparent 94%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
 .scroll-progress {
   transform: scaleX(0);
   transform-origin: left;
@@ -381,6 +410,9 @@
   .drift {
     animation: drift 14s ease-in-out infinite;
     animation-delay: var(--delay, 0ms);
+  }
+  .marker {
+    animation: marker-draw 900ms cubic-bezier(0.2, 0.7, 0.2, 1) 400ms both;
   }
   .marquee-track {
     animation: marquee var(--duration, 45s) linear infinite;

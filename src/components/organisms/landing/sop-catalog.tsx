@@ -37,7 +37,7 @@ export function SopCatalog({ sections }: { sections: CatalogSection[] }) {
               className={cn(
                 "h-11 rounded-full border px-4 font-medium transition-colors duration-150",
                 selected
-                  ? "border-brand-deep bg-brand-deep text-white"
+                  ? "border-brand-deep bg-linear-135 from-brand-deep to-brand-mid text-white"
                   : "bg-background hover:border-primary/50 hover:bg-muted",
               )}
             >

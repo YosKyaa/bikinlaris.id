@@ -18,11 +18,12 @@ export function CredibilitySection() {
   ];
 
   return (
-    <section className="relative isolate overflow-hidden bg-brand-deep text-white">
+    <section className="relative isolate overflow-hidden bg-linear-135 from-brand-deep from-30% to-brand-mid text-white">
+      {/* Green light behind the text (keeps 5.4:1), lime only behind the number cards. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="drift absolute -top-20 left-[10%] size-80 rounded-full bg-accent-lime/25 blur-3xl" />
+        <div className="drift absolute -top-48 -left-40 size-[36rem] bg-radial from-primary/40 to-transparent to-70%" />
         <div
-          className="drift absolute right-[5%] -bottom-24 size-96 rounded-full bg-primary/50 blur-3xl"
+          className="drift absolute -right-40 -bottom-56 size-[40rem] bg-radial from-accent-lime/25 to-transparent to-70%"
           style={{ "--delay": "-7s" } as CSSProperties}
         />
       </div>

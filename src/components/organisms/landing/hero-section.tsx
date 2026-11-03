@@ -18,21 +18,26 @@ const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 export function HeroSection() {
   const copy = id.landing.hero;
   return (
-    <section id={HERO_ID} className="relative isolate overflow-hidden">
-      {/* Soft moving light behind the hero; decorative. */}
+    <section
+      id={HERO_ID}
+      className="relative isolate overflow-hidden bg-linear-to-b from-success-soft via-success-soft/40 to-background"
+    >
+      {/* Moving lime light behind the hero; decorative. Lime keeps grey text above AA. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="drift absolute -top-24 right-[-10%] size-[28rem] rounded-full bg-accent-lime/30 blur-3xl" />
+        <div className="drift absolute -top-48 right-[-25%] size-[44rem] bg-radial from-accent-lime/60 to-transparent to-70%" />
         <div
-          className="drift absolute top-1/3 left-[-12%] size-[24rem] rounded-full bg-primary/15 blur-3xl"
+          className="drift absolute -bottom-40 left-[-30%] size-[36rem] bg-radial from-accent-lime/35 to-transparent to-70%"
           style={{ "--delay": "-6s" } as CSSProperties}
         />
       </div>
       <div className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 lg:pt-16 lg:pb-24">
         <div className="grid items-center gap-10 *:min-w-0 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div>
-            <Eyebrow className="enter">{copy.eyebrow}</Eyebrow>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-              {copy.title(totalQuestions)}
+            <Eyebrow tone="pill" className="enter">
+              {copy.eyebrow}
+            </Eyebrow>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+              {copy.titleLead} <span className="marker">{copy.titleMark(totalQuestions)}</span>
             </h1>
             <p className="enter mt-4 max-w-xl text-lg text-muted-foreground" style={delay(120)}>
               {copy.subtitle}

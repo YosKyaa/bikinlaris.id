@@ -134,11 +134,15 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section id={LANDING_ANCHORS.how} className="scroll-mt-20">
+    <section id={LANDING_ANCHORS.how} className="relative isolate scroll-mt-20 overflow-hidden">
+      <div
+        aria-hidden
+        className="drift absolute -right-48 bottom-0 -z-10 size-[40rem] bg-radial from-accent-lime/40 to-transparent to-70%"
+      />
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
         <div className="reveal">
-          <Eyebrow>{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
+          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
         </div>
         <div className="reveal-scale mt-10">
           <HowItWorksTabs steps={steps} />

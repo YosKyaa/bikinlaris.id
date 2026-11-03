@@ -44,7 +44,10 @@ export function SiteHeader() {
         </div>
       </div>
       {/* Reading progress, driven by page scroll (CSS only). */}
-      <div aria-hidden className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-primary" />
+      <div
+        aria-hidden
+        className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-linear-to-r from-primary to-accent-lime"
+      />
     </header>
   );
 }

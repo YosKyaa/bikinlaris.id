@@ -10,11 +10,21 @@ import { SopDocumentPreview } from "./sop-document-preview";
 /**
  * Hero visual: a real, cheerful stall owner (Bali) with a live SOP page floating over the photo
  * in glass. The photo drifts on scroll; a small glass pill floats. The SOP card itself stays
- * still because it holds tappable controls.
+ * still because it holds tappable controls. Behind the photo: a brand gradient panel that
+ * peeks out top right, and a green glow (only here: green behind grey text fails AA).
  */
 export function HeroVisual() {
   return (
     <div className="enter-zoom relative w-full md:mx-auto md:max-w-xl lg:max-w-none lg:pb-12 lg:pl-12">
+      <div
+        aria-hidden
+        className="drift absolute -inset-[15%] -z-10 bg-radial from-primary/30 to-transparent to-65%"
+        style={{ "--delay": "-3s" } as CSSProperties}
+      />
+      <div
+        aria-hidden
+        className="absolute -top-3 -right-3 -z-10 h-3/4 w-3/4 rounded-xl bg-linear-135 from-accent-lime to-primary sm:-top-4 sm:-right-4"
+      />
       <PhotoFrame
         photo={photos.hero}
         priority

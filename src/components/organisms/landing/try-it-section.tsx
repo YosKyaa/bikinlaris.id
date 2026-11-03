@@ -32,11 +32,14 @@ export function TryItSection() {
   });
 
   return (
-    <section id={TRY_IT_ID} className="scroll-mt-20 border-t">
+    <section
+      id={TRY_IT_ID}
+      className="scroll-mt-20 bg-linear-to-b from-background via-success-soft to-background"
+    >
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
         <div className="reveal max-w-2xl">
-          <Eyebrow>{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
+          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
           <p className="mt-3 text-lg text-muted-foreground">{copy.body(totalQuestions)}</p>
         </div>
         <div className="reveal-scale mt-10">
