@@ -58,7 +58,7 @@ export function ResearcherMobileBar(nav: Omit<ResearcherNavProps, "onNavigate">)
           >
             <XIcon aria-hidden className="size-6" />
           </Button>
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-x-hidden overflow-y-auto overscroll-contain">
             <ResearcherNav {...nav} onNavigate={() => setOpen(false)} />
           </div>
         </SheetContent>

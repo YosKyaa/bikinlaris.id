@@ -110,6 +110,8 @@ export interface StaffStore {
   getParticipant(businessId: string): Promise<Participant | null>;
   createParticipant(input: NewParticipant): Promise<Participant>;
   updateParticipant(businessId: string, input: NewParticipant): Promise<boolean>;
+  /** Admin only (RLS "admin menghapus peserta"): answers, pack, events and coach go with it. */
+  deleteParticipant(businessId: string): Promise<boolean>;
   setQuestionnaire(
     businessId: string,
     field: QuestionnaireField,
@@ -123,6 +125,10 @@ export interface StaffStore {
   listTeam(): Promise<{ members: TeamMember[]; invites: TeamInvite[] }>;
   invite(email: string, role: TeamInvite["role"]): Promise<InviteResult>;
   removeInvite(email: string): Promise<boolean>;
+  /** Admin only (RLS "admin mengubah peran"). False when no such member. */
+  setRole(userId: string, role: TeamMember["role"]): Promise<boolean>;
+  /** Admin only, never oneself (RLS "admin mengeluarkan anggota"). The login account stays. */
+  removeMember(userId: string): Promise<boolean>;
 }
 
 export interface DataSource {

@@ -35,7 +35,8 @@ export const ROUTES = {
   researcherBusiness: (businessId: string) => `/tim/umkm/${businessId}`,
   editParticipant: (businessId: string) => `/tim/umkm/${businessId}/ubah`,
   team: "/tim/anggota",
-  researcherExport: (table: "ringkasan" | "events" | "coach") => `/api/tim/ekspor?tabel=${table}`,
+  researcherExport: (table: "ringkasan" | "events" | "coach" | "laporan") =>
+    `/api/tim/ekspor?tabel=${table}`,
 } as const;
 
 /** Owner pages: reached through the private link, never through a login form. */

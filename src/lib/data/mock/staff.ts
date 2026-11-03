@@ -142,4 +142,28 @@ export const mockStaffStore: StaffStore = {
   async removeInvite(email) {
     return store().invites.delete(email);
   },
+
+  async removeMember(userId) {
+    const s = store();
+    const member = [...s.staff.values()].find((m) => m.id === userId);
+    return member ? s.staff.delete(member.email) : false;
+  },
+
+  async deleteParticipant(businessId) {
+    const s = store();
+    if (!s.businesses.delete(businessId)) return false;
+    s.diagnoses.delete(businessId);
+    s.packs.delete(businessId);
+    for (const [token, owner] of s.tokens) if (owner === businessId) s.tokens.delete(token);
+    s.events = s.events.filter((e) => e.businessId !== businessId);
+    s.coach = s.coach.filter((m) => m.businessId !== businessId);
+    return true;
+  },
+
+  async setRole(userId, role) {
+    const member = [...store().staff.values()].find((m) => m.id === userId);
+    if (!member) return false;
+    member.role = role;
+    return true;
+  },
 };

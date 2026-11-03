@@ -16,6 +16,7 @@ import {
   PARTICIPANT_FILTERS,
   type ParticipantFilter as Filter,
 } from "@/lib/data/research";
+import { requireStaffPage } from "@/lib/data/staff-session";
 import { todayIso } from "@/lib/format";
 
 export const metadata: Metadata = { title: id.researcher.list.title };
@@ -27,7 +28,11 @@ function parseFilter(value: string | string[] | undefined): Filter {
 /** Every participant with the stage filter (shareable links), then the CSV downloads. */
 export default async function ParticipantListPage({ searchParams }: PageProps<"/tim/umkm">) {
   const filter = parseFilter((await searchParams)[FILTER_PARAM]);
-  const rows = buildRows(await data().staff.listParticipants(), todayIso());
+  const [user, participants] = await Promise.all([
+    requireStaffPage(),
+    data().staff.listParticipants(),
+  ]);
+  const rows = buildRows(participants, todayIso());
   const copy = id.researcher.list;
 
   return (
@@ -53,6 +58,7 @@ export default async function ParticipantListPage({ searchParams }: PageProps<"/
       <ParticipantTable
         rows={filter === "semua" ? rows : rows.filter((row) => row.stage === filter)}
         filter={filter}
+        canDelete={user.role === "admin"}
       />
       <ExportPanel coachExport={isCoachEnabled()} />
     </>

@@ -95,7 +95,7 @@ export default async function ResearcherDashboardPage() {
         </div>
         {/* Everyone done: nothing urgent, and the empty state would wrongly say "add the first". */}
         {urgent.length > 0 || counts.semua === 0 ? (
-          <ParticipantTable rows={urgent} filter="semua" />
+          <ParticipantTable rows={urgent} filter="semua" compact />
         ) : null}
       </section>
     </>

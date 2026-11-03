@@ -293,6 +293,7 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      claim_staff_invite: { Args: never; Returns: boolean };
       is_admin: { Args: never; Returns: boolean };
       is_staff: { Args: never; Returns: boolean };
       umkm_catat: {

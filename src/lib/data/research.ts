@@ -37,7 +37,7 @@ export const PARTICIPANT_FILTERS = [
 export type ParticipantFilter = (typeof PARTICIPANT_FILTERS)[number];
 
 /** Most urgent first in the table. */
-const STAGE_ORDER: Record<ParticipantStage, number> = {
+export const STAGE_ORDER: Record<ParticipantStage, number> = {
   siap_dikirim: 0,
   terkirim: 1,
   belum_h30: 2,
@@ -151,23 +151,29 @@ export function buildDueList(participants: Participant[], today: string): DueIte
 
 /* ---------- CSV export (SmartPLS input, joined to SurveyMonkey by `kode`) ---------- */
 
-type Cell = string | number | boolean | null | undefined;
+export type Cell = string | number | boolean | null | undefined;
+
+/** Header + rows, shared by the CSV files and the Excel report (same columns, same values). */
+export interface DataTable {
+  header: string[];
+  rows: Cell[][];
+}
 
 function csvCell(value: Cell): string {
   const text = value === null || value === undefined ? "" : String(value);
   return /[",\n;]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-function toCsv(header: string[], rows: Cell[][]): string {
+function toCsv({ header, rows }: DataTable): string {
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
 /** One row per participant: profile, answers per question, map, pack, questionnaire, usage. */
-export function summaryCsv(
+export function summaryTable(
   participants: Participant[],
   events: ResearchEvent[],
   today: string,
-): string {
+): DataTable {
   const header = [
     "kode",
     "business_id",
@@ -249,14 +255,17 @@ export function summaryCsv(
       ...EVENT_ACTIONS.map((a) => own.filter((e) => e.action === a).length),
     ];
   });
-  return toCsv(header, rows);
+  return { header, rows };
 }
 
-export function eventsCsv(participants: Participant[], events: ResearchEvent[]): string {
+export const summaryCsv = (...args: Parameters<typeof summaryTable>) =>
+  toCsv(summaryTable(...args));
+
+export function eventsTable(participants: Participant[], events: ResearchEvent[]): DataTable {
   const codes = new Map(participants.map((p) => [p.business.id, p.business.code]));
-  return toCsv(
-    ["id", "kode", "business_id", "action", "meta", "created_at"],
-    events.map((e) => [
+  return {
+    header: ["id", "kode", "business_id", "action", "meta", "created_at"],
+    rows: events.map((e) => [
       e.id,
       codes.get(e.businessId) ?? null,
       e.businessId,
@@ -264,15 +273,17 @@ export function eventsCsv(participants: Participant[], events: ResearchEvent[]):
       e.meta ? JSON.stringify(e.meta) : null,
       e.createdAt,
     ]),
-  );
+  };
 }
 
+export const eventsCsv = (...args: Parameters<typeof eventsTable>) => toCsv(eventsTable(...args));
+
 /** "Tanya coach" conversations, one row per message, for qualitative analysis. */
-export function coachCsv(participants: Participant[], messages: CoachMessage[]): string {
+export function coachTable(participants: Participant[], messages: CoachMessage[]): DataTable {
   const codes = new Map(participants.map((p) => [p.business.id, p.business.code]));
-  return toCsv(
-    ["id", "kode", "business_id", "peran", "topik", "isi", "sumber", "created_at"],
-    messages.map((m) => [
+  return {
+    header: ["id", "kode", "business_id", "peran", "topik", "isi", "sumber", "created_at"],
+    rows: messages.map((m) => [
       m.id,
       codes.get(m.businessId) ?? null,
       m.businessId,
@@ -282,5 +293,7 @@ export function coachCsv(participants: Participant[], messages: CoachMessage[]):
       m.source,
       m.createdAt,
     ]),
-  );
+  };
 }
+
+export const coachCsv = (...args: Parameters<typeof coachTable>) => toCsv(coachTable(...args));

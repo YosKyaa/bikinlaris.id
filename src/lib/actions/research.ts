@@ -8,7 +8,7 @@ import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { getStaffUser } from "@/lib/data/staff-session";
 import type { NewParticipant, Result, TeamInvite } from "@/lib/data/types";
-import { inviteSchema } from "@/lib/validations/auth";
+import { inviteSchema, STAFF_ROLES } from "@/lib/validations/auth";
 import {
   normalizeWhatsApp,
   participantSchema,
@@ -98,6 +98,9 @@ export async function setQuestionnaireAction(
   }
 }
 
+/** Supabase user ids are UUIDs; the demo data uses short readable ids. */
+const memberIdSchema = z.string().min(1).max(64);
+
 async function adminOnly(): Promise<boolean> {
   return (await getStaffUser())?.role === "admin";
 }
@@ -116,6 +119,65 @@ export async function inviteAction(values: {
     return { ok: true, data: result.invite };
   } catch {
     return { ok: false, error: id.team.errors.failed };
+  }
+}
+
+/**
+ * Admin gives a team member another role. Takes effect on the member's next page (the role is
+ * read per request). Admins cannot change their own role, so the team always keeps an admin.
+ */
+export async function setRoleAction(userId: string, role: string): Promise<Result<null>> {
+  const admin = await getStaffUser();
+  if (admin?.role !== "admin") return forbidden;
+  const parsedId = memberIdSchema.safeParse(userId);
+  const parsedRole = z.enum(STAFF_ROLES).safeParse(role);
+  if (!parsedId.success || !parsedRole.success)
+    return { ok: false, error: id.team.errors.roleFailed };
+  if (parsedId.data === admin.id) return { ok: false, error: id.team.errors.ownRole };
+  try {
+    const updated = await data().staff.setRole(parsedId.data, parsedRole.data);
+    if (!updated) return { ok: false, error: id.team.errors.notMember };
+    revalidatePath(ROUTES.researcher, "layout");
+    return { ok: true, data: null };
+  } catch {
+    return { ok: false, error: id.team.errors.roleFailed };
+  }
+}
+
+/** Admin lets a member go (never oneself). Their participants stay; so does their login. */
+export async function removeMemberAction(userId: string): Promise<Result<null>> {
+  const admin = await getStaffUser();
+  if (admin?.role !== "admin") return forbidden;
+  const parsed = memberIdSchema.safeParse(userId);
+  if (!parsed.success) return { ok: false, error: id.team.errors.removeFailed };
+  if (parsed.data === admin.id) return { ok: false, error: id.team.errors.ownRemove };
+  try {
+    const removed = await data().staff.removeMember(parsed.data);
+    if (!removed) return { ok: false, error: id.team.errors.notMember };
+    revalidatePath(ROUTES.researcher, "layout");
+    return { ok: true, data: null };
+  } catch {
+    return { ok: false, error: id.team.errors.removeFailed };
+  }
+}
+
+/**
+ * Admin deletes a participant for good (e.g. test entries): answers, pack, events and coach
+ * messages go with it. False from the database (no row, or the policy is not there yet) is
+ * reported without technical detail.
+ */
+export async function deleteParticipantAction(businessId: string): Promise<Result<null>> {
+  const admin = await getStaffUser();
+  if (admin?.role !== "admin") return forbidden;
+  const parsed = businessIdSchema.safeParse(businessId);
+  if (!parsed.success) return { ok: false, error: id.researcher.remove.failed };
+  try {
+    const deleted = await data().staff.deleteParticipant(parsed.data);
+    if (!deleted) return { ok: false, error: id.researcher.remove.notDeleted };
+    revalidatePath(ROUTES.researcher, "layout");
+    return { ok: true, data: null };
+  } catch {
+    return { ok: false, error: id.researcher.remove.failed };
   }
 }
 

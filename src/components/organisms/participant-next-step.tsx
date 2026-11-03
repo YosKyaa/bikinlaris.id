@@ -7,7 +7,7 @@ import type { ParticipantStage } from "@/lib/data/types";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { ParticipantLinks } from "@/lib/research-links";
 
-import { STAGE_VARIANT } from "./participant-table";
+import { STAGE_VARIANT } from "@/components/molecules/participant-cells";
 import { MarkQuestionnaireButton, SendQuestionnaireLink } from "./questionnaire-buttons";
 
 interface ParticipantNextStepProps {

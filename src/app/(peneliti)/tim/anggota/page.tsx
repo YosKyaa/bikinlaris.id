@@ -16,7 +16,7 @@ export default async function TeamPage() {
   const signUpUrl = `${appUrl}${ROUTES.signUp}`;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
       <header className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">{id.team.title}</h1>
         <p className="text-muted-foreground">{id.team.subtitle}</p>

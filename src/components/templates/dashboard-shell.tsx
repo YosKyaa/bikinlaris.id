@@ -21,13 +21,16 @@ export function DashboardShell({ nav, notice, children }: DashboardShellProps) {
   return (
     <div className="min-h-dvh bg-canvas lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] print:block print:bg-white">
       <aside className="sticky top-0 hidden h-dvh p-3 pr-0 lg:block print:hidden">
-        <div className="relative isolate h-full overflow-y-auto rounded-2xl bg-brand-deep">
+        {/* The tile clips the light; only the inner area scrolls, and only vertically. */}
+        <div className="relative isolate h-full overflow-hidden rounded-2xl bg-brand-deep">
           {/* Green light behind the logo only; the text below sits on plain --brand-deep. */}
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -right-24 -z-10 size-72 bg-radial from-primary/40 to-transparent to-70%"
           />
-          <ResearcherNav {...nav} />
+          <div className="h-full [scrollbar-width:thin] overflow-x-hidden overflow-y-auto overscroll-contain">
+            <ResearcherNav {...nav} />
+          </div>
         </div>
       </aside>
 

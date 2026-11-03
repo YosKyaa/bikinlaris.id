@@ -13,7 +13,7 @@ interface StepActionBarProps {
 /** "Kembali" + primary action. Sticky in the thumb zone on phones and tablets, inline on laptops. */
 export function StepActionBar({ backHref, nextLabel, onNext, pending }: StepActionBarProps) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:mt-8 lg:border-0 lg:p-0">
+    <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:mt-8 lg:border-0 lg:bg-transparent lg:p-0">
       <div className="mx-auto flex max-w-2xl gap-3">
         {backHref ? (
           <Button asChild variant="outline" size="lg" className="flex-1 lg:flex-none">

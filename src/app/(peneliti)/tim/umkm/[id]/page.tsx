@@ -7,6 +7,7 @@ import { z } from "zod";
 import { CopyField } from "@/components/molecules/copy-field";
 import { BusinessDetail } from "@/components/organisms/business-detail";
 import { CoachTranscript } from "@/components/organisms/coach-transcript";
+import { DeleteParticipantButton } from "@/components/organisms/delete-participant-button";
 import { ParticipantNextStep } from "@/components/organisms/participant-next-step";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { id } from "@/content/id";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { participantStage } from "@/lib/data/research";
+import { requireStaffPage } from "@/lib/data/staff-session";
 import { todayIso } from "@/lib/format";
 import { participantLinks } from "@/lib/research-links";
 
@@ -26,7 +28,8 @@ export default async function ParticipantPage({
   const businessId = z.uuid().safeParse((await params).id);
   if (!businessId.success) notFound();
   const staff = data().staff;
-  const [participant, events, coachMessages] = await Promise.all([
+  const [user, participant, events, coachMessages] = await Promise.all([
+    requireStaffPage(),
     staff.getParticipant(businessId.data),
     staff.listEvents(businessId.data),
     // The coach table may not exist yet on an older database: show no conversation then.
@@ -88,6 +91,25 @@ export default async function ParticipantPage({
 
       <BusinessDetail participant={participant} events={[...events].reverse()} />
       <CoachTranscript messages={coachMessages} />
+
+      {user.role === "admin" ? (
+        <section
+          aria-labelledby="hapus-umkm"
+          className="flex flex-col gap-4 rounded-2xl border border-destructive/30 bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        >
+          <div>
+            <h2 id="hapus-umkm" className="text-lg font-semibold">
+              {copy.remove.zoneTitle}
+            </h2>
+            <p className="text-muted-foreground">{copy.remove.zoneBody}</p>
+          </div>
+          <DeleteParticipantButton
+            businessId={business.id}
+            businessName={business.name}
+            redirectTo={ROUTES.participants}
+          />
+        </section>
+      ) : null}
     </div>
   );
 }

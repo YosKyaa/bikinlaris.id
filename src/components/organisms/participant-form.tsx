@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition, type ComponentProps } from "react";
 import { Controller, useForm, type FieldError as HookFieldError } from "react-hook-form";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { InlineError } from "@/components/molecules/inline-error";
 import { LocationPicker } from "@/components/molecules/location-picker";
 import { ProfileSelectItems } from "@/components/molecules/profile-select-items";
@@ -151,47 +152,53 @@ export function ParticipantForm({ businessId, defaults }: ParticipantFormProps) 
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-8 pb-24 lg:pb-0">
-      <FieldSet>
-        <FieldLegend>{copy.groups.owner}</FieldLegend>
-        <FieldGroup>
-          {textField("ownerName", { autoComplete: "off", maxLength: NAME_MAX_LENGTH })}
-          {textField("whatsapp", { type: "tel", inputMode: "tel", autoComplete: "off" })}
-        </FieldGroup>
-      </FieldSet>
+    <form onSubmit={onSubmit} noValidate className="grid gap-3 pb-24 sm:gap-4 lg:pb-0">
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{copy.groups.owner}</FieldLegend>
+          <FieldGroup>
+            {textField("ownerName", { autoComplete: "off", maxLength: NAME_MAX_LENGTH })}
+            {textField("whatsapp", { type: "tel", inputMode: "tel", autoComplete: "off" })}
+          </FieldGroup>
+        </FieldSet>
+      </BentoTile>
 
-      <FieldSet>
-        <FieldLegend>{profile.groups.business}</FieldLegend>
-        <FieldGroup>
-          {textField("name", { autoComplete: "off", maxLength: NAME_MAX_LENGTH })}
-          {textField("product", { autoComplete: "off", maxLength: PRODUCT_MAX_LENGTH })}
-          {selectField("sector")}
-        </FieldGroup>
-      </FieldSet>
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{profile.groups.business}</FieldLegend>
+          <FieldGroup>
+            {textField("name", { autoComplete: "off", maxLength: NAME_MAX_LENGTH })}
+            {textField("product", { autoComplete: "off", maxLength: PRODUCT_MAX_LENGTH })}
+            {selectField("sector")}
+          </FieldGroup>
+        </FieldSet>
+      </BentoTile>
 
-      <FieldSet>
-        <FieldLegend>{profile.groups.people}</FieldLegend>
-        <FieldGroup>
-          <Controller
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <LocationPicker
-                idPrefix="participant-location"
-                value={field.value}
-                onChange={field.onChange}
-                error={errorText(errors.location)}
-              />
-            )}
-          />
-          {selectField("yearsRunning")}
-          {selectField("employees")}
-          {selectField("ownerRole")}
-        </FieldGroup>
-      </FieldSet>
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{profile.groups.people}</FieldLegend>
+          <FieldGroup>
+            <Controller
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <LocationPicker
+                  idPrefix="participant-location"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errorText(errors.location)}
+                />
+              )}
+            />
+            {selectField("yearsRunning")}
+            {selectField("employees")}
+            {selectField("ownerRole")}
+          </FieldGroup>
+        </FieldSet>
+      </BentoTile>
 
       <InlineError message={serverError} />
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:pt-2">
         <div className="mx-auto max-w-2xl">
           <Button type="submit" size="lg" className="w-full lg:w-auto" disabled={pending}>
             {pending ? copy.pending : businessId ? copy.submitEdit : copy.submitNew}

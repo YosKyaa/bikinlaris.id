@@ -2,7 +2,6 @@
 
 import {
   BarChart3Icon,
-  DownloadIcon,
   LayoutDashboardIcon,
   ListChecksIcon,
   LogOutIcon,
@@ -17,6 +16,8 @@ import { Logo } from "@/components/atoms/logo";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
+
+import { ExportMenu } from "./export-menu";
 
 export interface ResearcherNavProps {
   userName: string;
@@ -36,9 +37,6 @@ interface NavItem {
   icon: LucideIcon;
   isActive: (path: string) => boolean;
 }
-
-type ExportTable = Parameters<typeof ROUTES.researcherExport>[0];
-const EXPORTS: ExportTable[] = ["ringkasan", "events"];
 
 const startsWith = (prefix: string) => (path: string) => path.startsWith(prefix);
 
@@ -90,9 +88,9 @@ const LINK_CLASS =
 const IDLE_CLASS = "text-brand-deep-muted hover:bg-white/10 hover:text-white";
 
 /**
- * Researcher panel navigation on --brand-deep: pages with icons (current page in lime), quick
- * CSV downloads, and the signed-in account with "Keluar". Used in the laptop sidebar and in the
- * phone drawer.
+ * Team panel navigation on --brand-deep: pages with icons (current page in lime), one
+ * "Unduh data" menu, and the signed-in account with "Keluar". Short enough for a 600px-high
+ * screen; it scrolls (vertically only) below that. Used in the laptop sidebar and the drawer.
  */
 export function ResearcherNav({
   userName,
@@ -104,10 +102,9 @@ export function ResearcherNav({
 }: ResearcherNavProps) {
   const pathname = usePathname();
   const copy = id.researcher.sidebar;
-  const tables: ExportTable[] = coachExport ? [...EXPORTS, "coach"] : [...EXPORTS];
 
   return (
-    <div className="flex h-full flex-col gap-6 p-4 text-white">
+    <div className="flex min-h-full flex-col gap-5 p-4 text-white">
       <div>
         <Link
           href={ROUTES.researcher}
@@ -141,25 +138,7 @@ export function ResearcherNav({
         </ul>
       </nav>
 
-      <section aria-labelledby="unduh-cepat">
-        <h2 id="unduh-cepat" className="px-3 text-sm font-semibold text-brand-deep-muted">
-          {copy.exports}
-        </h2>
-        <ul className="mt-1 space-y-1">
-          {tables.map((table) => (
-            <li key={table}>
-              <a
-                href={ROUTES.researcherExport(table)}
-                download
-                className={cn(LINK_CLASS, IDLE_CLASS, "text-sm")}
-              >
-                <DownloadIcon aria-hidden className="size-4 shrink-0" />
-                {copy.exportLinks[table]}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ExportMenu coachExport={coachExport} className={cn(LINK_CLASS, IDLE_CLASS, "w-full")} />
 
       <div className="mt-auto rounded-xl bg-white/10 p-3">
         <div className="flex items-center gap-3">

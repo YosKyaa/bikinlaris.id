@@ -39,6 +39,15 @@ async function staffById(supabase: Client, userId: string): Promise<StaffUser | 
   return data ? toStaff(data) : null;
 }
 
+/**
+ * A member who was let go and has been invited again joins back on sign-in: the account
+ * already exists, so the new-account trigger does not run (migration 20261103030000).
+ */
+async function rejoin(supabase: Client, userId: string): Promise<StaffUser | null> {
+  const { data, error } = await supabase.rpc("claim_staff_invite");
+  return !error && data ? staffById(supabase, userId) : null;
+}
+
 /** Owners' access tokens are readable by staff only (RLS), to build the private link. */
 async function participantsWhere(supabase: Client, businessId?: string): Promise<Participant[]> {
   const businesses = supabase.from("businesses").select("*").order("created_at");
@@ -79,7 +88,8 @@ export const supabaseStaffStore: StaffStore = {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.user) return { ok: false, reason: "invalid" };
-    const user = await staffById(supabase, data.user.id);
+    const user =
+      (await staffById(supabase, data.user.id)) ?? (await rejoin(supabase, data.user.id));
     if (!user) {
       await supabase.auth.signOut();
       return { ok: false, reason: "notStaff" };
@@ -109,7 +119,8 @@ export const supabaseStaffStore: StaffStore = {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) return { ok: false, reason: "invalid" };
-    const user = await staffById(supabase, data.user.id);
+    const user =
+      (await staffById(supabase, data.user.id)) ?? (await rejoin(supabase, data.user.id));
     if (!user) {
       await supabase.auth.signOut();
       return { ok: false, reason: "notStaff" };
@@ -256,6 +267,39 @@ export const supabaseStaffStore: StaffStore = {
       .single();
     if (error) return { ok: false, reason: "failed" };
     return { ok: true, invite: toInvite(data) };
+  },
+
+  async removeMember(userId) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("staff")
+      .delete()
+      .eq("user_id", userId)
+      .select("user_id");
+    if (error) throw error;
+    return data.length > 0;
+  },
+
+  async deleteParticipant(businessId) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("businesses")
+      .delete()
+      .eq("id", businessId)
+      .select("id");
+    if (error) throw error;
+    return data.length > 0;
+  },
+
+  async setRole(userId, role) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("staff")
+      .update({ role })
+      .eq("user_id", userId)
+      .select("user_id");
+    if (error) throw error;
+    return data.length > 0;
   },
 
   async removeInvite(email) {
