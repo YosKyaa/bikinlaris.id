@@ -300,6 +300,7 @@ export type Database = {
         Args: { p_action: string; p_meta: Json; p_token: string };
         Returns: undefined;
       };
+      umkm_coach_jatah: { Args: { p_token: string }; Returns: Json };
       umkm_coach_riwayat: { Args: { p_token: string }; Returns: Json };
       umkm_daftar: {
         Args: {

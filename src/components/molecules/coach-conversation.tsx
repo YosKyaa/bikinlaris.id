@@ -4,17 +4,38 @@ import { COACH_TOPICS, type CoachTopic } from "@/lib/coach/rules";
 import type { CoachRole } from "@/lib/data/types";
 
 import { CoachBubble } from "./coach-bubble";
+import { CoachTyping } from "./coach-typing";
+
+export interface CoachTurn {
+  id: number;
+  role: CoachRole;
+  text: string;
+  /** Sent during this visit: slides in. */
+  fresh?: boolean;
+  /** A new answer that is still typing itself out. */
+  typing?: boolean;
+}
 
 interface CoachConversationProps {
-  turns: { id: number; role: CoachRole; text: string }[];
+  turns: CoachTurn[];
   pending: boolean;
   /** Suggested questions are offered while there is no conversation yet. */
   canAsk: boolean;
   onSuggest: (topic: CoachTopic) => void;
+  /** Keeps the newest line in view while an answer types. */
+  onProgress: () => void;
+  onTyped: (turnId: number) => void;
 }
 
-/** The chat body: suggested questions to start, then the messages, then a "writing" note. */
-export function CoachConversation({ turns, pending, canAsk, onSuggest }: CoachConversationProps) {
+/** The chat body: suggested questions to start, then the messages, then the typing bubble. */
+export function CoachConversation({
+  turns,
+  pending,
+  canAsk,
+  onSuggest,
+  onProgress,
+  onTyped,
+}: CoachConversationProps) {
   const copy = id.coach;
   return (
     <div className="space-y-4">
@@ -39,13 +60,17 @@ export function CoachConversation({ turns, pending, canAsk, onSuggest }: CoachCo
       ) : null}
       <ul aria-live="polite" className="space-y-3">
         {turns.map((turn) => (
-          <CoachBubble key={turn.id} role={turn.role} text={turn.text} />
+          <CoachBubble
+            key={turn.id}
+            role={turn.role}
+            text={turn.text}
+            fresh={turn.fresh}
+            typing={turn.typing}
+            onProgress={onProgress}
+            onTyped={() => onTyped(turn.id)}
+          />
         ))}
-        {pending ? (
-          <li className="text-sm text-muted-foreground" role="status">
-            {copy.pending}
-          </li>
-        ) : null}
+        {pending ? <CoachTyping /> : null}
       </ul>
     </div>
   );

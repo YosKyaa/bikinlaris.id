@@ -16,6 +16,11 @@ const stateSchema = z.object({
 
 const registeredSchema = z.object({ kode: z.string(), token: z.string() });
 
+const coachQuotaSchema = z.object({
+  status: z.enum(["ok", "terlalu_cepat", "batas_harian", "batas_semua"]),
+  dipakai: z.number(),
+});
+
 const coachHistorySchema = z.object({
   pesan: z.array(z.unknown()),
   hari_ini: z.number(),
@@ -114,6 +119,13 @@ export const supabaseOwnerStore: OwnerStore = {
     if (data === null) throw new Error("tautan_tidak_valid");
     const history = coachHistorySchema.parse(data);
     return { turns: history.pesan.map(toCoachTurn), askedToday: history.hari_ini };
+  },
+
+  async reserveCoach(token) {
+    const { data, error } = await createAnonClient().rpc("umkm_coach_jatah", { p_token: token });
+    if (error) throw error;
+    const quota = coachQuotaSchema.parse(data);
+    return { status: quota.status, used: quota.dipakai };
   },
 
   async saveCoachExchange(token, exchange) {

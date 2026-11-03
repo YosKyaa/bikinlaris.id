@@ -65,6 +65,19 @@ export interface OwnerStore {
   coachHistory(token: string): Promise<CoachHistory>;
   /** Stores one question with its answer, and logs `coach_tanya`. */
   saveCoachExchange(token: string, exchange: CoachExchange): Promise<void>;
+  /**
+   * Takes one coach slot before the AI is called, atomically (the database queues callers):
+   * pause between questions, per-owner and all-owners daily limits. A taken slot stays taken.
+   */
+  reserveCoach(token: string): Promise<CoachQuota>;
+}
+
+export type CoachQuotaStatus = "ok" | "terlalu_cepat" | "batas_harian" | "batas_semua";
+
+/** `used`: this owner's slots today, including the one just taken. */
+export interface CoachQuota {
+  status: CoachQuotaStatus;
+  used: number;
 }
 
 /** waTaken: that number is already a participant (its link is never returned). */

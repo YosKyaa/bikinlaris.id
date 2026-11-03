@@ -3,7 +3,7 @@
 import { MessageCircleQuestionMarkIcon, SendHorizontalIcon, XIcon } from "lucide-react";
 import { useEffect, useId, useRef, useState, useTransition, type FormEvent } from "react";
 
-import { CoachConversation } from "@/components/molecules/coach-conversation";
+import { CoachConversation, type CoachTurn } from "@/components/molecules/coach-conversation";
 import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ import type { CoachRole } from "@/lib/data/types";
 
 /** The length counter appears only once the question gets close to the limit. */
 const COUNTER_FROM = 0.8;
+/** While an answer types, follow it only if the reader is this close to the bottom. */
+const FOLLOW_PX = 120;
 
 interface CoachWidgetProps {
   turns: { id: number; role: CoachRole; text: string }[];
@@ -35,6 +37,8 @@ interface CoachWidgetProps {
  * "Tanya coach": a labelled button at the bottom right (above the phone action bar) that opens
  * the chat full screen on phones and as a side panel on wider screens. The state lives here, so
  * closing the panel keeps the conversation. Every exchange is stored for the study (said on screen).
+ * Like a chat: the question shows at once, a typing bubble while the coach works, then the
+ * answer types itself out. On failure the question goes back into the field.
  */
 export function CoachWidget({
   turns: initial,
@@ -45,7 +49,9 @@ export function CoachWidget({
   const copy = id.coach;
   const inputId = useId();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [turns, setTurns] = useState(initial);
+  const [turns, setTurns] = useState<CoachTurn[]>(initial);
+  // Ids for messages made here; negative, so they never clash with stored ones.
+  const nextId = useRef(-1);
   const [asked, setAsked] = useState(askedToday);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -55,24 +61,51 @@ export function CoachWidget({
   // Keep the newest message in view.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [turns, pending]);
+  }, [turns.length, pending]);
+
+  /** Follows a typing answer, unless the reader scrolled up to read something else. */
+  function follow() {
+    const el = scrollRef.current;
+    if (el && el.scrollHeight - el.scrollTop - el.clientHeight < FOLLOW_PX) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }
 
   function ask(question: string, topic: CoachTopic | null) {
     setError(null);
+    if (!question.trim()) {
+      setError(copy.errors.empty);
+      return;
+    }
+    const questionId = nextId.current--;
+    setTurns((list) => [
+      ...list,
+      { id: questionId, role: "pemilik", text: question.trim(), fresh: true },
+    ]);
+    if (topic === null) setDraft("");
     startTransition(async () => {
       const result = await askCoachAction(question, topic);
       if (!result.ok) {
+        setTurns((list) => list.filter((turn) => turn.id !== questionId));
+        if (topic === null) setDraft(question);
         setError(result.error);
         return;
       }
+      const answerId = nextId.current--;
       setTurns((list) => [
-        ...list,
-        { id: -list.length - 1, role: "pemilik", text: result.data.question },
-        { id: -list.length - 2, role: "coach", text: result.data.answer },
+        ...list.map((turn) =>
+          turn.id === questionId ? { ...turn, text: result.data.question } : turn,
+        ),
+        { id: answerId, role: "coach", text: result.data.answer, fresh: true, typing: true },
       ]);
       setAsked(result.data.askedToday);
-      if (topic === null) setDraft("");
     });
+  }
+
+  function typed(turnId: number) {
+    setTurns((list) =>
+      list.map((turn) => (turn.id === turnId && turn.typing ? { ...turn, typing: false } : turn)),
+    );
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -125,6 +158,8 @@ export function CoachWidget({
             pending={pending}
             canAsk={remaining > 0}
             onSuggest={(topic) => ask(copy.suggestions[topic], topic)}
+            onProgress={follow}
+            onTyped={typed}
           />
         </div>
 

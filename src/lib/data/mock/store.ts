@@ -60,6 +60,8 @@ interface MockStore {
   nextCode: number;
   coach: CoachMessage[];
   nextCoachId: number;
+  /** Coach slots taken (same as coach_jatah in Supabase). */
+  coachQuota: { businessId: string; at: number }[];
 }
 
 /** Coach messages returned to the owner (same as umkm_coach_riwayat in Supabase). */
@@ -290,6 +292,7 @@ function seed(): MockStore {
     nextCode: 1,
     coach: [],
     nextCoachId: 1,
+    coachQuota: [],
   };
   const today = todayIso();
 

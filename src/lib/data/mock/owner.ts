@@ -2,10 +2,13 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
+import { COACH_ALL_DAILY_LIMIT, COACH_DAILY_LIMIT, COACH_PAUSE_SECONDS } from "@/lib/coach/rules";
 import { addDays, todayIso } from "@/lib/format";
 
 import type { OwnerStore } from "../source";
 import type { Diagnosis, OwnerState, Pack } from "../types";
+
+const MS_PER_SECOND = 1000;
 import { COACH_HISTORY_SHOWN, newId, nextCode, pushCoach, pushEvent, store } from "./store";
 
 const TOKEN_BYTES = 16;
@@ -155,6 +158,26 @@ export const mockOwnerStore: OwnerStore = {
         (m) => m.role === "pemilik" && todayIso(new Date(m.createdAt)) === today,
       ).length,
     };
+  },
+
+  /** Same rules as umkm_coach_jatah; the mock store is in one process, so this is atomic. */
+  async reserveCoach(token) {
+    const s = store();
+    const businessId = businessIdOf(token);
+    const now = Date.now();
+    const today = todayIso();
+    const isToday = (at: number) => todayIso(new Date(at)) === today;
+    const used = s.coachQuota.filter((q) => q.businessId === businessId && isToday(q.at)).length;
+    const pauseMs = COACH_PAUSE_SECONDS * MS_PER_SECOND;
+    if (s.coachQuota.some((q) => q.businessId === businessId && now - q.at < pauseMs)) {
+      return { status: "terlalu_cepat", used };
+    }
+    if (used >= COACH_DAILY_LIMIT) return { status: "batas_harian", used };
+    if (s.coachQuota.filter((q) => isToday(q.at)).length >= COACH_ALL_DAILY_LIMIT) {
+      return { status: "batas_semua", used };
+    }
+    s.coachQuota.push({ businessId, at: now });
+    return { status: "ok", used: used + 1 };
   },
 
   async saveCoachExchange(token, exchange) {

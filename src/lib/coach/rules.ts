@@ -1,7 +1,15 @@
 /** "Tanya coach" limits. One place to tune cost and length. */
 
-/** Questions per owner per day (WIB). Keeps cost predictable; there are no reminders. */
+/**
+ * Questions per owner per day (WIB). Keeps cost predictable; there are no reminders.
+ * The database enforces these three limits (umkm_coach_jatah, migration 20261103040000);
+ * change them there too.
+ */
 export const COACH_DAILY_LIMIT = 10;
+/** All owners together per day: caps the AI bill even if many accounts are made. */
+export const COACH_ALL_DAILY_LIMIT = 300;
+/** Pause between two questions of one owner: stops scripted bursts. */
+export const COACH_PAUSE_SECONDS = 8;
 export const QUESTION_MAX_LENGTH = 300;
 /** Stored answers are cut here (database CHECK allows 4000). */
 export const ANSWER_MAX_LENGTH = 2000;
