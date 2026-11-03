@@ -112,6 +112,8 @@ export interface DurationStats {
 
 export interface TeamRow {
   staffId: string | null;
+  /** The owners who registered themselves (one row). */
+  self: boolean;
   name: string | null;
   added: number;
   packs: number;

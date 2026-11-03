@@ -2,10 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Fragment, useState, useTransition, type ComponentProps } from "react";
+import { useState, useTransition, type ComponentProps } from "react";
 import { Controller, useForm, type FieldError as HookFieldError } from "react-hook-form";
 
 import { InlineError } from "@/components/molecules/inline-error";
+import { ProfileSelectItems } from "@/components/molecules/profile-select-items";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -17,16 +18,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { id } from "@/content/id";
 import { createParticipantAction, updateParticipantAction } from "@/lib/actions/research";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
@@ -145,22 +137,11 @@ export function ParticipantForm({ businessId, defaults }: ParticipantFormProps) 
                 <SelectValue placeholder={profile.choose} />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(SELECT_GROUPS[key]).map(([group, values], index) => {
-                  const heading = groupLabels[key]?.[group];
-                  return (
-                    <Fragment key={group}>
-                      {index > 0 ? <SelectSeparator /> : null}
-                      <SelectGroup>
-                        {heading ? <SelectLabel>{heading}</SelectLabel> : null}
-                        {values.map((value) => (
-                          <SelectItem key={value} value={value}>
-                            {labels[value]}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </Fragment>
-                  );
-                })}
+                <ProfileSelectItems
+                  groups={SELECT_GROUPS[key]}
+                  labels={labels}
+                  groupLabels={groupLabels[key]}
+                />
               </SelectContent>
             </Select>
             <FieldError>{error}</FieldError>

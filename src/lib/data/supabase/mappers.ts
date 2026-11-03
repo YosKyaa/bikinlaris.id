@@ -24,6 +24,7 @@ import type { Json, TableRow } from "@/types/database";
 import {
   COACH_ROLES,
   EVENT_ACTIONS,
+  SIGNUP_VIAS,
   type Business,
   type CoachMessage,
   type CoachTurn,
@@ -53,6 +54,8 @@ const businessRowSchema = z.object({
   created_at: z.string(),
   /** Staff rows only: umkm_state strips it from the owner's view. */
   created_by: z.string().nullable().optional(),
+  /** Missing on databases from before the self-registration migration. */
+  daftar_via: z.enum(SIGNUP_VIAS).optional(),
 });
 
 export function toBusiness(row: unknown): Business {
@@ -71,6 +74,7 @@ export function toBusiness(row: unknown): Business {
     ownerRole: r.peran,
     createdAt: r.created_at,
     createdBy: r.created_by ?? null,
+    signupVia: r.daftar_via ?? "pendamping",
   };
 }
 

@@ -21,6 +21,7 @@ import type {
   EventAction,
   FunnelStepKey,
   ParticipantStage,
+  SignupVia,
   StaffRole,
 } from "@/lib/data/types";
 
@@ -112,7 +113,7 @@ export const id = {
         "Jawab pertanyaan tentang usaha Anda. Lihat bagian yang perlu dibenahi dulu. Bawa pulang SOP (panduan kerja langkah demi langkah) yang siap dipakai.",
       secondaryCta: "Lihat contoh SOP",
       // [KONFIRMASI] Durasi dan pendampingan.
-      microcopy: `Sekitar ${DURATION_MINUTES} menit, dibantu pendamping dari tim peneliti. Tanpa daftar akun.`,
+      microcopy: `Sekitar ${DURATION_MINUTES} menit. Daftar cukup dengan nomor WhatsApp, tanpa kata sandi.`,
       previewLabel: "Contoh halaman SOP dari paket",
       previewHint: "Coba ketuk kotaknya, begini cara mencoret tiap hari.",
       // Starts with the visible short day ("Sen") so voice control users can say what they see.
@@ -216,7 +217,7 @@ export const id = {
         {
           q: "Berapa lama mengisinya?",
           // [KONFIRMASI] Durasi.
-          a: `Sekitar ${DURATION_MINUTES} menit bersama pendamping. Jawaban tersimpan otomatis, jadi bisa dilanjut nanti lewat tautan yang sama.`,
+          a: `Sekitar ${DURATION_MINUTES} menit, sendiri atau bersama pendamping. Jawaban tersimpan otomatis, jadi bisa dilanjut nanti lewat tautan yang sama.`,
         },
         {
           q: "Apakah data usaha saya aman?",
@@ -225,7 +226,7 @@ export const id = {
         },
         {
           q: "Apakah harus paham teknologi?",
-          a: "Tidak. Kalau bisa membuka WhatsApp, Anda bisa memakai bikinlaris. Pendamping membantu dari awal sampai paket SOP diterima.",
+          a: "Tidak. Kalau bisa membuka WhatsApp, Anda bisa memakai bikinlaris. Daftar sendiri dari HP, atau minta dibantu pendamping dari tim peneliti.",
         },
         {
           q: "Bagaimana cara ikut?",
@@ -251,19 +252,19 @@ export const id = {
 
   join: {
     eyebrow: "Cara ikut",
-    title: "Cek usaha dilakukan bersama pendamping",
-    body: "bikinlaris dipakai dalam penelitian Jakarta Global University. Anda tidak perlu mendaftar atau membuat kata sandi.",
+    title: "Ikut cek usaha dari HP Anda",
+    body: "bikinlaris dipakai dalam penelitian Jakarta Global University. Daftar sendiri, atau minta dibantu pendamping. Tanpa kata sandi.",
+    signup: "Daftar sekarang",
     stepsTitle: "Langkahnya",
     steps: [
       {
-        title: "Pendamping datang ke usaha Anda",
-        body: (questions: number) =>
-          `Pendamping dari tim peneliti menemani Anda menjawab ${questions} pertanyaan, sekitar ${DURATION_MINUTES} menit.`,
+        title: "Daftar dengan nomor WhatsApp",
+        body: () => "Isi nama dan data usaha, sekitar 2 menit. Pendamping juga bisa membantu.",
       },
       {
-        title: "Anda dapat tautan pribadi lewat WhatsApp",
-        body: () =>
-          "Tautan itu kunci Anda untuk membuka paket SOP. Simpan pesannya dan jangan dibagikan.",
+        title: "Jawab pertanyaan cek usaha",
+        body: (questions: number) =>
+          `${questions} pertanyaan, sekitar ${DURATION_MINUTES} menit. Simpan tautan pribadi Anda di WhatsApp.`,
       },
       {
         title: "Jalankan SOP selama 30 hari",
@@ -274,19 +275,66 @@ export const id = {
     // [KONFIRMASI] Siapa yang bisa ikut dan bagaimana pengunjung umum menghubungi tim.
     whoTitle: "Siapa yang bisa ikut?",
     whoBody:
-      "Peserta dipilih tim peneliti dari UMKM di Depok, Bekasi, dan Bogor. Pendamping akan menghubungi Anda lebih dulu.",
+      "Pemilik atau pengelola UMKM di Jabodetabek yang usahanya sudah berjalan minimal 1 tahun.",
     lostTitle: "Tautan hilang atau tidak bisa dibuka?",
-    lostBody: "Minta pendamping mengirim ulang tautannya. Jawaban dan paket SOP Anda tetap aman.",
+    lostBody:
+      "Cari pesan berisi tautan di WhatsApp Anda. Kalau tidak ada, hubungi tim peneliti. Jawaban dan paket SOP Anda tetap aman.",
     resumeTitle: (business: string) => `Lanjutkan ${business}`,
     resumeBody: "Tautan Anda sudah tersimpan di HP ini.",
     resume: "Lanjutkan",
     notices: {
       tautan:
-        "Tautan ini tidak dikenali. Buka lagi tautan dari WhatsApp pendamping, atau minta dikirim ulang.",
+        "Tautan ini tidak dikenali. Buka lagi tautan pribadi dari WhatsApp Anda, atau daftar dulu.",
       tersimpan:
         "Jawaban Anda tersimpan. Buka lagi tautan dari WhatsApp kapan saja untuk melanjutkan.",
       keluar: "Anda sudah keluar dari HP ini. Buka lagi tautan dari WhatsApp untuk masuk.",
       gangguan: "bikinlaris sedang tidak bisa dibuka. Coba lagi beberapa menit lagi.",
+    },
+  },
+
+  signup: {
+    eyebrow: "Daftar cek usaha",
+    title: "Daftar dulu, sekitar 2 menit",
+    body: "Tanpa kata sandi. Untuk usaha yang sudah berjalan minimal 1 tahun.",
+    groups: {
+      you: "Tentang Anda",
+      business: "Tentang usaha",
+      more: "Sedikit lagi",
+    },
+    fields: {
+      ownerName: { label: "Nama Anda", placeholder: "Contoh: Rini" },
+      whatsapp: {
+        label: "Nomor WhatsApp",
+        placeholder: "Contoh: 0812 3456 7890",
+        hint: "Untuk menyimpan tautan pribadi dan menerima kuesioner nanti.",
+      },
+    },
+    // [KONFIRMASI] Redaksi persetujuan ikut penelitian.
+    consent:
+      "Saya bersedia ikut penelitian Jakarta Global University. Jawaban saya dipakai untuk menyusun paket SOP dan untuk penelitian.",
+    submit: "Daftar dan mulai",
+    pending: "Mendaftarkan…",
+    haveLink: "Sudah punya tautan dari WhatsApp? Buka saja tautan itu.",
+    errors: {
+      consent: "Centang persetujuan dulu untuk ikut.",
+      closed: "Pendaftaran sedang ditutup. Hubungi tim peneliti kalau ingin ikut.",
+      tooFast: "Isi datanya dulu dengan tenang, lalu tekan Daftar lagi.",
+      waTaken:
+        "Nomor ini sudah terdaftar. Buka tautan pribadi dari WhatsApp Anda, atau hubungi tim peneliti.",
+      busy: "Pendaftaran sedang ramai. Coba lagi beberapa menit lagi.",
+      failed: "Pendaftaran belum berhasil. Periksa internet Anda, lalu coba lagi.",
+    },
+    done: {
+      title: "Pendaftaran berhasil",
+      code: (code: string) => `Kode peserta Anda: ${code}`,
+      saveTitle: "Simpan tautan pribadi Anda",
+      saveBody: "Tautan ini kunci untuk membuka cek usaha dan paket SOP. Jangan dibagikan.",
+      saveWhatsApp: "Simpan ke WhatsApp saya",
+      start: "Mulai cek usaha",
+    },
+    closed: {
+      title: "Pendaftaran sedang ditutup",
+      body: "Hubungi tim peneliti kalau ingin ikut. Kalau sudah punya tautan pribadi, buka saja tautan itu.",
     },
   },
 
@@ -803,6 +851,7 @@ export const id = {
       eventTime: "Waktu",
       eventAction: "Aktivitas",
       eventMeta: "Keterangan",
+      signupVia: "Cara daftar",
       coach: "Percakapan coach",
       noCoach: "Pemilik belum bertanya ke coach.",
       coachRoles: { pemilik: "Pemilik", coach: "Coach" } satisfies Record<CoachRole, string>,
@@ -821,6 +870,10 @@ export const id = {
       diagnosa_ulang: "Ulang cek usaha",
       coach_tanya: "Tanya coach",
     } satisfies Record<EventAction, string>,
+    signupVia: {
+      pendamping: "Ditambahkan pendamping",
+      mandiri: "Daftar sendiri",
+    } satisfies Record<SignupVia, string>,
     forbidden: "Halaman ini khusus tim peneliti.",
     markFailed: "Status belum tersimpan. Coba lagi.",
   },

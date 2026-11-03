@@ -16,6 +16,7 @@ export type Database = {
           access_token: string;
           created_at: string;
           created_by: string | null;
+          daftar_via: string;
           id: string;
           jumlah_karyawan: string;
           kode: string;
@@ -32,6 +33,7 @@ export type Database = {
           access_token?: string;
           created_at?: string;
           created_by?: string | null;
+          daftar_via?: string;
           id?: string;
           jumlah_karyawan: string;
           kode?: string;
@@ -48,6 +50,7 @@ export type Database = {
           access_token?: string;
           created_at?: string;
           created_by?: string | null;
+          daftar_via?: string;
           id?: string;
           jumlah_karyawan?: string;
           kode?: string;
@@ -297,6 +300,20 @@ export type Database = {
         Returns: undefined;
       };
       umkm_coach_riwayat: { Args: { p_token: string }; Returns: Json };
+      umkm_daftar: {
+        Args: {
+          p_jumlah_karyawan: string;
+          p_lama_usaha: string;
+          p_lokasi: string;
+          p_nama: string;
+          p_pemilik: string;
+          p_peran: string;
+          p_produk: string;
+          p_sektor: string;
+          p_wa: string;
+        };
+        Returns: Json;
+      };
       umkm_coach_simpan: {
         Args: {
           p_jawab: string;

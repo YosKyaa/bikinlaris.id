@@ -34,3 +34,15 @@ export const participantSchema = businessProfileSchema.extend({
 });
 
 export type ParticipantInput = z.infer<typeof participantSchema>;
+
+/**
+ * Self-registration at /ikut: the same data, plus consent to take part in the study.
+ * `website` is a field people never see (bots fill it); `startedAt` is when the form opened.
+ */
+export const selfSignupSchema = participantSchema.extend({
+  consent: z.literal(true, "consent"),
+  website: z.string().max(0).optional(),
+  startedAt: z.number(),
+});
+
+export type SelfSignupInput = z.infer<typeof selfSignupSchema>;

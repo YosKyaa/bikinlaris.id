@@ -5,6 +5,7 @@ import { MarketingLayout } from "@/components/templates/marketing-layout";
 import { id } from "@/content/id";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import { getOwnerState, JOIN_NOTICES } from "@/lib/data/owner-session";
+import { env } from "@/lib/env";
 
 export const metadata: Metadata = { title: id.join.eyebrow };
 
@@ -26,6 +27,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/cara-ikut">
       <JoinGuide
         notice={notice ? id.join.notices[notice] : null}
         resume={state ? { businessName: state.business.name, href: ROUTES.start } : null}
+        signupHref={env.UMKM_SIGNUP ? ROUTES.signup : null}
       />
     </MarketingLayout>
   );

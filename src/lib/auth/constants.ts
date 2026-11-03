@@ -9,6 +9,9 @@ export const SUPABASE_COOKIE_PREFIX = "sb-";
 export const ROUTES = {
   home: "/",
   join: "/cara-ikut",
+  /** Owners register themselves (no account): form, then the saved-link screen. */
+  signup: "/ikut",
+  signupDone: "/ikut/berhasil",
   ownerLink: (token: string) => `/u/${token}`,
   start: "/beranda",
   diagnosis: "/diagnosis",

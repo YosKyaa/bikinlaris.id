@@ -23,9 +23,14 @@ export interface Business extends BusinessProfile {
   /** WhatsApp number in international format without "+", e.g. "6281234567890". */
   whatsapp: string;
   createdAt: string;
-  /** Team member who added the participant; null when that account was removed. */
+  /** Team member who added the participant; null when self-registered or the account was removed. */
   createdBy: string | null;
+  signupVia: SignupVia;
 }
+
+/** How a participant joined: added by an enumerator, or registered themselves at /ikut. */
+export const SIGNUP_VIAS = ["pendamping", "mandiri"] as const;
+export type SignupVia = (typeof SIGNUP_VIAS)[number];
 
 export type Answers = Partial<Record<QuestionId, StoredAnswer>>;
 

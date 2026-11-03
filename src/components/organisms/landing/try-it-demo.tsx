@@ -140,7 +140,7 @@ export function TryItDemo({
           </div>
           <div className="mt-6 border-t pt-5">
             <Button asChild size="lg" className="btn-shine w-full sm:w-auto">
-              <Link href={ROUTES.join}>
+              <Link href={ROUTES.signup}>
                 {copy.cta}
                 <ArrowRightIcon aria-hidden />
               </Link>

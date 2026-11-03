@@ -1,4 +1,10 @@
-import { ArrowRightIcon, InfoIcon, KeyRoundIcon, MessageCircleIcon, UsersIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  CalendarCheckIcon,
+  ClipboardListIcon,
+  InfoIcon,
+  MessageCircleIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Eyebrow } from "@/components/atoms/eyebrow";
@@ -7,16 +13,18 @@ import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { totalQuestions } from "@/lib/diagnosis/bank";
 
-const STEP_ICONS = [UsersIcon, MessageCircleIcon, KeyRoundIcon] as const;
+const STEP_ICONS = [MessageCircleIcon, ClipboardListIcon, CalendarCheckIcon] as const;
 
 interface JoinGuideProps {
   notice: string | null;
   /** Set when this device already holds a valid private link. */
   resume: { businessName: string; href: string } | null;
+  /** Self-registration link, or null while registration is closed. */
+  signupHref: string | null;
 }
 
-/** /cara-ikut: how owners join (with an enumerator, then a private WhatsApp link). */
-export function JoinGuide({ notice, resume }: JoinGuideProps) {
+/** /cara-ikut: how owners join (register themselves or with an enumerator, then a private link). */
+export function JoinGuide({ notice, resume, signupHref }: JoinGuideProps) {
   const copy = id.join;
   return (
     <div className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:px-6 lg:py-16">
@@ -50,6 +58,14 @@ export function JoinGuide({ notice, resume }: JoinGuideProps) {
         <Eyebrow>{copy.eyebrow}</Eyebrow>
         <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">{copy.title}</h1>
         <p className="text-lg text-muted-foreground">{copy.body}</p>
+        {signupHref && !resume ? (
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link href={signupHref}>
+              {copy.signup}
+              <ArrowRightIcon aria-hidden />
+            </Link>
+          </Button>
+        ) : null}
       </header>
 
       <section aria-labelledby="langkah-ikut">

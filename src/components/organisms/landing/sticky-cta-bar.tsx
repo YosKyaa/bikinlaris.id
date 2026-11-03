@@ -29,7 +29,7 @@ export function StickyCtaBar({ heroId }: { heroId: string }) {
       )}
     >
       <Button asChild size="lg" className="btn-shine w-full">
-        <Link href={ROUTES.join} tabIndex={visible ? undefined : -1}>
+        <Link href={ROUTES.signup} tabIndex={visible ? undefined : -1}>
           {id.common.join}
         </Link>
       </Button>

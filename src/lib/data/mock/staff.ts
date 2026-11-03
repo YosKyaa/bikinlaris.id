@@ -89,6 +89,7 @@ export const mockStaffStore: StaffStore = {
       code: nextCode(s),
       createdAt: new Date().toISOString(),
       createdBy: (email && s.staff.get(email)?.id) || null,
+      signupVia: "pendamping",
     });
     s.tokens.set(token, businessId);
     const created = participant(businessId);

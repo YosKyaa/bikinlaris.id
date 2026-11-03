@@ -179,6 +179,7 @@ export function summaryCsv(
     "jumlah_karyawan",
     "peran",
     "terdaftar",
+    "daftar_via",
     "tahap",
     ...diagnosisBank.questions.map((q) => q.id),
     ...sections.flatMap((sec) => [`skor_${sec.id}`, `warna_${sec.id}`]),
@@ -218,6 +219,7 @@ export function summaryCsv(
       b.employees,
       b.ownerRole,
       b.createdAt.slice(0, 10),
+      b.signupVia,
       participantStage(participant, today),
       ...diagnosisBank.questions.map((q) => answers[q.id] ?? null),
       ...sections.flatMap((sec) =>

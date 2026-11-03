@@ -313,6 +313,7 @@ function seed(): MockStore {
       whatsapp: `6281200000${String(index + 1).padStart(3, "0")}`,
       createdAt: at(joinedOn, "09:00"),
       createdBy: enumeratorId,
+      signupVia: "pendamping",
     });
     s.tokens.set(item.token, businessId);
     pushEvent(
@@ -365,13 +366,20 @@ function seed(): MockStore {
   });
 
   demoCohort(today).forEach((item, index) => {
-    seedDemoParticipant(s, item, SEED.length + index + 1, item.byAdmin ? adminId : enumeratorId);
+    const addedBy =
+      item.addedBy === "self" ? null : item.addedBy === "admin" ? adminId : enumeratorId;
+    seedDemoParticipant(s, item, SEED.length + index + 1, addedBy);
   });
   return s;
 }
 
 /** One generated participant from demo-cohort.ts, with its diagnosis, pack and events. */
-function seedDemoParticipant(s: MockStore, item: DemoParticipant, n: number, createdBy: string) {
+function seedDemoParticipant(
+  s: MockStore,
+  item: DemoParticipant,
+  n: number,
+  createdBy: string | null,
+) {
   const businessId = seedId(n);
   s.businesses.set(businessId, {
     ...item.profile,
@@ -381,6 +389,7 @@ function seedDemoParticipant(s: MockStore, item: DemoParticipant, n: number, cre
     whatsapp: `6281200000${String(n).padStart(3, "0")}`,
     createdAt: at(item.joinedOn, "08:30"),
     createdBy,
+    signupVia: createdBy === null ? "mandiri" : "pendamping",
   });
   s.tokens.set(`demo-${n}`, businessId);
   for (const event of item.events) pushEvent(s, businessId, event.action, event.meta, event.at);

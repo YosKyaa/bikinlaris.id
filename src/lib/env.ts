@@ -63,6 +63,11 @@ const serverEnvSchema = z
       .enum(["true", "false"])
       .default("false")
       .transform((value) => value === "true"),
+    /** "false" closes self-registration at /ikut (e.g. after fieldwork); enumerators can still add. */
+    UMKM_SIGNUP: z
+      .enum(["true", "false"])
+      .default("true")
+      .transform((value) => value === "true"),
     /** Fieldwork deadline (yyyy-mm-dd, WIB) used by the monitoring page's projections. */
     RESEARCH_DEADLINE: z.iso.date().default(DEFAULT_RESEARCH_DEADLINE),
   })

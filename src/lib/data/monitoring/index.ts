@@ -20,6 +20,9 @@ export { ALERT_PREVIEW, ALERT_RULES, PACE_WINDOW_WEEKS, SAMPLE_THRESHOLDS } from
 
 export const FILTER_PARAMS = { location: "lokasi", staff: "pendamping" } as const;
 
+/** "Pendamping" filter value for owners who registered themselves. */
+export const SELF_SIGNUP_FILTER = "mandiri";
+
 /** Reads `?lokasi=` and `?pendamping=`; anything unknown falls back to "semua". */
 export function parseMonitoringFilters(
   params: Record<string, string | string[] | undefined>,
@@ -27,15 +30,22 @@ export function parseMonitoringFilters(
 ): MonitoringFilters {
   const location = LOCATIONS.find((l) => l === params[FILTER_PARAMS.location]) ?? ALL;
   const staff = params[FILTER_PARAMS.staff];
-  const staffId = members.some((m) => m.id === staff) && typeof staff === "string" ? staff : ALL;
-  return { location, staffId };
+  const known =
+    typeof staff === "string" &&
+    (staff === SELF_SIGNUP_FILTER || members.some((m) => m.id === staff));
+  return { location, staffId: known ? staff : ALL };
+}
+
+function byChannel({ createdBy, signupVia }: Participant["business"], staffId: string) {
+  if (staffId === ALL) return true;
+  return staffId === SELF_SIGNUP_FILTER ? signupVia === "mandiri" : createdBy === staffId;
 }
 
 function applyFilters(participants: Participant[], filters: MonitoringFilters) {
   return participants.filter(
     ({ business }) =>
       (filters.location === ALL || business.location === filters.location) &&
-      (filters.staffId === ALL || business.createdBy === filters.staffId),
+      byChannel(business, filters.staffId),
   );
 }
 

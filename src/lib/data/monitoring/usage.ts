@@ -3,6 +3,9 @@ import { daysWith, median } from "./insights";
 import { ACTIVE_DAY_BUCKETS, type ActiveDayBucket, type Engagement, type TeamRow } from "./types";
 
 const FEW_DAYS = 2;
+/** Row keys for participants without a (known) team member. */
+const SELF_SIGNUP = "mandiri";
+const UNKNOWN = "tidak-tercatat";
 const SEVERAL_DAYS = 5;
 
 function activeDayBucket(days: number): ActiveDayBucket {
@@ -52,14 +55,21 @@ export function buildEngagement(packs: Pack[], events: ResearchEvent[]): Engagem
   };
 }
 
-/** Participants per team member who added them: added, packs made, questionnaires done. */
+/**
+ * Participants per recruitment channel: each team member who added them, plus one row for
+ * owners who registered themselves (/ikut). Added, packs made, questionnaires done.
+ */
 export function buildTeam(participants: Participant[], members: TeamMember[]): TeamRow[] {
-  const rows = new Map<string | null, TeamRow>();
+  const rows = new Map<string, TeamRow>();
   for (const { business, pack } of participants) {
-    const staffId = members.some((m) => m.id === business.createdBy) ? business.createdBy : null;
+    const self = business.signupVia === "mandiri";
+    const staffId =
+      !self && members.some((m) => m.id === business.createdBy) ? business.createdBy : null;
     const member = members.find((m) => m.id === staffId);
-    const row = rows.get(staffId) ?? {
+    const key = self ? SELF_SIGNUP : (staffId ?? UNKNOWN);
+    const row = rows.get(key) ?? {
       staffId,
+      self,
       name: member ? (member.name ?? member.email) : null,
       added: 0,
       packs: 0,
@@ -68,7 +78,7 @@ export function buildTeam(participants: Participant[], members: TeamMember[]): T
     row.added += 1;
     if (pack?.status === "siap") row.packs += 1;
     if (pack?.questionnaireDoneAt) row.done += 1;
-    rows.set(staffId, row);
+    rows.set(key, row);
   }
   return [...rows.values()].sort((a, b) => b.added - a.added);
 }

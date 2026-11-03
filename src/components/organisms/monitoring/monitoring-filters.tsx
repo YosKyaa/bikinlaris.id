@@ -3,7 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import { ALL, FILTER_PARAMS, type MonitoringFilters as Filters } from "@/lib/data/monitoring";
+import {
+  ALL,
+  FILTER_PARAMS,
+  SELF_SIGNUP_FILTER,
+  type MonitoringFilters as Filters,
+} from "@/lib/data/monitoring";
 import { LOCATION_GROUPS } from "@/lib/validations/business";
 
 const groupLabels: Record<string, string> = id.profile.optionGroups.location;
@@ -67,6 +72,7 @@ export function MonitoringFilters({ filters, members, shown, total }: Monitoring
               {member.label}
             </option>
           ))}
+          <option value={SELF_SIGNUP_FILTER}>{id.researcher.signupVia.mandiri}</option>
         </select>
       </label>
       <div className="flex gap-2">

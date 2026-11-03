@@ -32,8 +32,10 @@ export function TeamOverview({ rows }: { rows: TeamRow[] }) {
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.staffId ?? "unknown"}>
-              <TableCell className="font-medium break-words">{row.name ?? copy.unknown}</TableCell>
+            <TableRow key={row.self ? "self" : (row.staffId ?? "unknown")}>
+              <TableCell className="font-medium break-words">
+                {row.self ? id.researcher.signupVia.mandiri : (row.name ?? copy.unknown)}
+              </TableCell>
               {COLUMNS.map((column) => (
                 <TableCell key={column} className="text-right tabular-nums">
                   {row[column]}

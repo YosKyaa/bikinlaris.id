@@ -14,6 +14,8 @@ const stateSchema = z.object({
   paket: z.unknown().nullable(),
 });
 
+const registeredSchema = z.object({ kode: z.string(), token: z.string() });
+
 const coachHistorySchema = z.object({
   pesan: z.array(z.unknown()),
   hari_ini: z.number(),
@@ -81,6 +83,29 @@ export const supabaseOwnerStore: OwnerStore = {
       p_meta: metaToJson(meta),
     });
     if (error) throw error;
+  },
+
+  async register(input) {
+    const { data, error } = await createAnonClient().rpc("umkm_daftar", {
+      p_nama: input.name,
+      p_pemilik: input.ownerName,
+      p_wa: input.whatsapp,
+      p_produk: input.product,
+      p_lokasi: input.location,
+      p_sektor: input.sector,
+      p_lama_usaha: input.yearsRunning,
+      p_jumlah_karyawan: input.employees,
+      p_peran: input.ownerRole,
+    });
+    if (error) {
+      if (error.message.includes("wa_terdaftar")) return { ok: false, reason: "waTaken" };
+      if (error.message.includes("terlalu_banyak")) return { ok: false, reason: "busy" };
+      return { ok: false, reason: "failed" };
+    }
+    const created = registeredSchema.safeParse(data);
+    return created.success
+      ? { ok: true, token: created.data.token, code: created.data.kode }
+      : { ok: false, reason: "failed" };
   },
 
   async coachHistory(token) {

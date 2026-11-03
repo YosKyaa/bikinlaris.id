@@ -1,10 +1,14 @@
 import "server-only";
 
+import { randomBytes } from "node:crypto";
+
 import { addDays, todayIso } from "@/lib/format";
 
 import type { OwnerStore } from "../source";
 import type { Diagnosis, OwnerState, Pack } from "../types";
-import { COACH_HISTORY_SHOWN, newId, pushCoach, pushEvent, store } from "./store";
+import { COACH_HISTORY_SHOWN, newId, nextCode, pushCoach, pushEvent, store } from "./store";
+
+const TOKEN_BYTES = 16;
 
 function businessIdOf(token: string): string {
   const businessId = store().tokens.get(token);
@@ -112,6 +116,27 @@ export const mockOwnerStore: OwnerStore = {
       if (already) return;
     }
     pushEvent(s, businessId, action, meta);
+  },
+
+  async register(input) {
+    const s = store();
+    if ([...s.businesses.values()].some((b) => b.whatsapp === input.whatsapp)) {
+      return { ok: false, reason: "waTaken" };
+    }
+    const businessId = newId();
+    const token = randomBytes(TOKEN_BYTES).toString("hex");
+    const code = nextCode(s);
+    s.businesses.set(businessId, {
+      ...input,
+      id: businessId,
+      code,
+      createdAt: new Date().toISOString(),
+      createdBy: null,
+      signupVia: "mandiri",
+    });
+    s.tokens.set(token, businessId);
+    pushEvent(s, businessId, "profil_selesai", { via: "mandiri" });
+    return { ok: true, token, code };
   },
 
   async coachHistory(token) {

@@ -59,11 +59,17 @@ export interface OwnerStore {
   reset(token: string): Promise<void>;
   /** Passive research log. `hasil_buka` is stored at most once per day. */
   log(token: string, action: EventAction, meta: EventMeta | null): Promise<void>;
+  /** Self-registration (/ikut): creates the business and returns its private link token. */
+  register(input: NewParticipant): Promise<RegisterResult>;
   /** "Tanya coach": recent messages and today's question count. */
   coachHistory(token: string): Promise<CoachHistory>;
   /** Stores one question with its answer, and logs `coach_tanya`. */
   saveCoachExchange(token: string, exchange: CoachExchange): Promise<void>;
 }
+
+/** waTaken: that number is already a participant (its link is never returned). */
+export type RegisterResult =
+  { ok: true; token: string; code: string } | { ok: false; reason: "waTaken" | "busy" | "failed" };
 
 export interface CoachExchange {
   question: string;

@@ -41,6 +41,7 @@ export function BusinessDetail({
     [fields.yearsRunning.label, options.yearsRunning[business.yearsRunning]],
     [fields.employees.label, options.employees[business.employees]],
     [fields.ownerRole.label, options.ownerRole[business.ownerRole]],
+    [copy.signupVia, id.researcher.signupVia[business.signupVia]],
   ];
   const ready = pack?.status === "siap" ? pack : null;
 

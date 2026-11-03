@@ -60,6 +60,7 @@ const SHARE_SENT = 0.85;
 const SHARE_DONE = 0.75;
 const SHARE_PAUSED = 0.12;
 const SHARE_BY_ADMIN = 0.3;
+const SHARE_SELF = 0.25;
 const SHARE_COACH = 0.4;
 
 /** Small deterministic generator (LCG), so the demo looks the same on every restart. */
@@ -85,7 +86,8 @@ export interface DemoParticipant {
   ownerName: string;
   profile: BusinessProfile;
   joinedOn: string;
-  byAdmin: boolean;
+  /** Who added the participant; "self" = registered at /ikut. */
+  addedBy: "enumerator" | "admin" | "self";
   answers: Answers | null;
   hardest: SectionId | null;
   startedAt: string | null;
@@ -144,7 +146,11 @@ export function demoCohort(today: string): DemoParticipant[] {
         ownerRole: rng.pick(OWNER_ROLES),
       },
       joinedOn,
-      byAdmin: rng.chance(SHARE_BY_ADMIN),
+      addedBy: rng.chance(SHARE_SELF)
+        ? "self"
+        : rng.chance(SHARE_BY_ADMIN)
+          ? "admin"
+          : "enumerator",
       answers: null,
       hardest: null,
       startedAt: null,
