@@ -1,14 +1,3 @@
-import type { SampleThreshold } from "./types";
-
-/**
- * Minimum SEM-PLS sample, inverse square root method (Kock & Hadaya, 2018), from
- * docs/konteks-riset.md: about 99 respondents for p_min 0.25 and 155 for p_min 0.20.
- */
-export const SAMPLE_THRESHOLDS: readonly SampleThreshold[] = [
-  { n: 99, pMin: 0.25 },
-  { n: 155, pMin: 0.2 },
-];
-
 /** Weekly pace of new packs is averaged over this many recent weeks. */
 export const PACE_WINDOW_WEEKS = 4;
 export const DAYS_PER_WEEK = 7;

@@ -48,6 +48,16 @@ const nextConfig: NextConfig = {
       { source: "/u/:token", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
     ];
   },
+  // The team panel moved from /peneliti to /tim (owner request, 3 November 2026). Old
+  // bookmarks and links keep working. Temporary (307), so a later rename is not cached.
+  async redirects() {
+    return [
+      { source: "/peneliti/tim", destination: "/tim/anggota", permanent: false },
+      { source: "/peneliti", destination: "/tim", permanent: false },
+      { source: "/peneliti/:path*", destination: "/tim/:path*", permanent: false },
+      { source: "/api/peneliti/:path*", destination: "/api/tim/:path*", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

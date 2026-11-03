@@ -3,7 +3,7 @@ import type { EmployeeCount, Location, Sector, YearsRunning } from "@/lib/valida
 
 import type { FunnelStep } from "../types";
 
-/** Shapes of the monitoring page (/peneliti/pantauan). Keys only; labels come from content/. */
+/** Shapes of the monitoring page (/tim/pantauan). Keys only; labels come from content/. */
 
 export const ALL = "semua";
 
@@ -17,23 +17,17 @@ export interface CountRow<K extends string = string> {
   value: number;
 }
 
-export interface SampleThreshold {
-  n: number;
-  pMin: number;
-}
-
-export interface SampleProgress {
-  /** Questionnaires marked as filled in. */
+export interface ProgramProgress {
+  /** Day-30 questionnaires marked as filled in. */
   done: number;
-  /** Ready packs whose day 30 falls on or before the deadline: the best case for the sample. */
-  reachable: number;
-  thresholds: readonly SampleThreshold[];
-  deadline: string;
-  /** Packs created after this day reach day 30 after the deadline. */
-  lastPackDay: string;
-  daysToLastPackDay: number;
-  /** Packs still needed (made by lastPackDay) to reach the next threshold; null when reached. */
-  nextThreshold: { n: number; missing: number } | null;
+  /** Ready packs whose day 30 is today or past. */
+  pastDay30: number;
+  /** done as a share of pastDay30. */
+  responsePercent: number;
+  /** Ready packs still inside their 30 days. */
+  active: number;
+  /** Ready packs reaching day 30 within the next week. */
+  upcoming: number;
   /** Packs created per week, averaged over the last weeks. */
   weeklyPace: number;
 }
@@ -48,7 +42,6 @@ export interface TimelinePoint {
 export interface Timeline {
   points: TimelinePoint[];
   today: string;
-  deadline: string;
 }
 
 export const ALERT_KINDS = [
@@ -131,7 +124,7 @@ export interface Monitoring {
   /** Participants after the filters, and before them. */
   participants: number;
   totalParticipants: number;
-  sample: SampleProgress;
+  program: ProgramProgress;
   timeline: Timeline;
   funnel: FunnelStep[];
   alerts: AlertGroup[];

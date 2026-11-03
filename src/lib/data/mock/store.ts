@@ -294,8 +294,8 @@ function seed(): MockStore {
   const today = todayIso();
 
   for (const [index, member] of [
-    { email: "peneliti@bikinlaris.id", name: "Tim Lapangan", role: "enumerator" as const },
-    { email: "admin@bikinlaris.id", name: "Admin Penelitian", role: "admin" as const },
+    { email: "pendamping@bikinlaris.id", name: "Tim Lapangan", role: "enumerator" as const },
+    { email: "admin@bikinlaris.id", name: "Admin bikinlaris", role: "admin" as const },
   ].entries()) {
     s.staff.set(member.email, { ...member, id: seedId(900 + index), password: MOCK_PASSWORD });
   }

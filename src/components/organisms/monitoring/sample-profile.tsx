@@ -46,7 +46,7 @@ function rowsOf(field: Field, rows: CountRow[], tone: "single" | "ordinal") {
 export function SampleProfile({ profile, total }: { profile: Profile; total: number }) {
   const copy = id.monitoring.profile;
   return (
-    <ChartCard headingId="profil-sampel" title={copy.title} description={copy.body}>
+    <ChartCard headingId="profil-peserta" title={copy.title} description={copy.body}>
       <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
         {FIELDS.map(({ field, tone }) => (
           <div key={field}>

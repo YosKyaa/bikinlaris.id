@@ -6,12 +6,17 @@ import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { ENTER_APP } from "@/lib/transitions";
+import { cn } from "@/lib/utils";
 
 export const LANDING_ANCHORS = {
   how: "cara-kerja",
   pack: "isi-paket",
   faq: "tanya-jawab",
 } as const;
+
+/** Green underline that grows from the left on hover and keyboard focus (200ms). */
+const UNDERLINE =
+  "relative after:absolute after:inset-x-3 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-primary after:transition-transform after:duration-200 hover:after:scale-x-100 focus-visible:after:scale-x-100";
 
 /**
  * Marketing header (glass): logo, 3 anchors, "Masuk" (ghost), primary CTA, scroll progress.
@@ -33,7 +38,12 @@ export function SiteHeader() {
             <ul className="flex gap-1">
               {(Object.keys(LANDING_ANCHORS) as (keyof typeof LANDING_ANCHORS)[]).map((key) => (
                 <li key={key}>
-                  <Button asChild variant="ghost" size="sm" className="h-11 font-medium">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className={cn("h-11 font-medium", UNDERLINE)}
+                  >
                     <a href={`#${LANDING_ANCHORS[key]}`}>{id.nav[key]}</a>
                   </Button>
                 </li>

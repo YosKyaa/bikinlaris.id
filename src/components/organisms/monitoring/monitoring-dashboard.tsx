@@ -13,7 +13,7 @@ import { DiagnosisHighlights } from "./diagnosis-highlights";
 import { EngagementOverview } from "./engagement-overview";
 import { ProgressTimeline } from "./progress-timeline";
 import { SampleProfile } from "./sample-profile";
-import { SampleProgress } from "./sample-progress";
+import { ProgramProgress } from "./program-progress";
 import { SectionHealth } from "./section-health";
 import { SopUsage } from "./sop-usage";
 import { TeamOverview } from "./team-overview";
@@ -45,7 +45,7 @@ export function MonitoringDashboard({ monitoring: m }: { monitoring: Monitoring 
 
   return (
     <div className="space-y-6">
-      <SampleProgress sample={m.sample} />
+      <ProgramProgress program={m.program} />
       <ProgressTimeline timeline={m.timeline} />
       <div className={GRID}>
         <ActionAlerts groups={m.alerts} />

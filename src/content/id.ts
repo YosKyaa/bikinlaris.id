@@ -217,20 +217,20 @@ export const id = {
         {
           q: "Apakah data usaha saya aman?",
           // [KONFIRMASI] Redaksi keamanan data dan siapa yang bisa melihat jawaban.
-          a: "Jawaban Anda hanya dipakai untuk menyusun paket SOP dan untuk penelitian. Hanya tim peneliti yang bisa melihatnya.",
+          a: "Jawaban Anda hanya dipakai untuk menyusun paket SOP dan untuk penelitian. Hanya tim bikinlaris yang bisa melihatnya.",
         },
         {
           q: "Apakah harus paham teknologi?",
-          a: "Tidak. Kalau bisa membuka WhatsApp, Anda bisa memakai bikinlaris. Daftar sendiri dari HP, atau minta dibantu pendamping dari tim peneliti.",
+          a: "Tidak. Kalau bisa membuka WhatsApp, Anda bisa memakai bikinlaris. Daftar sendiri dari HP, atau minta dibantu pendamping dari tim bikinlaris.",
         },
         {
           q: "Bagaimana cara ikut?",
           // [KONFIRMASI] Alur untuk pengunjung yang datang sendiri.
-          a: "Pendamping dari tim peneliti datang dan menemani cek usaha. Setelah itu Anda dapat tautan pribadi lewat WhatsApp. Tidak perlu membuat akun atau mengingat sandi.",
+          a: "Pendamping dari tim bikinlaris datang dan menemani cek usaha. Setelah itu Anda dapat tautan pribadi lewat WhatsApp. Tidak perlu membuat akun atau mengingat sandi.",
         },
         {
           q: "Apa yang terjadi setelah dapat SOP?",
-          a: "Jalankan SOP pertama dulu sampai jadi kebiasaan. Sekitar hari ke-30, peneliti mengirim kuesioner singkat lewat WhatsApp, kira-kira 15 menit.",
+          a: "Jalankan SOP pertama dulu sampai jadi kebiasaan. Sekitar hari ke-30, tim bikinlaris mengirim kuesioner singkat lewat WhatsApp, kira-kira 15 menit.",
         },
       ],
     },
@@ -264,7 +264,7 @@ export const id = {
       {
         title: "Jalankan SOP selama 30 hari",
         body: () =>
-          "Buka tautan kapan saja untuk melihat SOP. Sekitar hari ke-30, peneliti mengirim kuesioner singkat.",
+          "Buka tautan kapan saja untuk melihat SOP. Sekitar hari ke-30, tim bikinlaris mengirim kuesioner singkat.",
       },
     ],
     // [KONFIRMASI] Siapa yang bisa ikut dan bagaimana pengunjung umum menghubungi tim.
@@ -273,7 +273,7 @@ export const id = {
       "Pemilik atau pengelola UMKM di Jabodetabek yang usahanya sudah berjalan minimal 1 tahun.",
     lostTitle: "Tautan hilang atau tidak bisa dibuka?",
     lostBody:
-      "Cari pesan berisi tautan di WhatsApp Anda. Kalau tidak ada, hubungi tim peneliti. Jawaban dan paket SOP Anda tetap aman.",
+      "Cari pesan berisi tautan di WhatsApp Anda. Kalau tidak ada, hubungi tim bikinlaris. Jawaban dan paket SOP Anda tetap aman.",
     resumeTitle: (business: string) => `Lanjutkan ${business}`,
     resumeBody: "Tautan Anda sudah tersimpan di HP ini.",
     resume: "Lanjutkan",
@@ -312,10 +312,10 @@ export const id = {
     haveLink: "Sudah punya tautan dari WhatsApp? Buka saja tautan itu.",
     errors: {
       consent: "Centang persetujuan dulu untuk ikut.",
-      closed: "Pendaftaran sedang ditutup. Hubungi tim peneliti kalau ingin ikut.",
+      closed: "Pendaftaran sedang ditutup. Hubungi tim bikinlaris kalau ingin ikut.",
       tooFast: "Isi datanya dulu dengan tenang, lalu tekan Daftar lagi.",
       waTaken:
-        "Nomor ini sudah terdaftar. Buka tautan pribadi dari WhatsApp Anda, atau hubungi tim peneliti.",
+        "Nomor ini sudah terdaftar. Buka tautan pribadi dari WhatsApp Anda, atau hubungi tim bikinlaris.",
       busy: "Pendaftaran sedang ramai. Coba lagi beberapa menit lagi.",
       failed: "Pendaftaran belum berhasil. Periksa internet Anda, lalu coba lagi.",
     },
@@ -329,7 +329,7 @@ export const id = {
     },
     closed: {
       title: "Pendaftaran sedang ditutup",
-      body: "Hubungi tim peneliti kalau ingin ikut. Kalau sudah punya tautan pribadi, buka saja tautan itu.",
+      body: "Hubungi tim bikinlaris kalau ingin ikut. Kalau sudah punya tautan pribadi, buka saja tautan itu.",
     },
   },
 
@@ -356,10 +356,10 @@ export const id = {
   },
 
   auth: {
-    title: "Masuk tim peneliti",
+    title: "Masuk tim bikinlaris",
     formTitle: "Masuk ke akun tim",
     subtitle:
-      "Khusus enumerator dan admin penelitian. Pemilik usaha tidak perlu masuk: cukup buka tautan dari WhatsApp.",
+      "Khusus pendamping dan admin bikinlaris. Pemilik usaha tidak perlu masuk: cukup buka tautan dari WhatsApp.",
     email: "Email",
     emailPlaceholder: "nama@gmail.com",
     password: "Kata sandi",
@@ -390,7 +390,7 @@ export const id = {
       divider: "atau dengan email dan sandi",
     },
     mockHint: (password: string) =>
-      `Mode contoh. Akun tim: peneliti@bikinlaris.id (enumerator) dan admin@bikinlaris.id (admin), sandi ${password}. Tautan UMKM contoh: /u/demo (paket jadi) dan /u/coba (belum mulai).`,
+      `Mode contoh. Akun tim: pendamping@bikinlaris.id (pendamping) dan admin@bikinlaris.id (admin), sandi ${password}. Tautan UMKM contoh: /u/demo (paket jadi) dan /u/coba (belum mulai).`,
     otp: {
       label: "Kode 6 angka dari email",
       hint: (email: string) => `Kode dikirim ke ${email}. Cek juga folder spam.`,
@@ -437,13 +437,13 @@ export const id = {
   authShowcase: {
     backHome: "Kembali ke beranda",
     team: {
-      eyebrow: "Panel tim peneliti",
+      eyebrow: "Panel tim bikinlaris",
       days: "hari SOP dijalankan, lalu kuesioner dikirim",
       tasksTitle: "Di panel ini",
       tasks: [
         "Tambah UMKM dan kirim tautan lewat WhatsApp",
         "Lihat siapa yang sudah hari ke-30",
-        "Unduh data penelitian (CSV)",
+        "Unduh data peserta (CSV)",
       ],
     },
     owner: {
@@ -590,7 +590,7 @@ export const id = {
     cta: "Buat paket SOP",
     confirm: {
       title: "Buat paket SOP sekarang?",
-      body: "Paket disusun dari jawaban di atas. Hari ini dihitung sebagai hari pertama. Sekitar 30 hari lagi, peneliti mengirim kuesioner singkat lewat WhatsApp.",
+      body: "Paket disusun dari jawaban di atas. Hari ini dihitung sebagai hari pertama. Sekitar 30 hari lagi, tim bikinlaris mengirim kuesioner singkat lewat WhatsApp.",
       confirm: "Ya, buat paket",
       cancel: "Cek lagi",
     },
@@ -709,17 +709,18 @@ export const id = {
     },
     checkbox: "☐",
     footer: (date: string) =>
-      `Kerjakan satu dulu sampai jadi kebiasaan. Sekitar ${date} peneliti mengirim kuesioner singkat.`,
+      `Kerjakan satu dulu sampai jadi kebiasaan. Sekitar ${date} tim bikinlaris mengirim kuesioner singkat.`,
   },
 
+  // The team panel. Called "tim", never "peneliti" (owner request, 3 November 2026).
   researcher: {
-    title: "Panel peneliti",
+    title: "Panel tim",
     subtitle: "Tambah UMKM, kirim kuesioner hari ke-30, dan unduh data.",
     // Dashboard with sidebar (owner request, 3 November 2026).
     dashboard: {
       title: "Ringkasan",
       greeting: (name: string) => `Halo, ${name}`,
-      subtitle: "Ini keadaan penelitian hari ini. Mulai dari kartu hijau tua.",
+      subtitle: "Ini keadaan peserta hari ini. Mulai dari kartu hijau tua.",
       asOf: (date: string) => `Data per ${date}`,
       kpis: {
         label: "Angka utama",
@@ -741,7 +742,7 @@ export const id = {
     },
     sidebar: {
       label: "Menu panel",
-      eyebrow: "Panel tim peneliti",
+      eyebrow: "Panel tim bikinlaris",
       openMenu: "Buka menu",
       exports: "Unduh data (CSV)",
       exportLinks: {
@@ -758,9 +759,9 @@ export const id = {
     menu: {
       overview: "Ringkasan",
       participants: "Daftar UMKM",
-      monitoring: "Pantauan riset",
+      monitoring: "Pantauan",
       newParticipant: "Tambah UMKM",
-      team: "Tim peneliti",
+      team: "Anggota tim",
       logout: "Keluar",
     },
     funnel: {
@@ -920,7 +921,7 @@ export const id = {
       pendamping: "Ditambahkan pendamping",
       mandiri: "Daftar sendiri",
     } satisfies Record<SignupVia, string>,
-    forbidden: "Halaman ini khusus tim peneliti.",
+    forbidden: "Halaman ini khusus tim bikinlaris.",
     markFailed: "Status belum tersimpan. Coba lagi.",
   },
 
@@ -961,8 +962,8 @@ export const id = {
   },
 
   monitoring: {
-    title: "Pantauan riset",
-    subtitle: "Kemajuan sampel, UMKM yang perlu dibantu, dan gambaran hasil cek usaha.",
+    title: "Pantauan",
+    subtitle: "Kemajuan program, UMKM yang perlu dibantu, dan gambaran hasil cek usaha.",
     asOf: (date: string) => `Data per ${date}.`,
     print: "Cetak halaman ini",
     tableToggle: "Lihat sebagai tabel",
@@ -984,30 +985,19 @@ export const id = {
       filteredBody: "Ubah atau hapus saringan untuk melihat data lain.",
       noPacks: "Belum ada paket SOP. Bagian ini terisi setelah UMKM selesai cek usaha.",
     },
-    sample: {
-      title: "Kemajuan sampel",
-      body: "Responden kuesioner hari ke-30, untuk analisis SEM-PLS.",
-      hero: "Kuesioner sudah diisi",
-      meter: "Responden dibandingkan dengan batas minimal sampel",
-      done: "Sudah mengisi",
-      reachable: "Paling banyak bisa mengisi sebelum tenggat",
-      threshold: (n: number, pMin: string) => `${n} responden (p_min ${pMin})`,
-      thresholdsNote:
-        "Batas minimal sampel SEM-PLS, metode inverse square root (Kock & Hadaya, 2018).",
-      deadline: (date: string) => `Tenggat kuesioner: ${date}.`,
-      reachableTile: "Bisa dikuesioner sebelum tenggat",
-      reachableHint: "Paket yang hari ke-30-nya jatuh sebelum tenggat",
-      lastPackTile: "Batas membuat paket",
-      lastPackHint: (days: number) =>
-        days > 0 ? `${days} hari lagi` : days === 0 ? "Hari ini" : `Sudah lewat ${-days} hari`,
+    // No end date and no sample target: the program runs on (owner request, 3 November 2026).
+    program: {
+      title: "Kemajuan program",
+      body: "UMKM yang menjalankan SOP 30 hari, dan kuesioner yang kembali di hari ke-30.",
+      hero: "Kuesioner hari ke-30 diisi",
+      ofDay30: (n: number, percent: number) => `dari ${n} UMKM yang sudah hari ke-30 (${percent}%)`,
+      meter: "Kuesioner diisi dibandingkan UMKM yang sudah hari ke-30",
+      activeTile: "Sedang menjalankan SOP",
+      activeHint: "Paket siap, belum hari ke-30",
+      upcomingTile: "Sampai hari ke-30 minggu ini",
+      upcomingHint: (days: number) => `Dalam ${days} hari ke depan`,
       paceTile: "Paket baru per minggu",
       paceHint: (weeks: number) => `Rata-rata ${weeks} minggu terakhir`,
-      next: (missing: number, n: number, date: string) =>
-        `Perlu ${missing} paket lagi, paling lambat ${date}, agar sampel bisa mencapai ${n}.`,
-      late: (n: number) =>
-        `Batas membuat paket sudah lewat. Sampel belum bisa mencapai ${n} sebelum tenggat.`,
-      reached: "Semua batas minimal sampel bisa tercapai sebelum tenggat.",
-      assumption: "Hitungan ini menganggap semua peserta mengisi kuesioner.",
     },
     timeline: {
       title: "Paket dan hari ke-30 dari waktu ke waktu",
@@ -1018,7 +1008,6 @@ export const id = {
         done: "Kuesioner diisi",
       },
       today: "Hari ini",
-      deadline: "Tenggat",
       future: "Ke depan",
       chart: "Grafik jumlah kumulatif paket, hari ke-30, dan kuesioner per tanggal",
       keys: "Geser atau tekan panah kiri dan kanan untuk membaca tiap tanggal.",
@@ -1120,7 +1109,7 @@ export const id = {
       llm: "Dipersonalisasi Claude",
     },
     profile: {
-      title: "Profil sampel",
+      title: "Profil peserta",
       body: "Sebaran UMKM peserta. Sama dengan bagian B kuesioner.",
       otherPlaces: (n: number) => `${n} kab/kota lain`,
     },
@@ -1137,7 +1126,7 @@ export const id = {
   },
 
   team: {
-    title: "Tim peneliti",
+    title: "Anggota tim",
     subtitle:
       "Undang anggota dengan email. Kirim kode undangannya lewat WhatsApp, lalu mereka membuat akun sendiri.",
     members: "Anggota",
@@ -1147,14 +1136,14 @@ export const id = {
     inviteTitle: "Undang anggota",
     email: "Email",
     role: "Peran",
-    roles: { enumerator: "Enumerator", admin: "Admin" } satisfies Record<StaffRole, string>,
+    roles: { enumerator: "Pendamping", admin: "Admin" } satisfies Record<StaffRole, string>,
     submit: "Buat undangan",
     pending: "Membuat…",
     created: (email: string) => `Undangan untuk ${email} siap. Kirim kodenya lewat WhatsApp.`,
     code: "Kode undangan",
     share: "Kirim lewat WhatsApp",
     message: (email: string, code: string, url: string) =>
-      `Halo. Anda diundang ke tim peneliti bikinlaris.\nBuka ${url}\nDaftar dengan email ${email} dan kode undangan ${code}.`,
+      `Halo. Anda diundang ke tim bikinlaris.\nBuka ${url}\nDaftar dengan email ${email} dan kode undangan ${code}.`,
     remove: "Hapus",
     removeLabel: (email: string) => `Hapus undangan ${email}`,
     errors: {

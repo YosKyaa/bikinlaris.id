@@ -22,7 +22,7 @@ export const metadata: Metadata = { title: id.researcher.title };
 export default async function ParticipantPage({
   params,
   searchParams,
-}: PageProps<"/peneliti/umkm/[id]">) {
+}: PageProps<"/tim/umkm/[id]">) {
   const businessId = z.uuid().safeParse((await params).id);
   if (!businessId.success) notFound();
   const staff = data().staff;

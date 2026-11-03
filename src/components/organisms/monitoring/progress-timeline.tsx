@@ -25,13 +25,12 @@ const SERIES: LineSeries[] = [
   { key: "done", label: id.monitoring.timeline.series.done, color: "var(--viz-series-3)" },
 ];
 
-/** Cumulative packs, day-30 dates (known ahead) and questionnaires, with today and deadline. */
+/** Cumulative packs, day-30 dates (known ahead) and questionnaires, with today marked. */
 export function ProgressTimeline({ timeline }: { timeline: Timeline }) {
   const copy = id.monitoring.timeline;
   const { points } = timeline;
   const indexOf = (date: string) => points.findIndex((p) => p.date === date);
   const todayIndex = Math.max(0, indexOf(timeline.today));
-  const deadlineIndex = indexOf(timeline.deadline);
   const weekly = points.filter((_, i) => i % DAYS_PER_ROW === 0 || i === points.length - 1);
 
   const table = (
@@ -78,10 +77,7 @@ export function ProgressTimeline({ timeline }: { timeline: Timeline }) {
             ? [{ index, label: formatDayMonth(p.date), minor: day === MID_MONTH }]
             : [];
         })}
-        markers={[
-          { index: todayIndex, label: copy.today },
-          ...(deadlineIndex >= 0 ? [{ index: deadlineIndex, label: copy.deadline }] : []),
-        ]}
+        markers={[{ index: todayIndex, label: copy.today }]}
         futureFrom={todayIndex < points.length - 1 ? todayIndex + 1 : null}
         futureLabel={copy.future}
         initialIndex={todayIndex}

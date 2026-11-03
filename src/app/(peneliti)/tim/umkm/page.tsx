@@ -25,7 +25,7 @@ function parseFilter(value: string | string[] | undefined): Filter {
 }
 
 /** Every participant with the stage filter (shareable links), then the CSV downloads. */
-export default async function ParticipantListPage({ searchParams }: PageProps<"/peneliti/umkm">) {
+export default async function ParticipantListPage({ searchParams }: PageProps<"/tim/umkm">) {
   const filter = parseFilter((await searchParams)[FILTER_PARAM]);
   const rows = buildRows(await data().staff.listParticipants(), todayIso());
   const copy = id.researcher.list;

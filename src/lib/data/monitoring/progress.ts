@@ -1,9 +1,10 @@
-import { rules } from "@/lib/diagnosis/bank";
-import { addDays, daysBetween, todayIso } from "@/lib/format";
+import { addDays, todayIso } from "@/lib/format";
+import { percentOf } from "@/lib/viz";
 
+import { DUE_WINDOW_DAYS } from "../research";
 import type { Pack, Participant } from "../types";
-import { DAYS_PER_WEEK, PACE_WINDOW_WEEKS, SAMPLE_THRESHOLDS } from "./targets";
-import type { SampleProgress, Timeline, TimelinePoint } from "./types";
+import { DAYS_PER_WEEK, PACE_WINDOW_WEEKS } from "./targets";
+import type { ProgramProgress, Timeline, TimelinePoint } from "./types";
 
 /** WIB calendar day of a timestamp. */
 export const wibDay = (isoDateTime: string) => todayIso(new Date(isoDateTime));
@@ -12,28 +13,24 @@ export function readyPacks(participants: Participant[]): Pack[] {
   return participants.flatMap(({ pack }) => (pack?.status === "siap" ? [pack] : []));
 }
 
-/** Will the sample be large enough by the deadline, and how many packs are still needed? */
-export function buildSampleProgress(
-  participants: Participant[],
-  today: string,
-  deadline: string,
-): SampleProgress {
+/**
+ * Where the program stands, with no end date (owner request, 3 November 2026): who runs a
+ * SOP now, who reaches day 30 soon, and how many day-30 questionnaires came back.
+ */
+export function buildProgramProgress(participants: Participant[], today: string): ProgramProgress {
   const packs = readyPacks(participants);
+  const pastDay30 = packs.filter((p) => p.followUpOn <= today).length;
   const done = packs.filter((p) => p.questionnaireDoneAt).length;
-  const reachable = packs.filter((p) => p.followUpOn <= deadline).length;
-  const lastPackDay = addDays(deadline, -rules.followUpDays);
-  const next = SAMPLE_THRESHOLDS.find((t) => t.n > reachable);
+  const soon = addDays(today, DUE_WINDOW_DAYS);
   const windowStart = addDays(today, -PACE_WINDOW_WEEKS * DAYS_PER_WEEK);
   const recent = packs.filter((p) => p.createdOn > windowStart).length;
 
   return {
     done,
-    reachable,
-    thresholds: SAMPLE_THRESHOLDS,
-    deadline,
-    lastPackDay,
-    daysToLastPackDay: daysBetween(today, lastPackDay),
-    nextThreshold: next ? { n: next.n, missing: next.n - reachable } : null,
+    pastDay30,
+    responsePercent: percentOf(done, pastDay30),
+    active: packs.length - pastDay30,
+    upcoming: packs.filter((p) => p.followUpOn > today && p.followUpOn <= soon).length,
     weeklyPace: Math.round((recent / PACE_WINDOW_WEEKS) * 10) / 10,
   };
 }
@@ -48,23 +45,19 @@ function cumulative(days: string[]) {
 }
 
 /**
- * One point per day, from the first participant to the later of the deadline and the last
- * day 30: packs made and questionnaires filled in (up to today), and packs at day 30
- * (known ahead, since day 30 follows from the pack date).
+ * One point per day, from the first participant to the later of today and the last day 30:
+ * packs made and questionnaires filled in (up to today), and packs at day 30 (known ahead,
+ * since day 30 follows from the pack date).
  */
-export function buildTimeline(
-  participants: Participant[],
-  today: string,
-  deadline: string,
-): Timeline {
+export function buildTimeline(participants: Participant[], today: string): Timeline {
   const packs = readyPacks(participants);
   const firstDay = participants.map((p) => wibDay(p.business.createdAt)).sort()[0];
-  if (!firstDay) return { points: [], today, deadline };
+  if (!firstDay) return { points: [], today };
 
   const created = packs.map((p) => p.createdOn).sort();
   const day30 = packs.map((p) => p.followUpOn).sort();
   const done = packs.flatMap((p) => (p.questionnaireDoneAt ? [wibDay(p.questionnaireDoneAt)] : []));
-  const lastDay = [today, deadline, ...day30].sort().at(-1) ?? today;
+  const lastDay = [today, ...day30].sort().at(-1) ?? today;
 
   const countCreated = cumulative(created);
   const countDay30 = cumulative(day30);
@@ -80,5 +73,5 @@ export function buildTimeline(
     };
     points.push(past ? point : { ...point, packs: null, done: null });
   }
-  return { points, today, deadline };
+  return { points, today };
 }

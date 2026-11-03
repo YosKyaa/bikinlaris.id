@@ -13,9 +13,7 @@ import { localWhatsApp } from "@/lib/validations/participant";
 
 export const metadata: Metadata = { title: id.researcher.actions.edit };
 
-export default async function EditParticipantPage({
-  params,
-}: PageProps<"/peneliti/umkm/[id]/ubah">) {
+export default async function EditParticipantPage({ params }: PageProps<"/tim/umkm/[id]/ubah">) {
   const businessId = z.uuid().safeParse((await params).id);
   if (!businessId.success) notFound();
   const participant = await data().staff.getParticipant(businessId.data);

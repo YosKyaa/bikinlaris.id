@@ -26,22 +26,22 @@ export const ROUTES = {
   googleLogin: "/auth/google",
   /** Google comes back here through Supabase with a one-time code. */
   authCallback: "/auth/callback",
-  researcher: "/peneliti",
+  /** Team panel ("tim", not "peneliti": owner request, 3 November 2026). */
+  researcher: "/tim",
   /** Full participant list with the stage filter (the dashboard shows the most urgent few). */
-  participants: "/peneliti/umkm",
-  monitoring: "/peneliti/pantauan",
-  newParticipant: "/peneliti/umkm/baru",
-  researcherBusiness: (businessId: string) => `/peneliti/umkm/${businessId}`,
-  editParticipant: (businessId: string) => `/peneliti/umkm/${businessId}/ubah`,
-  team: "/peneliti/tim",
-  researcherExport: (table: "ringkasan" | "events" | "coach") =>
-    `/api/peneliti/ekspor?tabel=${table}`,
+  participants: "/tim/umkm",
+  monitoring: "/tim/pantauan",
+  newParticipant: "/tim/umkm/baru",
+  researcherBusiness: (businessId: string) => `/tim/umkm/${businessId}`,
+  editParticipant: (businessId: string) => `/tim/umkm/${businessId}/ubah`,
+  team: "/tim/anggota",
+  researcherExport: (table: "ringkasan" | "events" | "coach") => `/api/tim/ekspor?tabel=${table}`,
 } as const;
 
 /** Owner pages: reached through the private link, never through a login form. */
 export const OWNER_PREFIXES = ["/beranda", "/diagnosis", "/paket"] as const;
 /** Research team pages: staff account required. */
-export const STAFF_PREFIXES = ["/peneliti"] as const;
+export const STAFF_PREFIXES = ["/tim"] as const;
 
 export const NEXT_PARAM = "lanjut";
 export const NOTICE_PARAM = "info";

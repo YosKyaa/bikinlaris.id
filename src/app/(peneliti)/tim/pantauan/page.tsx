@@ -6,14 +6,13 @@ import { MonitoringFilters } from "@/components/organisms/monitoring/monitoring-
 import { id } from "@/content/id";
 import { data } from "@/lib/data";
 import { buildMonitoring, parseMonitoringFilters } from "@/lib/data/monitoring";
-import { env } from "@/lib/env";
 import { formatDate, todayIso } from "@/lib/format";
 import { groupByProvince } from "@/lib/wilayah";
 
 export const metadata: Metadata = { title: id.monitoring.title };
 
 /** Research monitoring: sample progress, who needs action, check results, usage, sample profile. */
-export default async function MonitoringPage({ searchParams }: PageProps<"/peneliti/pantauan">) {
+export default async function MonitoringPage({ searchParams }: PageProps<"/tim/pantauan">) {
   const staff = data().staff;
   const [participants, events, team, params] = await Promise.all([
     staff.listParticipants(),
@@ -30,7 +29,6 @@ export default async function MonitoringPage({ searchParams }: PageProps<"/penel
     filters,
     today,
     now: new Date(),
-    deadline: env.RESEARCH_DEADLINE,
   });
 
   return (

@@ -11,12 +11,12 @@ import {
   buildSopUsage,
   buildTopProblems,
 } from "./insights";
-import { buildSampleProgress, buildTimeline, readyPacks } from "./progress";
+import { buildProgramProgress, buildTimeline, readyPacks } from "./progress";
 import { buildEngagement, buildTeam } from "./usage";
 import { ALL, type Monitoring, type MonitoringFilters } from "./types";
 
 export * from "./types";
-export { ALERT_PREVIEW, ALERT_RULES, PACE_WINDOW_WEEKS, SAMPLE_THRESHOLDS } from "./targets";
+export { ALERT_PREVIEW, ALERT_RULES, PACE_WINDOW_WEEKS } from "./targets";
 
 export const FILTER_PARAMS = { location: "lokasi", staff: "pendamping" } as const;
 
@@ -49,7 +49,7 @@ function applyFilters(participants: Participant[], filters: MonitoringFilters) {
   );
 }
 
-/** Every number on /peneliti/pantauan, computed from the same filtered slice. */
+/** Every number on /tim/pantauan, computed from the same filtered slice. */
 export function buildMonitoring(input: {
   participants: Participant[];
   events: ResearchEvent[];
@@ -57,9 +57,8 @@ export function buildMonitoring(input: {
   filters: MonitoringFilters;
   today: string;
   now: Date;
-  deadline: string;
 }): Monitoring {
-  const { today, deadline } = input;
+  const { today } = input;
   const participants = applyFilters(input.participants, input.filters);
   const ids = new Set(participants.map((p) => p.business.id));
   const events = input.events.filter((e) => ids.has(e.businessId));
@@ -68,8 +67,8 @@ export function buildMonitoring(input: {
   return {
     participants: participants.length,
     totalParticipants: input.participants.length,
-    sample: buildSampleProgress(participants, today, deadline),
-    timeline: buildTimeline(participants, today, deadline),
+    program: buildProgramProgress(participants, today),
+    timeline: buildTimeline(participants, today),
     funnel: buildFunnel(participants, today),
     alerts: buildAlerts(participants, events, today, input.now),
     readyPacks: packs.length,
