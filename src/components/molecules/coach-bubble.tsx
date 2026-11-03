@@ -9,8 +9,8 @@ export function CoachBubble({ role, text }: { role: CoachRole; text: string }) {
     <li className={cn("flex", own ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "max-w-[85%] rounded-xl px-4 py-3",
-          own ? "bg-muted" : "border bg-background",
+          "max-w-[85%] rounded-2xl px-4 py-3",
+          own ? "rounded-br-md bg-success-soft" : "rounded-bl-md border bg-card",
         )}
       >
         <p className="text-sm font-semibold text-muted-foreground">

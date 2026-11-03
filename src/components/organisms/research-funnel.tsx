@@ -14,7 +14,7 @@ export function ResearchFunnel({ steps }: { steps: FunnelStep[] }) {
   return (
     <section
       aria-labelledby="perjalanan-peserta"
-      className="min-w-0 rounded-xl border bg-background p-5 shadow-card sm:p-6 print:break-inside-avoid print:shadow-none"
+      className="min-w-0 rounded-2xl border bg-card p-5 sm:p-6 print:break-inside-avoid"
     >
       <h2 id="perjalanan-peserta" className="text-xl font-semibold">
         {copy.title}

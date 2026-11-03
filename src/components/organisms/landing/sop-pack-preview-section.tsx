@@ -1,9 +1,10 @@
-import { Eyebrow } from "@/components/atoms/eyebrow";
+import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { id } from "@/content/id";
 import { sections, sopsOf } from "@/lib/diagnosis/bank";
 
 import { SampleSopDialog } from "../sample-sop-dialog";
 import { LANDING_ANCHORS } from "../site-header";
+import { LandingSection, TileHeading } from "./landing-section";
 import { SopCatalog, type CatalogSection } from "./sop-catalog";
 
 /** Desire: what is inside the pack, browsable per area, with one SOP that can be opened. */
@@ -24,22 +25,16 @@ export function SopPackPreviewSection() {
   }));
 
   return (
-    <section id={LANDING_ANCHORS.pack} className="relative isolate scroll-mt-20 overflow-hidden">
-      <div
-        aria-hidden
-        className="drift absolute -top-40 -left-48 -z-10 size-[36rem] bg-radial from-accent-lime/35 to-transparent to-70%"
-      />
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 *:min-w-0 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:py-24">
-        <div className="reveal-left">
-          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
-          <p className="mt-4 text-lg text-muted-foreground">{copy.body}</p>
-          <SampleSopDialog label={copy.openSample} className="mt-6" />
-        </div>
-        <div className="reveal-right">
+    <LandingSection id={LANDING_ANCHORS.pack}>
+      <BentoGrid className="lg:grid-cols-[1fr_1.6fr]">
+        <BentoTile tone="mint" className="reveal-left flex flex-col">
+          <TileHeading eyebrow={copy.eyebrow} title={copy.title} body={copy.body} tone="chip" />
+          <SampleSopDialog label={copy.openSample} className="mt-6 self-start lg:mt-auto" />
+        </BentoTile>
+        <BentoTile className="reveal-right">
           <SopCatalog sections={catalog} />
-        </div>
-      </div>
-    </section>
+        </BentoTile>
+      </BentoGrid>
+    </LandingSection>
   );
 }

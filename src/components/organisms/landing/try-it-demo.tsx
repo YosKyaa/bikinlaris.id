@@ -4,6 +4,7 @@ import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { SectionStatusBadge } from "@/components/atoms/section-status-badge";
 import { QuestionField } from "@/components/molecules/question-field";
 import { Button } from "@/components/ui/button";
@@ -73,8 +74,8 @@ export function TryItDemo({
   const found = answered.filter((r) => r.color !== "hijau");
 
   return (
-    <div className="grid gap-8 *:min-w-0 md:grid-cols-[1.1fr_1fr] lg:gap-12">
-      <ol className="space-y-4">
+    <BentoGrid className="md:grid-cols-[1.1fr_1fr]">
+      <ol className="space-y-3 sm:space-y-4">
         {questions.map((question, index) => (
           <li key={question.id}>
             <QuestionField
@@ -95,7 +96,7 @@ export function TryItDemo({
       </ol>
 
       <div className="md:sticky md:top-24 md:self-start">
-        <div className="rounded-xl border bg-background p-5 shadow-float sm:p-6">
+        <BentoTile>
           <h3 className="text-lg font-semibold">{copy.resultTitle}</h3>
           <div aria-live="polite" className="mt-4 space-y-3">
             {answered.length === 0 ? (
@@ -147,8 +148,8 @@ export function TryItDemo({
             </Button>
             <p className="mt-2 text-sm text-muted-foreground">{copy.ctaNote(totalQuestions)}</p>
           </div>
-        </div>
+        </BentoTile>
       </div>
-    </div>
+    </BentoGrid>
   );
 }

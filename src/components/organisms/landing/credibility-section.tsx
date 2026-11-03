@@ -1,57 +1,79 @@
 import type { CSSProperties } from "react";
 
-import { Eyebrow } from "@/components/atoms/eyebrow";
+import { BentoGrid, BentoTile, type TileTone } from "@/components/atoms/bento-tile";
 import { id } from "@/content/id";
 import { rules, sections, totalQuestions } from "@/lib/diagnosis/bank";
 import { cn } from "@/lib/utils";
 
+import { LandingSection, TileHeading } from "./landing-section";
+
 /**
- * Desire: credibility on --brand-deep. The numbers are counted from the question bank,
- * not marketing claims, and count up as the section scrolls in. Lime highlights one number.
+ * Desire: who made this, on --brand-deep, beside three number tiles. The numbers are counted
+ * from the question bank, not marketing claims, and count up as they scroll in.
  */
 export function CredibilitySection() {
   const copy = id.landing.credibility;
-  const facts = [
-    { value: totalQuestions, label: copy.facts.questions, highlight: true },
-    { value: sections.length, label: copy.facts.sections, highlight: false },
-    { value: rules.maxSopPerPack, label: copy.facts.maxSop, highlight: false },
+  const facts: { value: number; label: string; tone: TileTone; className: string }[] = [
+    {
+      value: totalQuestions,
+      label: copy.facts.questions,
+      tone: "lime",
+      className: "col-span-2 lg:col-span-6",
+    },
+    {
+      value: sections.length,
+      label: copy.facts.sections,
+      tone: "card",
+      className: "lg:col-span-3",
+    },
+    {
+      value: rules.maxSopPerPack,
+      label: copy.facts.maxSop,
+      tone: "card",
+      className: "lg:col-span-3",
+    },
   ];
 
   return (
-    <section className="relative isolate overflow-hidden bg-linear-135 from-brand-deep from-30% to-brand-mid text-white">
-      {/* Green light behind the text (keeps 5.4:1), lime only behind the number cards. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="drift absolute -top-48 -left-40 size-[36rem] bg-radial from-primary/40 to-transparent to-70%" />
-        <div
-          className="drift absolute -right-40 -bottom-56 size-[40rem] bg-radial from-accent-lime/25 to-transparent to-70%"
-          style={{ "--delay": "-7s" } as CSSProperties}
-        />
-      </div>
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-        <div className="reveal-left">
-          <Eyebrow tone="inverse">{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">{copy.title}</h2>
-          <p className="mt-4 text-lg text-brand-deep-muted">{copy.body}</p>
-        </div>
-        <ul className="grid content-center gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-          {facts.map((fact) => (
-            <li key={fact.label} className="glass-dark reveal-scale rounded-xl p-5 shadow-float">
-              <span
-                aria-hidden
-                className={cn(
-                  "count-up block text-5xl font-bold tabular-nums",
-                  fact.highlight && "text-accent-lime",
-                )}
-                style={{ "--target": fact.value } as CSSProperties}
-              >
-                <span className="count-up-value">{fact.value}</span>
-              </span>
+    <LandingSection>
+      <BentoGrid className="grid-cols-2 lg:grid-cols-12">
+        <BentoTile
+          tone="deep"
+          className="reveal-left isolate col-span-2 flex flex-col justify-center overflow-hidden p-6 sm:p-10 lg:col-span-6 lg:row-span-2"
+        >
+          {/* Green light behind the text keeps white 7:1 and the grey 5.4:1. */}
+          <div
+            aria-hidden
+            className="drift pointer-events-none absolute -top-40 -left-40 -z-10 size-[32rem] bg-radial from-primary/40 to-transparent to-70%"
+          />
+          <TileHeading eyebrow={copy.eyebrow} title={copy.title} body={copy.body} tone="inverse" />
+        </BentoTile>
+        {facts.map((fact) => (
+          <BentoTile
+            key={fact.label}
+            as="figure"
+            tone={fact.tone}
+            className={cn("reveal-scale flex flex-col justify-between gap-4", fact.className)}
+          >
+            <span
+              aria-hidden
+              className="count-up block text-5xl font-bold tabular-nums sm:text-6xl"
+              style={{ "--target": fact.value } as CSSProperties}
+            >
+              <span className="count-up-value">{fact.value}</span>
+            </span>
+            <figcaption
+              className={cn(
+                "font-medium",
+                fact.tone === "card" ? "text-muted-foreground" : "text-brand-deep",
+              )}
+            >
               <span className="sr-only">{fact.value} </span>
-              <span className="mt-1 block text-brand-deep-muted">{fact.label}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+              {fact.label}
+            </figcaption>
+          </BentoTile>
+        ))}
+      </BentoGrid>
+    </LandingSection>
   );
 }

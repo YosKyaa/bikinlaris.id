@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { InlineError } from "@/components/molecules/inline-error";
 import {
   AlertDialog,
@@ -71,8 +72,8 @@ export function DiagnosisSummary({
   }
 
   return (
-    <div className="space-y-10 pb-28 lg:pb-0">
-      <section aria-labelledby="hardest-title" className="space-y-4">
+    <div className="space-y-3 pb-28 sm:space-y-4 lg:pb-0">
+      <BentoTile as="section" aria-labelledby="hardest-title" className="space-y-4">
         <div>
           <h2 id="hardest-title" className="text-2xl font-semibold">
             {id.summary.hardestTitle}
@@ -93,8 +94,10 @@ export function DiagnosisSummary({
               key={option.id}
               htmlFor={`hardest-${option.id}`}
               className={cn(
-                "flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors duration-150 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
-                hardest === option.id ? "border-primary bg-success-soft" : "border-border",
+                "flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 p-4 transition-colors duration-150 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+                hardest === option.id
+                  ? "border-primary bg-success-soft"
+                  : "border-border bg-card hover:border-primary/40",
               )}
             >
               <RadioGroupItem id={`hardest-${option.id}`} value={option.id} />
@@ -106,11 +109,11 @@ export function DiagnosisSummary({
             </label>
           ))}
         </RadioGroup>
-      </section>
+      </BentoTile>
 
       <InlineError message={error} />
 
-      <section aria-labelledby="review-title" className="space-y-3">
+      <BentoTile as="section" aria-labelledby="review-title" className="space-y-4">
         <div>
           <h2 id="review-title" className="text-xl font-semibold">
             {id.summary.reviewTitle}
@@ -118,9 +121,9 @@ export function DiagnosisSummary({
           <p className="text-muted-foreground">{id.summary.reviewBody}</p>
         </div>
         <AnswerReview sections={sections} />
-      </section>
+      </BentoTile>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:pt-4">
         <div className="mx-auto max-w-2xl">
           <Button size="lg" className="w-full lg:w-auto" onClick={requestCreate} disabled={pending}>
             {pending ? id.summary.pending : id.summary.cta}

@@ -90,7 +90,7 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
 
       <section
         aria-labelledby="unduh-data"
-        className="flex flex-col gap-4 rounded-xl bg-muted p-5 lg:flex-row lg:items-center lg:justify-between"
+        className="flex flex-col gap-4 rounded-2xl border bg-card p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between"
       >
         <div>
           <h2 id="unduh-data" className="text-lg font-semibold">
@@ -99,20 +99,20 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
           <p className="text-muted-foreground">{id.researcher.export.body}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild variant="outline" className="bg-background">
+          <Button asChild variant="outline">
             <a href={ROUTES.researcherExport("ringkasan")} download>
               <DownloadIcon aria-hidden />
               {id.researcher.export.summary}
             </a>
           </Button>
-          <Button asChild variant="outline" className="bg-background">
+          <Button asChild variant="outline">
             <a href={ROUTES.researcherExport("events")} download>
               <DownloadIcon aria-hidden />
               {id.researcher.export.events}
             </a>
           </Button>
           {isCoachEnabled() ? (
-            <Button asChild variant="outline" className="bg-background">
+            <Button asChild variant="outline">
               <a href={ROUTES.researcherExport("coach")} download>
                 <DownloadIcon aria-hidden />
                 {id.researcher.export.coach}

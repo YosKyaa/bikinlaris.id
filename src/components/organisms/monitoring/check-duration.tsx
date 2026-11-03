@@ -24,7 +24,7 @@ export function CheckDuration({ duration, sources }: CheckDurationProps) {
           value={median === null ? null : id.common.minutes(median)}
           hint={copy.of(duration.completed)}
         />
-        <div className="rounded-xl border bg-background p-4 shadow-card print:shadow-none">
+        <div className="rounded-2xl border bg-card p-4">
           <p className="text-sm text-muted-foreground">{copy.sources}</p>
           <dl className="mt-2 space-y-1">
             {(["template", "llm"] as const).map((key) => (

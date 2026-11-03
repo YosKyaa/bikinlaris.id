@@ -54,7 +54,7 @@ export function SopPackList({ items }: { items: SopPackItem[] }) {
           key={item.sopId}
           id={sopAnchor(item.sopId)}
           value={item.sopId}
-          className="scroll-mt-20 rounded-xl border bg-background px-4 shadow-card transition-shadow duration-200 last:border-b hover:shadow-card-hover sm:px-5"
+          className="scroll-mt-20 rounded-2xl border bg-card px-4 last:border-b sm:px-5"
         >
           <AccordionTrigger className="py-4 hover:no-underline">
             <span className="flex items-start gap-3">

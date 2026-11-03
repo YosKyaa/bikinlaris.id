@@ -1,6 +1,6 @@
 import { CheckIcon, PrinterIcon, SendIcon } from "lucide-react";
 
-import { Eyebrow } from "@/components/atoms/eyebrow";
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { SaveIndicator } from "@/components/atoms/save-indicator";
 import { StepCounter } from "@/components/atoms/step-counter";
 import { AreaScoreBar } from "@/components/molecules/area-score-bar";
@@ -19,6 +19,7 @@ import {
 
 import { LANDING_ANCHORS } from "../site-header";
 import { HowItWorksTabs } from "./how-it-works-tabs";
+import { LandingSection, TileHeading } from "./landing-section";
 
 /** Example content for the step previews. Texts come from the bank; scores are illustrative. */
 const PREVIEW_QUESTION: QuestionId = "q_pesanan_1";
@@ -119,7 +120,7 @@ function PackPreview() {
   );
 }
 
-/** Interest: three numbered steps; each opens a snippet of the real screen. */
+/** Interest: three numbered step tiles; each opens a snippet of the real screen beside them. */
 export function HowItWorksSection() {
   const copy = id.landing.how;
   const [check, map, pack] = copy.steps;
@@ -134,20 +135,17 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section id={LANDING_ANCHORS.how} className="relative isolate scroll-mt-20 overflow-hidden">
-      <div
-        aria-hidden
-        className="drift absolute -right-48 bottom-0 -z-10 size-[40rem] bg-radial from-accent-lime/40 to-transparent to-70%"
-      />
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-        <div className="reveal">
-          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
-        </div>
-        <div className="reveal-scale mt-10">
-          <HowItWorksTabs steps={steps} />
-        </div>
+    <LandingSection id={LANDING_ANCHORS.how}>
+      <div className="reveal-scale">
+        <HowItWorksTabs
+          steps={steps}
+          heading={
+            <BentoTile>
+              <TileHeading eyebrow={copy.eyebrow} title={copy.title} />
+            </BentoTile>
+          }
+        />
       </div>
-    </section>
+    </LandingSection>
   );
 }

@@ -25,7 +25,7 @@ export function BusinessMap({
   const ordered = sections.map((s) => s.id).sort(compareSections(map, hardest));
   return (
     <section aria-labelledby="peta-usaha" className="space-y-4">
-      <div className="rounded-xl border bg-background p-5 shadow-card sm:p-6">
+      <div className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 id="peta-usaha" className="text-2xl font-semibold">
           {id.pack.map.title}
         </h2>

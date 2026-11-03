@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition, type ComponentProps } from "react";
 import { Controller, useForm, type FieldError as HookFieldError } from "react-hook-form";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { ChoiceChips } from "@/components/molecules/choice-chips";
 import { InlineError } from "@/components/molecules/inline-error";
 import { LocationPicker } from "@/components/molecules/location-picker";
@@ -55,8 +56,9 @@ const errorText = (error: HookFieldError | undefined) =>
   error?.message ? (errorMessages[error.message] ?? errorMessages.required) : undefined;
 
 /**
- * /ikut: one short page. Four typed fields, two dropdowns, three tap-to-choose rows, consent.
- * On success the private link is already saved on this phone; next comes the saved-link screen.
+ * /ikut: one short page, one tile per group. Four typed fields, two dropdowns, three
+ * tap-to-choose rows, consent with the button in the last (mint) tile. On success the private
+ * link is already saved on this phone; next comes the saved-link screen.
  */
 export function SelfSignupForm() {
   const router = useRouter();
@@ -152,97 +154,105 @@ export function SelfSignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-8 pb-24 lg:pb-0">
-      <FieldSet>
-        <FieldLegend>{copy.groups.you}</FieldLegend>
-        <FieldGroup>
-          {textField("ownerName", { autoComplete: "name", maxLength: NAME_MAX_LENGTH })}
-          {textField("whatsapp", { type: "tel", inputMode: "tel", autoComplete: "tel" })}
-        </FieldGroup>
-      </FieldSet>
+    <form onSubmit={onSubmit} noValidate className="grid gap-3 sm:gap-4">
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{copy.groups.you}</FieldLegend>
+          <FieldGroup>
+            {textField("ownerName", { autoComplete: "name", maxLength: NAME_MAX_LENGTH })}
+            {textField("whatsapp", { type: "tel", inputMode: "tel", autoComplete: "tel" })}
+          </FieldGroup>
+        </FieldSet>
+      </BentoTile>
 
-      <FieldSet>
-        <FieldLegend>{copy.groups.business}</FieldLegend>
-        <FieldGroup>
-          {textField("name", { autoComplete: "organization", maxLength: NAME_MAX_LENGTH })}
-          {textField("product", { autoComplete: "off", maxLength: PRODUCT_MAX_LENGTH })}
-          {sectorField()}
-          <Controller
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <LocationPicker
-                idPrefix="daftar-location"
-                value={field.value}
-                onChange={field.onChange}
-                error={errorText(errors.location)}
-              />
-            )}
-          />
-        </FieldGroup>
-      </FieldSet>
-
-      <FieldSet>
-        <FieldLegend>{copy.groups.more}</FieldLegend>
-        <div className="space-y-6">
-          {CHOICES.map(({ key, values, columns }) => (
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{copy.groups.business}</FieldLegend>
+          <FieldGroup>
+            {textField("name", { autoComplete: "organization", maxLength: NAME_MAX_LENGTH })}
+            {textField("product", { autoComplete: "off", maxLength: PRODUCT_MAX_LENGTH })}
+            {sectorField()}
             <Controller
-              key={key}
               control={form.control}
-              name={key}
-              render={({ field }) => {
-                const options: Record<string, string> = profile.options[key];
-                return (
-                  <ChoiceChips
-                    legend={profile.fields[key].label}
-                    options={values.map((value) => ({ value, label: options[value] ?? value }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errorText(errors[key])}
-                    columns={columns}
-                  />
-                );
-              }}
+              name="location"
+              render={({ field }) => (
+                <LocationPicker
+                  idPrefix="daftar-location"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errorText(errors.location)}
+                />
+              )}
             />
-          ))}
-        </div>
-      </FieldSet>
+          </FieldGroup>
+        </FieldSet>
+      </BentoTile>
+
+      <BentoTile>
+        <FieldSet>
+          <FieldLegend className="text-lg font-semibold">{copy.groups.more}</FieldLegend>
+          <div className="space-y-6">
+            {CHOICES.map(({ key, values, columns }) => (
+              <Controller
+                key={key}
+                control={form.control}
+                name={key}
+                render={({ field }) => {
+                  const options: Record<string, string> = profile.options[key];
+                  return (
+                    <ChoiceChips
+                      legend={profile.fields[key].label}
+                      options={values.map((value) => ({ value, label: options[value] ?? value }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errorText(errors[key])}
+                      columns={columns}
+                    />
+                  );
+                }}
+              />
+            ))}
+          </div>
+        </FieldSet>
+      </BentoTile>
 
       {/* People never see this field; scripts that fill every input do. */}
       <div aria-hidden className="absolute -left-[9999px] size-px overflow-hidden">
         <input tabIndex={-1} autoComplete="off" {...form.register("website")} />
       </div>
 
-      <Controller
-        control={form.control}
-        name="consent"
-        render={({ field }) => (
-          <Field data-invalid={Boolean(errors.consent)} orientation="horizontal">
-            <Checkbox
-              id="daftar-consent"
-              checked={field.value === true}
-              onCheckedChange={(checked) => field.onChange(checked === true)}
-              aria-invalid={Boolean(errors.consent)}
-              className="mt-0.5 size-5"
-            />
-            <div>
-              <FieldLabel htmlFor="daftar-consent" className="font-normal">
-                {copy.consent}
-              </FieldLabel>
-              <FieldError>{errorText(errors.consent)}</FieldError>
-            </div>
-          </Field>
-        )}
-      />
+      <BentoTile tone="mint" className="space-y-4">
+        <Controller
+          control={form.control}
+          name="consent"
+          render={({ field }) => (
+            <Field data-invalid={Boolean(errors.consent)} orientation="horizontal">
+              <Checkbox
+                id="daftar-consent"
+                checked={field.value === true}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+                aria-invalid={Boolean(errors.consent)}
+                className="mt-0.5 size-5 border-primary bg-background"
+              />
+              <div>
+                <FieldLabel htmlFor="daftar-consent" className="font-normal">
+                  {copy.consent}
+                </FieldLabel>
+                <FieldError>{errorText(errors.consent)}</FieldError>
+              </div>
+            </Field>
+          )}
+        />
 
-      <InlineError message={serverError} />
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:p-0">
-        <div className="mx-auto max-w-md">
-          <Button type="submit" size="lg" className="w-full" disabled={pending}>
-            {pending ? copy.pending : copy.submit}
-          </Button>
+        <InlineError message={serverError} />
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:bg-transparent lg:p-0">
+          <div className="mx-auto max-w-md lg:max-w-none">
+            <Button type="submit" size="lg" className="w-full" disabled={pending}>
+              {pending ? copy.pending : copy.submit}
+            </Button>
+          </div>
         </div>
-      </div>
+      </BentoTile>
     </form>
   );
 }

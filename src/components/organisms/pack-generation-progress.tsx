@@ -64,7 +64,7 @@ export function PackGenerationProgress({ sops }: PackGenerationProgressProps) {
 
   if (phase === "failed") {
     return (
-      <div className="space-y-4 rounded-xl border p-5">
+      <div className="space-y-4 rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="text-xl font-semibold">{id.generating.failedTitle}</h2>
         <InlineError message={id.generating.failedBody} />
         <Button
@@ -87,14 +87,14 @@ export function PackGenerationProgress({ sops }: PackGenerationProgressProps) {
     : id.generating.step(step + 1, sops.length, sops[step]?.title ?? "");
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-3 sm:space-y-4">
+      <div className="rounded-2xl border bg-card p-5 sm:p-6">
         <Progress value={(finished / Math.max(sops.length, 1)) * 100} className="h-2" aria-hidden />
         <p role="status" aria-live="polite" className="mt-3 font-semibold">
           {liveText}
         </p>
       </div>
-      <ol className="divide-y rounded-xl border">
+      <ol className="divide-y rounded-2xl border bg-card">
         {sops.map((sop, index) => {
           const state = index < finished ? "done" : index === step ? "working" : "waiting";
           return (

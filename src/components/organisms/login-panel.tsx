@@ -18,14 +18,14 @@ interface LoginPanelProps {
   mockHint: string | null;
 }
 
-/** Research team login. Owners are pointed to their WhatsApp link in the subtitle. */
+/**
+ * Research team login form tile. The page title and the note for owners (open the WhatsApp
+ * link instead) sit in the title tile of AuthLayout.
+ */
 export function LoginPanel({ next, notice, googleHref, mockHint }: LoginPanelProps) {
   return (
     <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">{id.auth.title}</h1>
-        <p className="text-muted-foreground">{id.auth.subtitle}</p>
-      </header>
+      <p className="text-2xl font-semibold tracking-tight">{id.auth.formTitle}</p>
       {notice ? (
         <Alert role="status">
           <InfoIcon aria-hidden />

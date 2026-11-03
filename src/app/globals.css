@@ -7,6 +7,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-canvas: var(--canvas);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
@@ -73,6 +74,8 @@
   --brand-deep-muted: oklch(0.848 0.019 161.04); /* #C3D1C9, secondary text on --brand-deep */
   /* Landing gradients run --brand-deep → --brand-mid. On it: white 7.2:1, --brand-deep-muted 4.6:1, lime 5.6:1. */
   --brand-mid: oklch(0.445 0.105 153.61); /* #116437 */
+  /* Bento page background; tiles are white on it. Grey text 5.1:1, --primary links 4.6:1. */
+  --canvas: oklch(0.966 0.006 153.78); /* #F1F5F2 */
 
   /* shadcn aliases mapped onto the tokens above. */
   --card: var(--background);

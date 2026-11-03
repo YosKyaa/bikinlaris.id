@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Eyebrow } from "@/components/atoms/eyebrow";
-import { EmptyState } from "@/components/molecules/empty-state";
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { SelfSignupForm } from "@/components/organisms/self-signup-form";
-import { FocusLayout } from "@/components/templates/focus-layout";
+import { AuthLayout } from "@/components/templates/auth-layout";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
@@ -17,29 +16,33 @@ export default function SignupPage() {
   const copy = id.signup;
   if (!env.UMKM_SIGNUP) {
     return (
-      <FocusLayout width="narrow">
-        <EmptyState
-          title={copy.closed.title}
-          body={copy.closed.body}
-          action={
-            <Button asChild variant="outline">
-              <Link href={ROUTES.join}>{id.join.eyebrow}</Link>
-            </Button>
-          }
-        />
-      </FocusLayout>
+      <AuthLayout
+        showcase="owner"
+        intro={{ eyebrow: copy.eyebrow, title: copy.closed.title, body: copy.closed.body }}
+      >
+        <div className="space-y-4">
+          <p className="text-muted-foreground">{copy.haveLink}</p>
+          <Button asChild variant="outline">
+            <Link href={ROUTES.join}>{id.join.eyebrow}</Link>
+          </Button>
+        </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <FocusLayout width="narrow">
-      <header className="mb-8 space-y-2">
-        <Eyebrow>{copy.eyebrow}</Eyebrow>
-        <h1 className="text-3xl font-bold tracking-tight text-balance">{copy.title}</h1>
-        <p className="text-muted-foreground">{copy.body}</p>
-      </header>
-      <SelfSignupForm />
-      <p className="mt-8 text-sm text-muted-foreground">{copy.haveLink}</p>
-    </FocusLayout>
+    <AuthLayout
+      showcase="owner"
+      formTile={false}
+      intro={{ eyebrow: copy.eyebrow, title: copy.title, body: copy.body }}
+    >
+      {/* Bottom room on phones for the fixed "Daftar dan mulai" bar. */}
+      <div className="grid gap-3 pb-24 sm:gap-4 lg:pb-0">
+        <SelfSignupForm />
+        <BentoTile className="py-4 text-sm text-muted-foreground sm:py-4">
+          {copy.haveLink}
+        </BentoTile>
+      </div>
+    </AuthLayout>
   );
 }

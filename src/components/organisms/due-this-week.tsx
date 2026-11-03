@@ -46,10 +46,7 @@ export function DueThisWeek({ items, windowDays }: { items: DueEntry[]; windowDa
   const surveyMissing = items.some((item) => item.sendHref === null);
 
   return (
-    <section
-      aria-labelledby="kirim-minggu-ini"
-      className="rounded-xl border bg-background p-5 shadow-card sm:p-6"
-    >
+    <section aria-labelledby="kirim-minggu-ini" className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="kirim-minggu-ini" className="text-xl font-semibold">
           {copy.title}

@@ -357,6 +357,7 @@ export const id = {
 
   auth: {
     title: "Masuk tim peneliti",
+    formTitle: "Masuk ke akun tim",
     subtitle:
       "Khusus enumerator dan admin penelitian. Pemilik usaha tidak perlu masuk: cukup buka tautan dari WhatsApp.",
     email: "Email",
@@ -407,6 +408,7 @@ export const id = {
 
   signUp: {
     title: "Buat akun tim",
+    formTitle: "Isi data akun",
     subtitle: "Pakai email yang diundang admin dan kode undangan dari pesan admin.",
     name: "Nama Anda",
     inviteCode: "Kode undangan",
@@ -429,6 +431,24 @@ export const id = {
     },
     mockHint: (email: string, code: string) =>
       `Mode contoh. Undangan yang tersedia: ${email} dengan kode ${code}.`,
+  },
+
+  // Bento tiles beside the login and sign-up forms. Only features that exist in the app.
+  authShowcase: {
+    backHome: "Kembali ke beranda",
+    team: {
+      eyebrow: "Panel tim peneliti",
+      days: "hari SOP dijalankan, lalu kuesioner dikirim",
+      tasksTitle: "Di panel ini",
+      tasks: [
+        "Tambah UMKM dan kirim tautan lewat WhatsApp",
+        "Lihat siapa yang sudah hari ke-30",
+        "Unduh data penelitian (CSV)",
+      ],
+    },
+    owner: {
+      questions: "pertanyaan cek usaha",
+    },
   },
 
   profile: {
@@ -559,7 +579,6 @@ export const id = {
     eyebrow: "Langkah 2 dari 2",
     title: "Satu langkah lagi",
     subtitle: "Pilih satu bagian, lalu paket SOP Anda dibuat.",
-    edit: (section: string) => `Ubah jawaban bagian ${section}`,
     editShort: "Ubah jawaban",
     incomplete: "Ada bagian yang belum selesai. Lengkapi dulu, lalu kembali ke sini.",
     completeSection: "Lengkapi bagian ini",
@@ -1128,6 +1147,7 @@ export const id = {
     title: "Design system",
     subtitle: "Alat review visual. Hanya aktif saat development.",
     colors: "Token warna",
+    tiles: "Tile bento",
     typography: "Tipografi",
     buttons: "Tombol",
     inputs: "Isian",

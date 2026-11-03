@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -15,6 +16,7 @@ import { id } from "@/content/id";
 import { sopAnchor } from "@/lib/anchors";
 import type { PackProblem } from "@/lib/data/types";
 import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
+import { cn } from "@/lib/utils";
 
 /** Fogg: one small, concrete step for this week (high ability, clear prompt). */
 export function FirstStepCard({ sopId }: { sopId: SopId }) {
@@ -25,7 +27,7 @@ export function FirstStepCard({ sopId }: { sopId: SopId }) {
   );
   const copy = id.pack.firstStep;
   return (
-    <section className="rounded-xl bg-brand-deep p-5 text-white shadow-float sm:p-6 print:hidden">
+    <BentoTile as="section" tone="deep" className="flex flex-col print:hidden">
       <p className="text-sm font-semibold text-accent-lime">{copy.eyebrow}</p>
       <p className="mt-1 text-xl font-semibold text-balance">{copy.title(sop.title)}</p>
       <p className="mt-2 flex items-center gap-2 text-brand-deep-muted">
@@ -35,11 +37,11 @@ export function FirstStepCard({ sopId }: { sopId: SopId }) {
       <Button
         asChild
         size="lg"
-        className="mt-4 w-full bg-accent-lime text-brand-deep shadow-none hover:bg-accent-lime/90 hover:shadow-none sm:w-auto"
+        className="mt-4 w-full bg-accent-lime text-brand-deep shadow-none hover:bg-accent-lime/90 hover:shadow-none sm:mt-auto sm:w-auto sm:self-start"
       >
         <a href={`#${sopAnchor(sopId)}`}>{copy.open}</a>
       </Button>
-    </section>
+    </BentoTile>
   );
 }
 
@@ -69,19 +71,19 @@ export function PackTips() {
 export function LaterSops({ sopIds }: { sopIds: SopId[] }) {
   if (sopIds.length === 0) return null;
   return (
-    <section className="rounded-xl bg-muted p-5 print:hidden">
+    <BentoTile as="section" className="print:hidden">
       <h2 className="text-lg font-semibold">{id.pack.later.title}</h2>
       <p className="text-sm text-muted-foreground">{id.pack.later.body}</p>
       <ul className="mt-3 flex flex-wrap gap-2">
         {sopIds.map((sopId) => (
           <li key={sopId}>
-            <Badge variant="outline" className="h-auto bg-background py-1">
+            <Badge variant="outline" className="h-auto bg-canvas py-1">
               {getSop(sopId).title}
             </Badge>
           </li>
         ))}
       </ul>
-    </section>
+    </BentoTile>
   );
 }
 
@@ -91,7 +93,7 @@ const MANY_POINTS = rules.redPoints + rules.yellowPoints;
 export function ProblemList({ problems }: { problems: PackProblem[] }) {
   if (problems.length === 0) return null;
   return (
-    <details className="group rounded-xl border bg-background shadow-card print:hidden">
+    <details className="group rounded-2xl border bg-card print:hidden">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 font-semibold [&::-webkit-details-marker]:hidden">
         {id.pack.problems.toggle(problems.length)}
         <ChevronDownIcon
@@ -131,19 +133,21 @@ export function PackStatusCard({
   totalDays,
   followUpDate,
   code,
+  className,
 }: {
   day: number;
   totalDays: number;
   followUpDate: string;
   code: string;
+  className?: string;
 }) {
   const shownDay = Math.min(day, totalDays);
   const copy = id.pack.status;
   return (
-    <section className="space-y-2 rounded-xl border bg-background p-4 shadow-card print:hidden">
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="font-semibold tabular-nums">{copy.day(shownDay, totalDays)}</p>
-        <p className="text-sm font-semibold text-muted-foreground tabular-nums">
+    <BentoTile as="section" className={cn("flex flex-col gap-3 print:hidden", className)}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <p className="text-lg font-semibold tabular-nums">{copy.day(shownDay, totalDays)}</p>
+        <p className="text-sm font-semibold whitespace-nowrap text-muted-foreground tabular-nums">
           {copy.code(code)}
         </p>
       </div>
@@ -152,9 +156,9 @@ export function PackStatusCard({
         aria-label={copy.progressLabel(shownDay, totalDays)}
         className="h-2"
       />
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground sm:mt-auto">
         {day > totalDays ? copy.after : copy.before(followUpDate)}
       </p>
-    </section>
+    </BentoTile>
   );
 }

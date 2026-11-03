@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { LoginPanel } from "@/components/organisms/login-panel";
-import { FocusLayout } from "@/components/templates/focus-layout";
+import { AuthLayout } from "@/components/templates/auth-layout";
 import { id } from "@/content/id";
 import { NEXT_PARAM, NOTICE_PARAM, ROUTES, safeNextPath } from "@/lib/auth/constants";
 import { MOCK_PASSWORD } from "@/lib/data/mock/store";
@@ -30,13 +30,20 @@ export default async function LoginPage({ searchParams }: PageProps<"/masuk">) {
   const notice = typeof noticeKey === "string" ? (NOTICES[noticeKey] ?? null) : null;
 
   return (
-    <FocusLayout width="narrow">
+    <AuthLayout
+      showcase="team"
+      intro={{
+        eyebrow: id.authShowcase.team.eyebrow,
+        title: id.auth.title,
+        body: id.auth.subtitle,
+      }}
+    >
       <LoginPanel
         next={next}
         notice={notice}
         googleHref={isGoogleLogin ? googleHref(next) : null}
         mockHint={isMockData ? id.auth.mockHint(MOCK_PASSWORD) : null}
       />
-    </FocusLayout>
+    </AuthLayout>
   );
 }

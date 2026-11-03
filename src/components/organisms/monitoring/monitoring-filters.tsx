@@ -41,7 +41,7 @@ export function MonitoringFilters({
       method="get"
       action={ROUTES.monitoring}
       aria-label={copy.label}
-      className="flex flex-col gap-3 rounded-xl bg-muted p-4 sm:flex-row sm:flex-wrap sm:items-end print:hidden"
+      className="flex flex-col gap-3 rounded-2xl border bg-card p-4 sm:flex-row sm:flex-wrap sm:items-end sm:p-5 print:hidden"
     >
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {copy.location}

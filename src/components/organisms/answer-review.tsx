@@ -22,7 +22,7 @@ export interface ReviewSection {
  */
 export function AnswerReview({ sections }: { sections: ReviewSection[] }) {
   return (
-    <ul className="divide-y rounded-xl border bg-background shadow-card">
+    <ul className="divide-y rounded-xl border">
       {sections.map((section) => (
         <li key={section.id}>
           <details className="group" open={!section.complete}>
@@ -56,8 +56,10 @@ export function AnswerReview({ sections }: { sections: ReviewSection[] }) {
                 ))}
               </dl>
               <Button asChild variant="outline" className="mt-2 h-11 w-full sm:w-auto">
-                <Link href={section.editHref} aria-label={id.summary.edit(section.label)}>
+                <Link href={section.editHref}>
                   {section.complete ? id.summary.editShort : id.summary.completeSection}
+                  {/* The name starts with the visible words (WCAG 2.5.3), then says which part. */}
+                  <span className="sr-only">: {section.label}</span>
                 </Link>
               </Button>
             </div>

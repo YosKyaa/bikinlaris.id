@@ -12,15 +12,15 @@ interface PanelTab {
   matches: string[];
 }
 
-/** Two-way switch between the panel's task list and the monitoring page. */
+/** Two-way switch (segmented tile) between the panel's task list and the monitoring page. */
 export function PanelTabs({ label, tabs }: { label: string; tabs: PanelTab[] }) {
   const pathname = usePathname();
   const isActive = (tab: PanelTab) =>
     pathname === tab.href || tab.matches.some((m) => pathname.startsWith(m));
 
   return (
-    <nav aria-label={label} className="mb-6 border-b print:hidden">
-      <ul className="-mb-px flex gap-1">
+    <nav aria-label={label} className="mb-4 sm:mb-6 print:hidden">
+      <ul className="inline-flex gap-1 rounded-2xl border bg-card p-1">
         {tabs.map((tab) => {
           const active = isActive(tab);
           return (
@@ -29,10 +29,10 @@ export function PanelTabs({ label, tabs }: { label: string; tabs: PanelTab[] }) 
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 items-center border-b-2 px-3 font-medium transition-colors duration-150",
+                  "inline-flex min-h-11 items-center rounded-xl px-4 font-medium transition-colors duration-150",
                   active
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground",
+                    ? "bg-brand-deep text-white"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 {tab.label}

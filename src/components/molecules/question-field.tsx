@@ -54,8 +54,8 @@ export function QuestionField({
     <fieldset
       aria-invalid={showInvalid || undefined}
       className={cn(
-        "rounded-xl border p-4 sm:p-5",
-        showInvalid ? "border-destructive bg-destructive-soft/40" : "bg-background shadow-card",
+        "rounded-2xl border p-4 sm:p-5",
+        showInvalid ? "border-destructive bg-destructive-soft/40" : "bg-card",
       )}
     >
       <legend className="float-left w-full font-semibold">

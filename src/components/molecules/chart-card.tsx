@@ -26,7 +26,7 @@ export function ChartCard({
     <section
       aria-labelledby={headingId}
       className={cn(
-        "min-w-0 rounded-xl border bg-background p-5 shadow-card sm:p-6 print:break-inside-avoid print:shadow-none",
+        "min-w-0 rounded-2xl border bg-card p-5 sm:p-6 print:break-inside-avoid",
         className,
       )}
     >

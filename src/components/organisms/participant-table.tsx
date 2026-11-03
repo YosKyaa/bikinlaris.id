@@ -59,7 +59,7 @@ export function ParticipantTable({
   }
 
   return (
-    <div className="rounded-xl border bg-background shadow-card">
+    <div className="rounded-2xl border bg-card">
       <Table>
         <TableCaption className="sr-only">{copy.caption}</TableCaption>
         <TableHeader>

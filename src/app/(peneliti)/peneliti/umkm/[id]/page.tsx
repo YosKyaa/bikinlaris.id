@@ -74,7 +74,7 @@ export default async function ParticipantPage({
           sentAt={pack?.questionnaireSentAt ?? null}
           doneAt={pack?.questionnaireDoneAt ?? null}
         />
-        <section className="rounded-xl bg-muted p-5 sm:p-6">
+        <section className="rounded-2xl border bg-card p-5 sm:p-6">
           <CopyField
             label={copy.detail.link}
             value={links.ownerUrl}

@@ -13,11 +13,11 @@ interface AppShellProps {
   width?: "default" | "wide";
 }
 
-/** Signed-in pages with a light header (pack page, researcher panel). */
+/** Signed-in pages with a light header (pack page, researcher panel); bento tiles on the canvas. */
 export function AppShell({ children, homeHref, headerAction, width = "default" }: AppShellProps) {
   const container = width === "wide" ? "max-w-6xl" : "max-w-3xl";
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <header className="sticky top-0 z-30 border-b bg-background print:hidden">
         <div
           className={cn(
@@ -37,7 +37,7 @@ export function AppShell({ children, homeHref, headerAction, width = "default" }
       </header>
       <main
         id="isi"
-        className={cn("mx-auto w-full flex-1 px-4 pt-6 pb-16 sm:px-6 sm:pt-10", container)}
+        className={cn("mx-auto w-full flex-1 px-4 pt-4 pb-16 sm:px-6 sm:pt-6", container)}
       >
         {children}
       </main>

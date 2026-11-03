@@ -15,7 +15,12 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-xl border border-dashed bg-muted/50 p-6 text-center", className)}>
+    <div
+      className={cn(
+        "rounded-2xl border border-dashed border-primary/30 bg-card p-6 text-center",
+        className,
+      )}
+    >
       <p className="font-semibold">{title}</p>
       <p className="mx-auto mt-1 max-w-md text-muted-foreground">{body}</p>
       {action ? <div className="mt-4 flex justify-center">{action}</div> : null}

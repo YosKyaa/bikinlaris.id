@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { BentoGrid, BentoTile, TILE_TONES, type TileTone } from "@/components/atoms/bento-tile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,9 @@ const COLOR_TOKENS = [
   ["success-soft", "#E8F3EC"],
   ["warning-soft", "#FEF3E2"],
   ["destructive-soft", "#FDECEA"],
+  ["brand-deep-muted", "#C3D1C9"],
+  ["brand-mid", "#116437"],
+  ["canvas", "#F1F5F2"],
 ] as const;
 
 const TYPE_SCALE = [
@@ -43,10 +47,24 @@ export function DesignSection({ title, children }: { title: string; children: Re
   );
 }
 
+const TONE_NAMES = Object.keys(TILE_TONES) as TileTone[];
+
 export function DesignFoundations() {
   const copy = id.design;
   return (
     <>
+      <DesignSection title={copy.tiles}>
+        <div className="rounded-2xl bg-canvas p-4">
+          <BentoGrid className="grid-cols-2 lg:grid-cols-4">
+            {TONE_NAMES.map((tone) => (
+              <BentoTile key={tone} tone={tone}>
+                <p className="font-semibold">{tone}</p>
+                <p className="text-sm">{copy.sampleText}</p>
+              </BentoTile>
+            ))}
+          </BentoGrid>
+        </div>
+      </DesignSection>
       <DesignSection title={copy.colors}>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {COLOR_TOKENS.map(([name, hex]) => (

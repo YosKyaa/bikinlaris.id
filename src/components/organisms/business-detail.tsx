@@ -75,7 +75,7 @@ export function BusinessDetail({
           <BusinessMap map={ready.map} hardest={ready.hardestSection} />
           <section
             aria-labelledby="isi-paket"
-            className="space-y-3 rounded-xl border bg-background p-5 shadow-card sm:p-6"
+            className="space-y-3 rounded-2xl border bg-card p-5 sm:p-6"
           >
             <div className="flex flex-wrap items-center gap-2">
               <h2 id="isi-paket" className="text-2xl font-semibold">
@@ -104,7 +104,7 @@ export function BusinessDetail({
         {events.length === 0 ? (
           <EmptyState title={copy.events} body={copy.noEvents} />
         ) : (
-          <div className="rounded-xl border bg-background shadow-card">
+          <div className="rounded-2xl border bg-card">
             <Table scrollLabel={copy.eventsTable}>
               <TableHeader>
                 <TableRow>

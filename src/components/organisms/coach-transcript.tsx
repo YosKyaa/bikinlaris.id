@@ -14,7 +14,7 @@ export function CoachTranscript({ messages }: { messages: CoachMessage[] }) {
       {messages.length === 0 ? (
         <EmptyState title={copy.coach} body={copy.noCoach} />
       ) : (
-        <ol className="divide-y rounded-xl border bg-background shadow-card">
+        <ol className="divide-y rounded-2xl border bg-card">
           {messages.map((message) => (
             <li key={message.id} className="space-y-1 p-4">
               <p className="flex flex-wrap gap-x-3 text-sm text-muted-foreground">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { DiagnosisSummary } from "@/components/organisms/diagnosis-summary";
 import { ExitLaterDialog } from "@/components/organisms/exit-later-dialog";
@@ -32,11 +33,11 @@ export default async function SummaryPage() {
 
   return (
     <FocusLayout headerAction={<ExitLaterDialog />}>
-      <header className="mb-8 space-y-2">
-        <Eyebrow>{id.summary.eyebrow}</Eyebrow>
+      <BentoTile tone="mint" as="header" className="mb-3 space-y-3 sm:mb-4">
+        <Eyebrow tone="chip">{id.summary.eyebrow}</Eyebrow>
         <h1 className="text-3xl font-bold tracking-tight">{id.summary.title}</h1>
         <p className="text-muted-foreground">{id.summary.subtitle}</p>
-      </header>
+      </BentoTile>
       <DiagnosisSummary
         sections={sections.map((section) => ({
           id: section.id,

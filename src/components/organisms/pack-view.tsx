@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 
+import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { id } from "@/content/id";
@@ -24,7 +25,10 @@ interface PackViewProps {
   coach: ComponentProps<typeof CoachWidget> | null;
 }
 
-/** The peak of the journey: calm completion, one clear first step, then the documents. */
+/**
+ * The peak of the journey, as a bento: the title, the first step (--brand-deep) beside the
+ * 30-day status, the two share actions, then the documents and the business map.
+ */
 export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: PackViewProps) {
   const documents = pack.sops.map((packSop, index) => {
     const sop = getSop(packSop.sopId);
@@ -37,25 +41,34 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
     };
     return { sop, index, props };
   });
+  const hasSops = pack.sops.length > 0;
 
   return (
     // Room at the bottom for the phone action bar, and for the floating coach button when on.
-    <div className={cn("space-y-8", coach ? "pb-40 lg:pb-24" : "pb-20 lg:pb-0")}>
+    <div className={cn("space-y-6 sm:space-y-8", coach ? "pb-40 lg:pb-24" : "pb-20 lg:pb-0")}>
       <PackViewTracker />
-      <header className="space-y-4 print:hidden">
-        <div className="space-y-1">
-          <Eyebrow>{id.pack.eyebrow}</Eyebrow>
-          <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+      <BentoGrid className="sm:grid-cols-2 print:hidden">
+        <BentoTile tone="mint" as="header" className="p-6 sm:col-span-2 sm:p-8">
+          <Eyebrow tone="chip">{id.pack.eyebrow}</Eyebrow>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             {id.pack.title(business.name)}
           </h1>
-        </div>
+        </BentoTile>
+        {hasSops ? <FirstStepCard sopId={pack.sops[0].sopId} /> : null}
         <PackStatusCard
           day={dayNumber(pack.createdOn)}
           totalDays={rules.followUpDays}
           followUpDate={formatDate(pack.followUpOn)}
           code={business.code}
+          className={hasSops ? undefined : "sm:col-span-2"}
         />
-      </header>
+        {hasSops ? (
+          <BentoTile className="space-y-4 sm:col-span-2">
+            <PackActions whatsAppUrl={whatsAppUrl} />
+            <PackTips />
+          </BentoTile>
+        ) : null}
+      </BentoGrid>
 
       <div className="hidden print:block">
         <p className="text-xl font-bold">{id.pack.printHeader(business.name)}</p>
@@ -64,16 +77,11 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
         </p>
       </div>
 
-      {pack.sops.length === 0 ? (
+      {!hasSops ? (
         <EmptyState title={id.pack.empty.title} body={id.pack.empty.body} />
       ) : (
         <>
-          <div className="space-y-4">
-            <FirstStepCard sopId={pack.sops[0].sopId} />
-            <PackActions whatsAppUrl={whatsAppUrl} />
-            <PackTips />
-          </div>
-          <section aria-labelledby="daftar-sop" className="space-y-4 print:hidden">
+          <section aria-labelledby="daftar-sop" className="space-y-3 sm:space-y-4 print:hidden">
             <h2 id="daftar-sop" className="text-2xl font-semibold">
               {id.pack.sops.title(pack.sops.length)}
             </h2>
@@ -99,7 +107,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
         </>
       )}
 
-      {coach && pack.sops.length > 0 ? <CoachWidget {...coach} /> : null}
+      {coach && hasSops ? <CoachWidget {...coach} /> : null}
 
       <div className="print:hidden">
         <BusinessMap map={pack.map} hardest={pack.hardestSection} compact>
@@ -107,7 +115,7 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
         </BusinessMap>
       </div>
       <LaterSops sopIds={pack.laterSopIds} />
-      {pack.sops.length > 0 ? <PackStickyActions whatsAppUrl={whatsAppUrl} /> : null}
+      {hasSops ? <PackStickyActions whatsAppUrl={whatsAppUrl} /> : null}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { PackGenerationProgress } from "@/components/organisms/pack-generation-progress";
 import { FocusLayout } from "@/components/templates/focus-layout";
 import { id } from "@/content/id";
@@ -22,10 +23,10 @@ export default async function GeneratingPage() {
 
   return (
     <FocusLayout>
-      <header className="mb-8 space-y-2">
+      <BentoTile tone="mint" as="header" className="mb-3 space-y-2 sm:mb-4">
         <h1 className="text-3xl font-bold tracking-tight">{id.generating.title(business.name)}</h1>
         <p className="text-muted-foreground">{id.generating.subtitle}</p>
-      </header>
+      </BentoTile>
       <PackGenerationProgress
         sops={pack.sops.map((sop) => ({ id: sop.sopId, title: getSop(sop.sopId).title }))}
       />

@@ -11,19 +11,22 @@ export const LANDING_ANCHORS = {
   faq: "tanya-jawab",
 } as const;
 
-/** Marketing header (glass): logo, 3 anchors, "Masuk" (ghost), primary CTA, scroll progress. */
+/**
+ * Marketing header as a floating glass tile: logo, 3 anchors, "Masuk" (ghost), primary CTA,
+ * scroll progress along its bottom edge.
+ */
 export function SiteHeader() {
   return (
-    <header className="glass header-elevate sticky top-0 z-40 border-x-0 border-t-0 border-b border-b-border/60">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 px-4 pt-3 sm:px-6">
+      <div className="glass header-elevate relative mx-auto flex h-16 max-w-6xl items-center gap-4 overflow-hidden rounded-2xl border-border px-3 sm:px-5">
         <Link
           href={ROUTES.home}
-          className="inline-flex min-h-11 items-center rounded-lg"
+          className="inline-flex min-h-11 items-center rounded-lg px-1"
           aria-label={id.app.domain}
         >
           <Logo />
         </Link>
-        <nav aria-label={id.nav.main} className="ml-6 hidden md:block">
+        <nav aria-label={id.nav.main} className="ml-4 hidden md:block">
           <ul className="flex gap-1">
             {(Object.keys(LANDING_ANCHORS) as (keyof typeof LANDING_ANCHORS)[]).map((key) => (
               <li key={key}>
@@ -42,12 +45,12 @@ export function SiteHeader() {
             <Link href={ROUTES.signup}>{id.common.join}</Link>
           </Button>
         </div>
+        {/* Reading progress, driven by page scroll (CSS only). */}
+        <div
+          aria-hidden
+          className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-linear-to-r from-primary to-accent-lime"
+        />
       </div>
-      {/* Reading progress, driven by page scroll (CSS only). */}
-      <div
-        aria-hidden
-        className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-linear-to-r from-primary to-accent-lime"
-      />
     </header>
   );
 }

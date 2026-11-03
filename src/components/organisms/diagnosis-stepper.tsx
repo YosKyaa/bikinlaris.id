@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
+import { BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { SaveIndicator, type SaveStatus } from "@/components/atoms/save-indicator";
 import { StepCounter } from "@/components/atoms/step-counter";
@@ -82,7 +83,8 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
 
   return (
     <div className="pb-28 lg:pb-0">
-      <div className="sticky top-14 z-20 -mx-4 border-b bg-background px-4 py-3">
+      {/* Floating progress tile, 8px under the 56px header. */}
+      <div className="sticky top-16 z-20 rounded-2xl border bg-card/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-5">
         <div className="flex items-center justify-between gap-4">
           <StepCounter current={props.index + 1} total={props.totalSections} />
           <SaveIndicator status={saveStatus} />
@@ -97,23 +99,23 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
         </p>
       </div>
 
-      <header className="mt-6 space-y-2">
-        <Eyebrow>{id.diagnosis.eyebrow}</Eyebrow>
+      <BentoTile tone="mint" as="header" className="mt-4 space-y-3">
+        <Eyebrow tone="chip">{id.diagnosis.eyebrow}</Eyebrow>
         <h1 className="text-3xl font-bold tracking-tight">{section.label}</h1>
         <p className="text-muted-foreground">
           {section.description}. {id.diagnosis.intro}
         </p>
         {isFresh ? (
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-muted p-3">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-background p-3">
             <TimeEstimate minutes={id.common.durationMinutes} />
             <span className="text-sm text-muted-foreground">
               {id.diagnosis.beforeStart(props.totalQuestions, props.totalSections)}
             </span>
           </p>
         ) : null}
-      </header>
+      </BentoTile>
 
-      <ol className="mt-6 space-y-4">
+      <ol className="mt-3 space-y-3 sm:mt-4 sm:space-y-4">
         {questions.map((question, index) => (
           <li
             key={question.id}

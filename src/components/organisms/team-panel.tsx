@@ -19,10 +19,7 @@ export function TeamPanel({ members, invites, currentUserId }: TeamPanelProps) {
   const copy = id.team;
   return (
     <div className="space-y-8">
-      <section
-        aria-labelledby="undang-anggota"
-        className="rounded-xl border bg-background p-5 shadow-card sm:p-6"
-      >
+      <section aria-labelledby="undang-anggota" className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 id="undang-anggota" className="mb-4 text-xl font-semibold">
           {copy.inviteTitle}
         </h2>
@@ -36,7 +33,7 @@ export function TeamPanel({ members, invites, currentUserId }: TeamPanelProps) {
         {invites.length === 0 ? (
           <EmptyState title={copy.invites} body={copy.noInvites} />
         ) : (
-          <ul className="divide-y rounded-xl border bg-background shadow-card">
+          <ul className="divide-y rounded-2xl border bg-card">
             {invites.map((invite) => (
               <li key={invite.email} className="flex flex-wrap items-center gap-3 p-4">
                 <div className="min-w-48 flex-1">
@@ -65,7 +62,7 @@ export function TeamPanel({ members, invites, currentUserId }: TeamPanelProps) {
         <h2 id="anggota" className="text-xl font-semibold">
           {copy.members}
         </h2>
-        <ul className="divide-y rounded-xl border bg-background shadow-card">
+        <ul className="divide-y rounded-2xl border bg-card">
           {members.map((member) => (
             <li key={member.id} className="flex flex-wrap items-center gap-3 p-4">
               <div className="min-w-0 flex-1">

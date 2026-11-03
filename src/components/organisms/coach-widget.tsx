@@ -118,7 +118,7 @@ export function CoachWidget({
           tabIndex={0}
           role="region"
           aria-label={copy.conversation}
-          className="flex-1 overflow-y-auto p-4"
+          className="flex-1 overflow-y-auto bg-canvas p-4"
         >
           <CoachConversation
             turns={turns}
