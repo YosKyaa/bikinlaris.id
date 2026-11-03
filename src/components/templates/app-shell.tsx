@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Logo } from "@/components/atoms/logo";
+import { PageTransition } from "@/components/atoms/page-transition";
 import { id } from "@/content/id";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +40,7 @@ export function AppShell({ children, homeHref, headerAction, width = "default" }
         id="isi"
         className={cn("mx-auto w-full flex-1 px-4 pt-4 pb-16 sm:px-6 sm:pt-6", container)}
       >
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   );

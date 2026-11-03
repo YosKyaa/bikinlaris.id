@@ -1,47 +1,39 @@
-import { PanelTabs } from "@/components/molecules/panel-tabs";
-import { AccountMenu } from "@/components/organisms/account-menu";
-import { AppShell } from "@/components/templates/app-shell";
+import { DashboardShell } from "@/components/templates/dashboard-shell";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Toaster } from "@/components/ui/sonner";
 import { id } from "@/content/id";
 import { logoutAction } from "@/lib/actions/auth";
-import { ROUTES } from "@/lib/auth/constants";
+import { isCoachEnabled } from "@/lib/ai";
 import { requireStaffPage } from "@/lib/data/staff-session";
+import { isMockData } from "@/lib/env";
 
 /** Researcher panel: enumerator and admin accounts only. */
 export default async function ResearcherLayout({ children }: LayoutProps<"/">) {
   const user = await requireStaffPage();
-  const menu = id.researcher.menu;
-  const links = [
-    { label: menu.participants, href: ROUTES.researcher },
-    { label: menu.monitoring, href: ROUTES.monitoring },
-    { label: menu.newParticipant, href: ROUTES.newParticipant },
-    ...(user.role === "admin" ? [{ label: menu.team, href: ROUTES.team }] : []),
-  ];
-  const tabs = [
-    {
-      label: menu.tasks,
-      href: ROUTES.researcher,
-      matches: [ROUTES.newParticipant, ROUTES.researcherBusiness("")],
-    },
-    { label: menu.monitoring, href: ROUTES.monitoring, matches: [] },
-  ];
 
   return (
-    <AppShell
-      width="wide"
-      homeHref={ROUTES.researcher}
-      headerAction={
-        <AccountMenu
-          label={user.name ?? user.email}
-          links={links}
-          logoutLabel={menu.logout}
-          logout={logoutAction}
-        />
-      }
-    >
-      <PanelTabs label={menu.sections} tabs={tabs} />
-      {children}
+    <>
+      <DashboardShell
+        nav={{
+          userName: user.name ?? user.email,
+          roleLabel: id.team.roles[user.role],
+          isAdmin: user.role === "admin",
+          coachExport: isCoachEnabled(),
+          logout: logoutAction,
+        }}
+        notice={
+          isMockData ? (
+            <Alert className="rounded-2xl">
+              <AlertDescription className="text-foreground">
+                {id.researcher.mockBanner}
+              </AlertDescription>
+            </Alert>
+          ) : null
+        }
+      >
+        {children}
+      </DashboardShell>
       <Toaster position="top-center" />
-    </AppShell>
+    </>
   );
 }

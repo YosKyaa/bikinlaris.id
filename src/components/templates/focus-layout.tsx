@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Logo } from "@/components/atoms/logo";
+import { PageTransition } from "@/components/atoms/page-transition";
 import { cn } from "@/lib/utils";
 
 interface FocusLayoutProps {
@@ -42,7 +43,7 @@ export function FocusLayout({
           className,
         )}
       >
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   );

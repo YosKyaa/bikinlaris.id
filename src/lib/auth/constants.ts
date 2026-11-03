@@ -27,6 +27,8 @@ export const ROUTES = {
   /** Google comes back here through Supabase with a one-time code. */
   authCallback: "/auth/callback",
   researcher: "/peneliti",
+  /** Full participant list with the stage filter (the dashboard shows the most urgent few). */
+  participants: "/peneliti/umkm",
   monitoring: "/peneliti/pantauan",
   newParticipant: "/peneliti/umkm/baru",
   researcherBusiness: (businessId: string) => `/peneliti/umkm/${businessId}`,

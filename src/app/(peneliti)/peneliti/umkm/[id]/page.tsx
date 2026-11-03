@@ -42,7 +42,7 @@ export default async function ParticipantPage({
   return (
     <div className="space-y-6">
       <Button asChild variant="ghost" className="-ml-3">
-        <Link href={ROUTES.researcher}>
+        <Link href={ROUTES.participants}>
           <ArrowLeftIcon aria-hidden />
           {copy.detail.back}
         </Link>

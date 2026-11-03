@@ -50,7 +50,7 @@ export function ParticipantTable({
             {filter === "semua" ? (
               <Link href={ROUTES.newParticipant}>{id.researcher.menu.newParticipant}</Link>
             ) : (
-              <Link href={ROUTES.researcher}>{id.researcher.empty.showAll}</Link>
+              <Link href={ROUTES.participants}>{id.researcher.empty.showAll}</Link>
             )}
           </Button>
         }

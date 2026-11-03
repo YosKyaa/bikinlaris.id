@@ -30,15 +30,15 @@ export function ParticipantFilter({
               <Link
                 href={
                   filter === "semua"
-                    ? ROUTES.researcher
-                    : `${ROUTES.researcher}?${FILTER_PARAM}=${filter}`
+                    ? ROUTES.participants
+                    : `${ROUTES.participants}?${FILTER_PARAM}=${filter}`
                 }
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "inline-flex h-11 items-center gap-2 rounded-lg border px-4 font-medium whitespace-nowrap transition-colors duration-150",
+                  "inline-flex h-11 items-center gap-2 rounded-xl border px-4 font-medium whitespace-nowrap transition-colors duration-150",
                   current
-                    ? "border-foreground bg-foreground text-background"
-                    : "bg-background hover:bg-muted",
+                    ? "border-brand-deep bg-brand-deep text-white"
+                    : "bg-card hover:border-primary/40",
                 )}
               >
                 {id.researcher.filters[filter]}

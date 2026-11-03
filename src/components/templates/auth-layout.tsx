@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
+import { PageTransition } from "@/components/atoms/page-transition";
 import { Logo } from "@/components/atoms/logo";
 import { HeaderMorph, TRANSITION_HOOKS } from "@/components/atoms/route-transition";
 import { AuthShowcase } from "@/components/organisms/auth-showcase";
@@ -53,41 +54,43 @@ export function AuthLayout({ intro, showcase, children, formTile = true }: AuthL
       </header>
 
       <main id="isi" className="flex-1 px-4 py-3 sm:px-6 sm:py-4 lg:py-6">
-        <div className="mx-auto grid max-w-6xl content-start gap-3 *:min-w-0 sm:gap-4 lg:grid-cols-2">
-          <div className="grid content-start gap-3 sm:gap-4 lg:sticky lg:top-6 lg:self-start">
-            <BentoTile
-              tone="deep"
-              as="header"
-              className={cn("isolate overflow-hidden p-6 sm:p-8", TRANSITION_HOOKS.tile[1])}
-            >
-              <div
-                aria-hidden
-                className="drift pointer-events-none absolute -top-32 -right-32 -z-10 size-[24rem] bg-radial from-primary/45 to-transparent to-70%"
-              />
-              <Eyebrow tone="inverse">{intro.eyebrow}</Eyebrow>
-              <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-                {intro.title}
-              </h1>
-              <p className="mt-3 text-lg text-brand-deep-muted">{intro.body}</p>
-            </BentoTile>
-            <div className={cn("hidden lg:block", TRANSITION_HOOKS.tile[3])}>
-              <AuthShowcase variant={showcase} />
+        <PageTransition>
+          <div className="mx-auto grid max-w-6xl content-start gap-3 *:min-w-0 sm:gap-4 lg:grid-cols-2">
+            <div className="grid content-start gap-3 sm:gap-4 lg:sticky lg:top-6 lg:self-start">
+              <BentoTile
+                tone="deep"
+                as="header"
+                className={cn("isolate overflow-hidden p-6 sm:p-8", TRANSITION_HOOKS.tile[1])}
+              >
+                <div
+                  aria-hidden
+                  className="drift pointer-events-none absolute -top-32 -right-32 -z-10 size-[24rem] bg-radial from-primary/45 to-transparent to-70%"
+                />
+                <Eyebrow tone="inverse">{intro.eyebrow}</Eyebrow>
+                <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+                  {intro.title}
+                </h1>
+                <p className="mt-3 text-lg text-brand-deep-muted">{intro.body}</p>
+              </BentoTile>
+              <div className={cn("hidden lg:block", TRANSITION_HOOKS.tile[3])}>
+                <AuthShowcase variant={showcase} />
+              </div>
             </div>
-          </div>
 
-          {formTile ? (
-            <BentoTile
-              className={cn(
-                "flex flex-col justify-center p-6 sm:p-8 lg:p-10",
-                TRANSITION_HOOKS.tile[2],
-              )}
-            >
-              {children}
-            </BentoTile>
-          ) : (
-            <div className={TRANSITION_HOOKS.tile[2]}>{children}</div>
-          )}
-        </div>
+            {formTile ? (
+              <BentoTile
+                className={cn(
+                  "flex flex-col justify-center p-6 sm:p-8 lg:p-10",
+                  TRANSITION_HOOKS.tile[2],
+                )}
+              >
+                {children}
+              </BentoTile>
+            ) : (
+              <div className={TRANSITION_HOOKS.tile[2]}>{children}</div>
+            )}
+          </div>
+        </PageTransition>
       </main>
     </div>
   );

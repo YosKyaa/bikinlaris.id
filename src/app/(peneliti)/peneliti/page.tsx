@@ -1,15 +1,14 @@
-import { DownloadIcon, PlusIcon } from "lucide-react";
+import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BentoGrid } from "@/components/atoms/bento-tile";
+import { DashboardKpis } from "@/components/organisms/dashboard-kpis";
 import { DueThisWeek } from "@/components/organisms/due-this-week";
-import { FILTER_PARAM, ParticipantFilter } from "@/components/organisms/participant-filter";
 import { ParticipantTable } from "@/components/organisms/participant-table";
 import { ResearchFunnel } from "@/components/organisms/research-funnel";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
-import { isCoachEnabled } from "@/lib/ai";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import {
@@ -18,36 +17,45 @@ import {
   buildRows,
   countByFilter,
   DUE_WINDOW_DAYS,
-  PARTICIPANT_FILTERS,
-  type ParticipantFilter as Filter,
 } from "@/lib/data/research";
-import { isMockData } from "@/lib/env";
-import { todayIso } from "@/lib/format";
+import { requireStaffPage } from "@/lib/data/staff-session";
+import { formatDate, todayIso } from "@/lib/format";
 import { questionnaireHref } from "@/lib/research-links";
 
-export const metadata: Metadata = { title: id.researcher.title };
+export const metadata: Metadata = { title: id.researcher.dashboard.title };
 
-function parseFilter(value: string | string[] | undefined): Filter {
-  return PARTICIPANT_FILTERS.find((f) => f === value) ?? "semua";
-}
+/** How many of the most urgent participants the overview lists (the rest is on the list page). */
+const URGENT_ROWS = 6;
 
-/** Three jobs: add a participant, send this week's questionnaires, download the data. */
-export default async function ResearcherPage({ searchParams }: PageProps<"/peneliti">) {
-  const filter = parseFilter((await searchParams)[FILTER_PARAM]);
+/**
+ * Overview: four headline numbers, this week's questionnaires beside the participant journey,
+ * and the most urgent participants. Adding a participant is the one primary action.
+ */
+export default async function ResearcherDashboardPage() {
+  const [user, participants] = await Promise.all([
+    requireStaffPage(),
+    data().staff.listParticipants(),
+  ]);
+  const copy = id.researcher.dashboard;
   const today = todayIso();
-  const participants = await data().staff.listParticipants();
   const rows = buildRows(participants, today);
+  const counts = countByFilter(rows);
+  const funnel = buildFunnel(participants, today);
+  const packs = funnel.find((step) => step.key === "packsCreated")?.count ?? 0;
   const due = buildDueList(participants, today).map((item) => ({
     ...item,
     sendHref: questionnaireHref(item),
   }));
+  const urgent = rows.filter((row) => row.stage !== "selesai").slice(0, URGENT_ROWS);
+  const firstName = (user.name ?? user.email).split(/[\s@]/)[0];
 
   return (
-    <div className="space-y-8">
+    <>
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">{id.researcher.title}</h1>
-          <p className="text-muted-foreground">{id.researcher.subtitle}</p>
+          <p className="text-sm font-semibold text-primary">{copy.asOf(formatDate(today))}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{copy.greeting(firstName)}</h1>
+          <p className="text-muted-foreground">{copy.subtitle}</p>
         </div>
         <Button asChild size="lg">
           <Link href={ROUTES.newParticipant}>
@@ -57,70 +65,39 @@ export default async function ResearcherPage({ searchParams }: PageProps<"/penel
         </Button>
       </header>
 
-      {isMockData ? (
-        <Alert>
-          <AlertDescription className="text-foreground">
-            {id.researcher.mockBanner}
-          </AlertDescription>
-        </Alert>
-      ) : null}
+      <DashboardKpis
+        total={counts.semua}
+        notStarted={counts.belum_mulai}
+        packs={packs}
+        ready={counts.siap_dikirim}
+        done={counts.selesai}
+      />
 
-      <div className="grid gap-6 *:min-w-0 lg:grid-cols-[1.4fr_1fr]">
+      <BentoGrid className="lg:grid-cols-[1.4fr_1fr]">
         <DueThisWeek items={due} windowDays={DUE_WINDOW_DAYS} />
-        <ResearchFunnel steps={buildFunnel(participants, today)} />
-      </div>
+        <ResearchFunnel steps={funnel} />
+      </BentoGrid>
 
-      <section aria-labelledby="daftar-umkm" className="space-y-4">
-        <div>
-          <h2 id="daftar-umkm" className="text-2xl font-semibold">
-            {id.researcher.table.title}
-          </h2>
-          <p className="text-muted-foreground">{id.researcher.table.body}</p>
-        </div>
-        <ParticipantFilter
-          filters={PARTICIPANT_FILTERS}
-          active={filter}
-          counts={countByFilter(rows)}
-        />
-        <ParticipantTable
-          rows={filter === "semua" ? rows : rows.filter((row) => row.stage === filter)}
-          filter={filter}
-        />
-      </section>
-
-      <section
-        aria-labelledby="unduh-data"
-        className="flex flex-col gap-4 rounded-2xl border bg-card p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between"
-      >
-        <div>
-          <h2 id="unduh-data" className="text-lg font-semibold">
-            {id.researcher.export.title}
-          </h2>
-          <p className="text-muted-foreground">{id.researcher.export.body}</p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+      <section aria-labelledby="perlu-tindak" className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 id="perlu-tindak" className="text-2xl font-semibold">
+              {copy.urgent.title}
+            </h2>
+            <p className="text-muted-foreground">{copy.urgent.body}</p>
+          </div>
           <Button asChild variant="outline">
-            <a href={ROUTES.researcherExport("ringkasan")} download>
-              <DownloadIcon aria-hidden />
-              {id.researcher.export.summary}
-            </a>
+            <Link href={ROUTES.participants}>
+              {copy.urgent.seeAll(counts.semua)}
+              <ArrowRightIcon aria-hidden />
+            </Link>
           </Button>
-          <Button asChild variant="outline">
-            <a href={ROUTES.researcherExport("events")} download>
-              <DownloadIcon aria-hidden />
-              {id.researcher.export.events}
-            </a>
-          </Button>
-          {isCoachEnabled() ? (
-            <Button asChild variant="outline">
-              <a href={ROUTES.researcherExport("coach")} download>
-                <DownloadIcon aria-hidden />
-                {id.researcher.export.coach}
-              </a>
-            </Button>
-          ) : null}
         </div>
+        {/* Everyone done: nothing urgent, and the empty state would wrongly say "add the first". */}
+        {urgent.length > 0 || counts.semua === 0 ? (
+          <ParticipantTable rows={urgent} filter="semua" />
+        ) : null}
       </section>
-    </div>
+    </>
   );
 }

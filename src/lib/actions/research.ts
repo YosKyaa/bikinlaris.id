@@ -37,7 +37,7 @@ export async function createParticipantAction(
       sektor: parsed.data.sector,
       lokasi: parsed.data.location,
     });
-    revalidatePath(ROUTES.researcher);
+    revalidatePath(ROUTES.researcher, "layout");
     return { ok: true, data: { businessId: created.business.id } };
   } catch {
     return { ok: false, error: id.participant.errors.saveFailed };

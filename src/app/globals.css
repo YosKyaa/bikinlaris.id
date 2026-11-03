@@ -496,13 +496,31 @@
  * view-transition-name here, only while a typed transition runs. React does not snapshot the
  * new page as a whole (root), so only the old root and these named parts animate.
  * Into the app: the landing recedes, then the tiles rise one by one. Back: the tiles sink,
- * the hero returns. Browsers without view transitions simply swap the page. Off under
- * prefers-reduced-motion.
+ * the hero returns. Opacity and transform only (no blur) to stay light on phones. Browsers
+ * without view transitions simply swap the page. Off under prefers-reduced-motion.
  */
 ::view-transition {
   /* Clicks during the short animation reach the live page instead of the overlay. */
   pointer-events: none;
 }
+
+/* Page swap (every other navigation, components/atoms/page-transition.tsx): the old content
+ * fades out fast, the new content fades in with a 10px rise. No box morph, no blur: only
+ * opacity and translate, which the GPU composites cheaply. The rest of the old page (root)
+ * fades in step. */
+::view-transition-old(root) {
+  animation: vt-fade-out 160ms ease-in both;
+}
+::view-transition-group(.page-swap) {
+  animation: none;
+}
+::view-transition-old(.page-swap) {
+  animation: vt-fade-out 140ms ease-in both;
+}
+::view-transition-new(.page-swap) {
+  animation: vt-page-in 260ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
+}
+
 :root:active-view-transition-type(masuk-sistem, keluar-sistem) .vt-tile-1 {
   view-transition-name: vt-tile-1;
 }
@@ -553,14 +571,18 @@
   to {
     opacity: 0;
     scale: 0.97;
-    filter: blur(6px);
   }
 }
 @keyframes vt-arrive {
   from {
     opacity: 0;
     scale: 1.02;
-    filter: blur(6px);
+  }
+}
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
   }
 }
 @keyframes vt-fade-out {

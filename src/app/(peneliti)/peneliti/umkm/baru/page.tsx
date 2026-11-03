@@ -14,7 +14,7 @@ export default function NewParticipantPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Button asChild variant="ghost" className="-ml-3">
-        <Link href={ROUTES.researcher}>
+        <Link href={ROUTES.participants}>
           <ArrowLeftIcon aria-hidden />
           {id.researcher.detail.back}
         </Link>

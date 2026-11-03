@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { PageTransition } from "@/components/atoms/page-transition";
 import { SiteFooter } from "@/components/organisms/site-footer";
 import { SiteHeader } from "@/components/organisms/site-header";
 
@@ -9,7 +10,7 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
       <main id="isi" className="flex-1">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter />
     </div>

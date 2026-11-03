@@ -3,11 +3,10 @@ import type { Metadata } from "next";
 import { PrintButton } from "@/components/atoms/print-button";
 import { MonitoringDashboard } from "@/components/organisms/monitoring/monitoring-dashboard";
 import { MonitoringFilters } from "@/components/organisms/monitoring/monitoring-filters";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { id } from "@/content/id";
 import { data } from "@/lib/data";
 import { buildMonitoring, parseMonitoringFilters } from "@/lib/data/monitoring";
-import { env, isMockData } from "@/lib/env";
+import { env } from "@/lib/env";
 import { formatDate, todayIso } from "@/lib/format";
 import { groupByProvince } from "@/lib/wilayah";
 
@@ -44,14 +43,6 @@ export default async function MonitoringPage({ searchParams }: PageProps<"/penel
         </div>
         <PrintButton label={id.monitoring.print} />
       </header>
-
-      {isMockData ? (
-        <Alert>
-          <AlertDescription className="text-foreground">
-            {id.researcher.mockBanner}
-          </AlertDescription>
-        </Alert>
-      ) : null}
 
       <MonitoringFilters
         filters={filters}

@@ -715,15 +715,53 @@ export const id = {
   researcher: {
     title: "Panel peneliti",
     subtitle: "Tambah UMKM, kirim kuesioner hari ke-30, dan unduh data.",
+    // Dashboard with sidebar (owner request, 3 November 2026).
+    dashboard: {
+      title: "Ringkasan",
+      greeting: (name: string) => `Halo, ${name}`,
+      subtitle: "Ini keadaan penelitian hari ini. Mulai dari kartu hijau tua.",
+      asOf: (date: string) => `Data per ${date}`,
+      kpis: {
+        label: "Angka utama",
+        total: "UMKM terdaftar",
+        packs: "Paket SOP dibuat",
+        ready: "Siap dikirim kuesioner",
+        done: "Kuesioner diisi",
+        readyCta: "Lihat daftarnya",
+        readyNone: "Belum ada yang perlu dikirim.",
+        notStarted: (n: number) => `${n} belum mulai cek usaha`,
+        share: (percent: number) => `${percent}% dari UMKM`,
+        ofPacks: (percent: number) => `${percent}% dari paket`,
+      },
+      urgent: {
+        title: "Perlu ditindaklanjuti",
+        body: "UMKM paling mendesak di atas.",
+        seeAll: (n: number) => `Lihat semua ${n} UMKM`,
+      },
+    },
+    sidebar: {
+      label: "Menu panel",
+      eyebrow: "Panel tim peneliti",
+      openMenu: "Buka menu",
+      exports: "Unduh data (CSV)",
+      exportLinks: {
+        ringkasan: "Ringkasan per UMKM",
+        events: "Log aktivitas",
+        coach: "Percakapan coach",
+      },
+    },
+    list: {
+      title: "Daftar UMKM",
+      subtitle: "Semua peserta, urut dari yang paling perlu ditindaklanjuti.",
+    },
     mockBanner: "Mode contoh: data di halaman ini adalah data contoh, bukan data lapangan.",
     menu: {
+      overview: "Ringkasan",
       participants: "Daftar UMKM",
       monitoring: "Pantauan riset",
       newParticipant: "Tambah UMKM",
       team: "Tim peneliti",
       logout: "Keluar",
-      sections: "Bagian panel",
-      tasks: "Tugas",
     },
     funnel: {
       title: "Perjalanan peserta",
