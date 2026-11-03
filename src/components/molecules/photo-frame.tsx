@@ -29,7 +29,7 @@ export function PhotoFrame({
   parallax = false,
 }: PhotoFrameProps) {
   return (
-    <figure className={cn("relative overflow-hidden rounded-2xl bg-muted", className)}>
+    <figure className={cn("relative overflow-hidden rounded-xl bg-muted shadow-card", className)}>
       <Image
         src={photo.src}
         alt={photo.alt}
@@ -41,7 +41,7 @@ export function PhotoFrame({
         style={{ objectPosition: photo.focus }}
       />
       {showPlace ? (
-        <span className="glass absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-foreground">
+        <span className="glass absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-foreground shadow-card">
           <MapPinIcon aria-hidden className="size-4 text-primary" />
           {photo.place}
         </span>

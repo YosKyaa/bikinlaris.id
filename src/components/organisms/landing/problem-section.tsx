@@ -1,45 +1,28 @@
-import { ArrowDownIcon, QuoteIcon } from "lucide-react";
-
-import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
+import { Eyebrow } from "@/components/atoms/eyebrow";
 import { id } from "@/content/id";
-import { cn } from "@/lib/utils";
 
-import { LandingSection, TileHeading } from "./landing-section";
-
-/**
- * Interest: everyday situations as plain sentences, one per tile (sizes differ, so it does
- * not read as an icon-card grid). The answer to them closes the block on --brand-deep.
- */
+/** Interest: everyday situations as plain sentences. A list, not an icon-card grid. */
 export function ProblemSection() {
   const copy = id.landing.problems;
   return (
-    <LandingSection>
-      <BentoGrid className="md:grid-cols-2 lg:grid-cols-3">
-        <BentoTile className="reveal flex flex-col justify-end md:col-span-2 lg:col-span-1 lg:row-span-2">
-          <TileHeading eyebrow={copy.eyebrow} title={copy.title} />
-        </BentoTile>
-        {copy.items.map((item, index) => (
-          <BentoTile
-            key={item}
-            as="figure"
-            className={cn("reveal-scale", index === 0 && "md:col-span-2")}
-          >
-            <QuoteIcon aria-hidden className="size-6 text-primary" />
-            <blockquote className="mt-3 text-lg font-medium text-balance sm:text-xl">
-              {item}
-            </blockquote>
-          </BentoTile>
-        ))}
-        <BentoTile
-          tone="deep"
-          className="reveal flex items-start gap-4 md:col-span-2 lg:col-span-3 lg:items-center"
-        >
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-lime text-brand-deep">
-            <ArrowDownIcon aria-hidden className="size-5" />
-          </span>
-          <p className="text-lg font-medium text-balance sm:text-xl">{copy.closing}</p>
-        </BentoTile>
-      </BentoGrid>
-    </LandingSection>
+    <section className="bg-linear-to-b from-background via-success-soft to-background">
+      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-24">
+        <div className="reveal">
+          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
+        </div>
+        <ul className="mt-8 space-y-3">
+          {copy.items.map((item) => (
+            <li
+              key={item}
+              className="reveal-left relative overflow-hidden rounded-xl bg-background py-4 pr-5 pl-7 text-lg font-medium shadow-card transition-shadow duration-200 before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-linear-to-b before:from-primary before:to-accent-lime hover:shadow-card-hover sm:text-xl"
+            >
+              “{item}”
+            </li>
+          ))}
+        </ul>
+        <p className="reveal mt-8 text-lg text-muted-foreground">{copy.closing}</p>
+      </div>
+    </section>
   );
 }

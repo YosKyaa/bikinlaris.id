@@ -15,8 +15,6 @@ import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { totalQuestions } from "@/lib/diagnosis/bank";
 
-import { LandingSection } from "./landing/landing-section";
-
 const STEP_ICONS = [MessageCircleIcon, ClipboardListIcon, CalendarCheckIcon] as const;
 
 interface JoinGuideProps {
@@ -34,8 +32,9 @@ interface JoinGuideProps {
 export function JoinGuide({ notice, resume, signupHref }: JoinGuideProps) {
   const copy = id.join;
   return (
-    <LandingSection className="pt-3 sm:pt-4 lg:pt-4">
-      <BentoGrid className="lg:grid-cols-3">
+    // Canvas only behind this page's tiles: the landing header and footer stay as they are.
+    <div className="bg-canvas px-4 py-4 sm:px-6 sm:py-6 lg:py-10">
+      <BentoGrid className="mx-auto max-w-6xl lg:grid-cols-3">
         {notice ? (
           <Alert role="status" className="rounded-2xl lg:col-span-3">
             <InfoIcon aria-hidden />
@@ -133,6 +132,6 @@ export function JoinGuide({ notice, resume, signupHref }: JoinGuideProps) {
           <p className="mt-1 text-muted-foreground">{copy.lostBody}</p>
         </BentoTile>
       </BentoGrid>
-    </LandingSection>
+    </div>
   );
 }

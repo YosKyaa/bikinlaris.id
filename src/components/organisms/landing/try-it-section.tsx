@@ -1,9 +1,8 @@
-import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
+import { Eyebrow } from "@/components/atoms/eyebrow";
 import type { QuestionId } from "@/content/diagnosis";
 import { id } from "@/content/id";
 import { getProblem, getQuestion, getSection, getSop, totalQuestions } from "@/lib/diagnosis/bank";
 
-import { LandingSection, TileHeading } from "./landing-section";
 import { TryItDemo, type DemoQuestion } from "./try-it-demo";
 
 /** Three real questions from three different sections of the bank (texts unchanged). */
@@ -33,21 +32,20 @@ export function TryItSection() {
   });
 
   return (
-    <LandingSection id={TRY_IT_ID}>
-      <BentoGrid>
-        <BentoTile tone="mint" className="reveal">
-          <TileHeading
-            eyebrow={copy.eyebrow}
-            title={copy.title}
-            body={copy.body(totalQuestions)}
-            tone="chip"
-            className="max-w-2xl"
-          />
-        </BentoTile>
-        <div className="reveal-scale">
+    <section
+      id={TRY_IT_ID}
+      className="scroll-mt-20 bg-linear-to-b from-background via-success-soft to-background"
+    >
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+        <div className="reveal max-w-2xl">
+          <Eyebrow tone="pill">{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">{copy.title}</h2>
+          <p className="mt-3 text-lg text-muted-foreground">{copy.body(totalQuestions)}</p>
+        </div>
+        <div className="reveal-scale mt-10">
           <TryItDemo questions={questions} totalQuestions={totalQuestions} />
         </div>
-      </BentoGrid>
-    </LandingSection>
+      </div>
+    </section>
   );
 }
