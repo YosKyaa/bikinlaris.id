@@ -489,6 +489,107 @@
   }
 }
 
+/* ---------- Route transition: landing <-> login and sign-up (owner request) ----------
+ * View Transitions API. React starts the transition with its type when a link from
+ * lib/transitions.ts is followed (the header pair in components/atoms/route-transition.tsx
+ * morphs bar <-> tile). The tiles (and the landing hero, on the way back) get a
+ * view-transition-name here, only while a typed transition runs. React does not snapshot the
+ * new page as a whole (root), so only the old root and these named parts animate.
+ * Into the app: the landing recedes, then the tiles rise one by one. Back: the tiles sink,
+ * the hero returns. Browsers without view transitions simply swap the page. Off under
+ * prefers-reduced-motion.
+ */
+::view-transition {
+  /* Clicks during the short animation reach the live page instead of the overlay. */
+  pointer-events: none;
+}
+:root:active-view-transition-type(masuk-sistem, keluar-sistem) .vt-tile-1 {
+  view-transition-name: vt-tile-1;
+}
+:root:active-view-transition-type(masuk-sistem, keluar-sistem) .vt-tile-2 {
+  view-transition-name: vt-tile-2;
+}
+:root:active-view-transition-type(masuk-sistem, keluar-sistem) .vt-tile-3 {
+  view-transition-name: vt-tile-3;
+}
+:root:active-view-transition-type(keluar-sistem) .vt-landing {
+  view-transition-name: vt-landing;
+}
+::view-transition-group(.header-morph) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  z-index: 10;
+}
+:root:active-view-transition-type(masuk-sistem)::view-transition-old(root) {
+  animation: vt-recede 260ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(vt-tile-1),
+::view-transition-new(vt-tile-2),
+::view-transition-new(vt-tile-3) {
+  animation: vt-rise 440ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+::view-transition-new(vt-tile-1) {
+  animation-delay: 120ms;
+}
+::view-transition-new(vt-tile-2) {
+  animation-delay: 200ms;
+}
+::view-transition-new(vt-tile-3) {
+  animation-delay: 280ms;
+}
+::view-transition-old(vt-tile-1),
+::view-transition-old(vt-tile-2),
+::view-transition-old(vt-tile-3) {
+  animation: vt-sink 200ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+:root:active-view-transition-type(keluar-sistem)::view-transition-old(root) {
+  animation: vt-fade-out 200ms ease-in both;
+}
+::view-transition-new(vt-landing) {
+  animation: vt-arrive 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both;
+}
+
+@keyframes vt-recede {
+  to {
+    opacity: 0;
+    scale: 0.97;
+    filter: blur(6px);
+  }
+}
+@keyframes vt-arrive {
+  from {
+    opacity: 0;
+    scale: 1.02;
+    filter: blur(6px);
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+    scale: 0.98;
+  }
+}
+@keyframes vt-sink {
+  to {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 @media print {
   @page {
     margin: 14mm;

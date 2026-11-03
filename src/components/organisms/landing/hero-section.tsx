@@ -2,10 +2,13 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { Eyebrow } from "@/components/atoms/eyebrow";
+import { TRANSITION_HOOKS } from "@/components/atoms/route-transition";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { totalQuestions } from "@/lib/diagnosis/bank";
+import { ENTER_APP } from "@/lib/transitions";
+import { cn } from "@/lib/utils";
 
 import { SampleSopDialog } from "../sample-sop-dialog";
 import { HeroVisual } from "./hero-visual";
@@ -20,7 +23,10 @@ export function HeroSection() {
   return (
     <section
       id={HERO_ID}
-      className="relative isolate overflow-hidden bg-linear-to-b from-success-soft via-success-soft/40 to-background"
+      className={cn(
+        "relative isolate overflow-hidden bg-linear-to-b from-success-soft via-success-soft/40 to-background",
+        TRANSITION_HOOKS.landingHero,
+      )}
     >
       {/* Moving lime light behind the hero; decorative. Lime keeps grey text above AA. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
@@ -44,7 +50,9 @@ export function HeroSection() {
             </p>
             <div className="enter mt-8 flex flex-col gap-3 sm:flex-row" style={delay(220)}>
               <Button asChild size="lg" className="btn-shine">
-                <Link href={ROUTES.signup}>{id.common.join}</Link>
+                <Link href={ROUTES.signup} transitionTypes={ENTER_APP}>
+                  {id.common.join}
+                </Link>
               </Button>
               <SampleSopDialog label={copy.secondaryCta} size="lg" />
             </div>

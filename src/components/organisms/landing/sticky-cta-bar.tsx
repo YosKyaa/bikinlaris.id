@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
+import { ENTER_APP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";
 
 /** Mobile-only CTA in the thumb zone, shown once the hero has scrolled out of view. */
@@ -29,7 +30,7 @@ export function StickyCtaBar({ heroId }: { heroId: string }) {
       )}
     >
       <Button asChild size="lg" className="btn-shine w-full">
-        <Link href={ROUTES.signup} tabIndex={visible ? undefined : -1}>
+        <Link href={ROUTES.signup} transitionTypes={ENTER_APP} tabIndex={visible ? undefined : -1}>
           {id.common.join}
         </Link>
       </Button>

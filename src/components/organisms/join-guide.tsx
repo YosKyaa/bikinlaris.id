@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { totalQuestions } from "@/lib/diagnosis/bank";
+import { ENTER_APP } from "@/lib/transitions";
 
 const STEP_ICONS = [MessageCircleIcon, ClipboardListIcon, CalendarCheckIcon] as const;
 
@@ -73,7 +74,7 @@ export function JoinGuide({ notice, resume, signupHref }: JoinGuideProps) {
           <p className="mt-3 text-lg text-muted-foreground">{copy.body}</p>
           {signupHref && !resume ? (
             <Button asChild size="lg" className="mt-6 w-full sm:w-auto">
-              <Link href={signupHref}>
+              <Link href={signupHref} transitionTypes={ENTER_APP}>
                 {copy.signup}
                 <ArrowRightIcon aria-hidden />
               </Link>

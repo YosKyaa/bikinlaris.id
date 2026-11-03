@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
+import { ENTER_APP } from "@/lib/transitions";
 
 /**
  * Action: repeats the benefit with the single primary CTA, on a brand gradient card.
@@ -25,7 +26,9 @@ export function ClosingCtaSection() {
           size="lg"
           className="btn-shine mt-8 bg-white text-brand-deep hover:bg-white/90"
         >
-          <Link href={ROUTES.signup}>{id.common.join}</Link>
+          <Link href={ROUTES.signup} transitionTypes={ENTER_APP}>
+            {id.common.join}
+          </Link>
         </Button>
         <p className="mt-4 text-sm text-brand-deep-muted">{id.landing.hero.microcopy}</p>
       </div>

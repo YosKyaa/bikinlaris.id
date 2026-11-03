@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import type { AnswerValue, SectionColor, StoredAnswer } from "@/content/diagnosis.types";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
+import { ENTER_APP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";
 
 export interface DemoQuestion {
@@ -140,7 +141,7 @@ export function TryItDemo({
           </div>
           <div className="mt-6 border-t pt-5">
             <Button asChild size="lg" className="btn-shine w-full sm:w-auto">
-              <Link href={ROUTES.signup}>
+              <Link href={ROUTES.signup} transitionTypes={ENTER_APP}>
                 {copy.cta}
                 <ArrowRightIcon aria-hidden />
               </Link>
