@@ -5,13 +5,16 @@ import { ROUTES } from "@/lib/auth/constants";
 import { createClient } from "@/lib/supabase/server";
 
 import type { SignUpResult, StaffStore } from "../source";
-import type { CoachMessage, Participant, ResearchEvent, StaffUser } from "../types";
+import type { CoachMessage, ContactNote, Participant, ResearchEvent, StaffUser } from "../types";
 import {
   fromParticipant,
   metaToJson,
   toBusiness,
   toCoachMessage,
+  toCoachUsage,
+  toContactNote,
   toDiagnosis,
+  toErrorReport,
   toEvent,
   toInvite,
   toPack,
@@ -26,6 +29,8 @@ const INVITE_REJECTIONS = ["undangan_tidak_cocok", "Database error saving new us
 
 /** PostgREST returns at most this many rows per request (Supabase default max_rows). */
 const PAGE_SIZE = 1000;
+/** Newest entries shown on the Sistem page. */
+const ERRORS_SHOWN = 50;
 
 type Client = Awaited<ReturnType<typeof createClient>>;
 
@@ -234,6 +239,77 @@ export const supabaseStaffStore: StaffStore = {
       messages.push(...data.map(toCoachMessage));
       if (data.length < PAGE_SIZE) return messages;
     }
+  },
+
+  async assignParticipants(businessIds, staffId) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("tim_atur_pendamping", {
+      p_businesses: businessIds,
+      p_pendamping: staffId,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async listContactNotes(businessId) {
+    const supabase = await createClient();
+    const notes: ContactNote[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const query = supabase
+        .from("kontak_catatan")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .range(from, from + PAGE_SIZE - 1);
+      const { data, error } = await (businessId ? query.eq("business_id", businessId) : query);
+      if (error) throw error;
+      notes.push(...data.map(toContactNote));
+      if (data.length < PAGE_SIZE) return notes;
+    }
+  },
+
+  async addContactNote(businessId, outcome, note) {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("kontak_catatan")
+      .insert({ business_id: businessId, hasil: outcome, catatan: note });
+    if (error) throw error;
+  },
+
+  async deleteContactNote(noteId) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("kontak_catatan")
+      .delete()
+      .eq("id", noteId)
+      .select("id");
+    if (error) throw error;
+    return data.length > 0;
+  },
+
+  async coachUsage(days) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("tim_pemakaian_coach", { p_hari: days });
+    if (error) throw error;
+    return toCoachUsage(data);
+  },
+
+  async listErrors() {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("galat")
+      .select("*")
+      .order("id", { ascending: false })
+      .limit(ERRORS_SHOWN);
+    if (error) throw error;
+    return data.map(toErrorReport);
+  },
+
+  async clearErrors() {
+    const supabase = await createClient();
+    // PostgREST refuses a delete without a filter; every id is positive.
+    const { error } = await supabase.from("galat").delete().gt("id", 0);
+    if (error) throw error;
   },
 
   async logEvent(businessId, action, meta) {

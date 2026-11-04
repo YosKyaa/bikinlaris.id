@@ -7,11 +7,14 @@ import { addDays, todayIso } from "@/lib/format";
 
 import type { OwnerStore } from "../source";
 import type { Diagnosis, OwnerState, Pack } from "../types";
-
-const MS_PER_SECOND = 1000;
 import { COACH_HISTORY_SHOWN, newId, nextCode, pushCoach, pushEvent, store } from "./store";
 
+const MS_PER_SECOND = 1000;
 const TOKEN_BYTES = 16;
+/** Same windows as umkm_coach_simpan and umkm_coach_tolak (migration 20261104000000). */
+const SLOT_SAVE_WINDOW_MS = 2 * 60 * MS_PER_SECOND;
+const REFUSALS_PER_DAY = 20;
+const REFUSAL_MAX_LENGTH = 300;
 
 function businessIdOf(token: string): string {
   const businessId = store().tokens.get(token);
@@ -135,6 +138,7 @@ export const mockOwnerStore: OwnerStore = {
       code,
       createdAt: new Date().toISOString(),
       createdBy: null,
+      assignedTo: null,
       signupVia: "mandiri",
     });
     s.tokens.set(token, businessId);
@@ -176,15 +180,48 @@ export const mockOwnerStore: OwnerStore = {
     if (s.coachQuota.filter((q) => isToday(q.at)).length >= COACH_ALL_DAILY_LIMIT) {
       return { status: "batas_semua", used };
     }
-    s.coachQuota.push({ businessId, at: now });
+    s.coachQuota.push({
+      businessId,
+      at: now,
+      finishedAt: null,
+      result: null,
+      inputTokens: null,
+      outputTokens: null,
+    });
     return { status: "ok", used: used + 1 };
   },
 
+  /** Same rule as umkm_coach_simpan: only for an open slot from the last two minutes. */
   async saveCoachExchange(token, exchange) {
     const s = store();
     const businessId = businessIdOf(token);
+    const now = Date.now();
+    const slot = s.coachQuota.findLast(
+      (q) =>
+        q.businessId === businessId && q.finishedAt === null && now - q.at < SLOT_SAVE_WINDOW_MS,
+    );
+    if (!slot) throw new Error("jatah_tidak_ada");
+    slot.finishedAt = now;
+    slot.result = exchange.offTopic ? "di_luar_topik" : "dijawab";
+    slot.inputTokens = exchange.usage?.inputTokens ?? null;
+    slot.outputTokens = exchange.usage?.outputTokens ?? null;
     pushCoach(s, businessId, "pemilik", exchange.question, exchange.topic, null);
     pushCoach(s, businessId, "coach", exchange.answer, exchange.topic, exchange.source);
-    pushEvent(s, businessId, "coach_tanya", { topik: exchange.topic });
+    pushEvent(s, businessId, "coach_tanya", {
+      topik: exchange.topic,
+      di_luar_topik: exchange.offTopic,
+    });
+  },
+
+  async logCoachRefusal(token, question) {
+    const s = store();
+    const businessId = businessIdOf(token);
+    const text = question.trim().slice(0, REFUSAL_MAX_LENGTH);
+    const today = todayIso();
+    const todays = s.coachRefusals.filter(
+      (r) => r.businessId === businessId && todayIso(new Date(r.createdAt)) === today,
+    );
+    if (!text || todays.length >= REFUSALS_PER_DAY) return;
+    s.coachRefusals.push({ businessId, text, createdAt: new Date().toISOString() });
   },
 };

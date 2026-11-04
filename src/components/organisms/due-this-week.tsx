@@ -1,10 +1,11 @@
 import Link from "next/link";
 
+import { ContactOutcomeBadge } from "@/components/molecules/contact-outcome-badge";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import type { DueGroup, DueItem } from "@/lib/data/types";
+import type { ContactOutcome, DueGroup, DueItem } from "@/lib/data/types";
 import { formatDate } from "@/lib/format";
 
 import { SendQuestionnaireLink } from "./questionnaire-buttons";
@@ -19,6 +20,10 @@ const GROUP_VARIANT = {
 export type DueEntry = DueItem & {
   /** WhatsApp link with the questionnaire message; null until SURVEY_URL is set. */
   sendHref: string | null;
+  /** Pendamping's name, or "Belum dibagi". */
+  assigneeName: string;
+  /** Newest contact note (outcome and short WIB date), or null. */
+  lastContact: { outcome: ContactOutcome; label: string } | null;
 };
 
 interface Group {
@@ -78,8 +83,15 @@ export function DueThisWeek({ items, windowDays }: { items: DueEntry[]; windowDa
                         {item.businessName}
                       </Link>
                       <p className="text-sm text-muted-foreground">
-                        <span className="font-mono">{item.code}</span> · {item.ownerName}
+                        <span className="font-mono">{item.code}</span> · {item.ownerName} ·{" "}
+                        {item.assigneeName}
                       </p>
+                      {item.lastContact ? (
+                        <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                          <ContactOutcomeBadge outcome={item.lastContact.outcome} />
+                          <span className="tabular-nums">{item.lastContact.label}</span>
+                        </p>
+                      ) : null}
                     </div>
                     <Badge variant={GROUP_VARIANT[group]}>{copy.day(item.dayNumber)}</Badge>
                     {group === "later" ? (

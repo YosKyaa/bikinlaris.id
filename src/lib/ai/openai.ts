@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
-import { AiError, type AiFailure, type AiProvider } from "./types";
+import { AiError, type AiFailure, type AiProvider, type AiTextResult } from "./types";
 
 /**
  * OpenAI Responses API over plain fetch (no SDK dependency). Works with any service that
@@ -16,6 +16,7 @@ const REASONING_EFFORT = "low";
 /** The text is not at a fixed index: collect every output_text part of the message items. */
 const responseSchema = z.object({
   status: z.string().optional(),
+  usage: z.object({ input_tokens: z.number(), output_tokens: z.number() }).optional(),
   output: z
     .array(
       z.object({
@@ -62,7 +63,7 @@ function toAiError(error: unknown): AiError {
 }
 
 export function openAiProvider(config: OpenAiConfig): AiProvider {
-  async function respond(body: Record<string, unknown>, timeoutMs: number): Promise<string> {
+  async function respond(body: Record<string, unknown>, timeoutMs: number): Promise<AiTextResult> {
     try {
       const response = await fetch(`${config.baseUrl}/responses`, {
         method: "POST",
@@ -95,7 +96,13 @@ export function openAiProvider(config: OpenAiConfig): AiProvider {
         .join("")
         .trim();
       if (!text) throw new AiError(parsed.data.status === "incomplete" ? "terpotong" : "format");
-      return text;
+      const usage = parsed.data.usage;
+      return {
+        text,
+        usage: usage
+          ? { inputTokens: usage.input_tokens, outputTokens: usage.output_tokens }
+          : null,
+      };
     } catch (error) {
       throw toAiError(error);
     }
@@ -118,7 +125,7 @@ export function openAiProvider(config: OpenAiConfig): AiProvider {
     async generateJson(request) {
       const schema: Record<string, unknown> = { ...z.toJSONSchema(request.schema) };
       delete schema.$schema;
-      const text = await respond(
+      const { text } = await respond(
         {
           instructions: request.instructions,
           input: request.input,

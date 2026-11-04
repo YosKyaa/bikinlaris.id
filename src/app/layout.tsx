@@ -15,6 +15,9 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: { default: id.app.title, template: `%s · ${id.app.domain}` },
   description: id.app.description,
+  // Home-screen icon on iPhone (Android reads the icons in app/manifest.ts).
+  icons: { apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { title: id.app.shortName, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

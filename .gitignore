@@ -47,3 +47,8 @@ supabase/.branches
 
 # dokumentasi markdown tidak ikut ke repo
 *.md
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/

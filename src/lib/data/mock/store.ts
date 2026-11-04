@@ -16,6 +16,7 @@ import type {
   Business,
   CoachMessage,
   CoachRole,
+  ContactNote,
   Diagnosis,
   EventAction,
   Pack,
@@ -47,6 +48,16 @@ export interface MockStaff {
   password: string;
 }
 
+/** One coach slot (coach_jatah in Supabase): taken before the AI call, finished on save. */
+export interface MockCoachSlot {
+  businessId: string;
+  at: number;
+  finishedAt: number | null;
+  result: "dijawab" | "di_luar_topik" | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+}
+
 interface MockStore {
   staff: Map<string, MockStaff>;
   invites: Map<string, TeamInvite>;
@@ -61,7 +72,11 @@ interface MockStore {
   coach: CoachMessage[];
   nextCoachId: number;
   /** Coach slots taken (same as coach_jatah in Supabase). */
-  coachQuota: { businessId: string; at: number }[];
+  coachQuota: MockCoachSlot[];
+  /** Questions the app's check turned away (coach_tolak). */
+  coachRefusals: { businessId: string; text: string; createdAt: string }[];
+  contactNotes: ContactNote[];
+  nextContactId: number;
 }
 
 /** Coach messages returned to the owner (same as umkm_coach_riwayat in Supabase). */
@@ -293,6 +308,9 @@ function seed(): MockStore {
     coach: [],
     nextCoachId: 1,
     coachQuota: [],
+    coachRefusals: [],
+    contactNotes: [],
+    nextContactId: 1,
   };
   const today = todayIso();
 
@@ -316,6 +334,7 @@ function seed(): MockStore {
       whatsapp: `6281200000${String(index + 1).padStart(3, "0")}`,
       createdAt: at(joinedOn, "09:00"),
       createdBy: enumeratorId,
+      assignedTo: enumeratorId,
       signupVia: "pendamping",
     });
     s.tokens.set(item.token, businessId);
@@ -373,7 +392,38 @@ function seed(): MockStore {
       item.addedBy === "self" ? null : item.addedBy === "admin" ? adminId : enumeratorId;
     seedDemoParticipant(s, item, SEED.length + index + 1, addedBy);
   });
+  seedContactNotes(s, enumeratorId, today);
   return s;
+}
+
+/** A few day-30 calls, so the contact log and "Kontak terakhir" have something to show. */
+function seedContactNotes(s: MockStore, authorId: string, today: string) {
+  const notes: {
+    business: number;
+    outcome: ContactNote["outcome"];
+    note: string | null;
+    daysAgo: number;
+  }[] = [
+    {
+      business: 2,
+      outcome: "tidak_diangkat",
+      note: "Ditelepon jam 10, tidak diangkat.",
+      daysAgo: 2,
+    },
+    { business: 2, outcome: "minta_nanti", note: "Minta dihubungi lagi sore hari.", daysAgo: 1 },
+    { business: 3, outcome: "tersambung", note: "Kuesioner dikirim lewat WhatsApp.", daysAgo: 1 },
+    { business: 6, outcome: "tersambung", note: null, daysAgo: 9 },
+  ];
+  for (const item of notes) {
+    s.contactNotes.push({
+      id: s.nextContactId++,
+      businessId: seedId(item.business),
+      staffId: authorId,
+      outcome: item.outcome,
+      note: item.note,
+      createdAt: at(addDays(today, -item.daysAgo), "10:00"),
+    });
+  }
 }
 
 /** One generated participant from demo-cohort.ts, with its diagnosis, pack and events. */
@@ -392,6 +442,7 @@ function seedDemoParticipant(
     whatsapp: `6281200000${String(n).padStart(3, "0")}`,
     createdAt: at(item.joinedOn, "08:30"),
     createdBy,
+    assignedTo: createdBy,
     signupVia: createdBy === null ? "mandiri" : "pendamping",
   });
   s.tokens.set(`demo-${n}`, businessId);
@@ -400,6 +451,15 @@ function seedDemoParticipant(
     pushCoach(s, businessId, "pemilik", id.coach.suggestions[topic], topic, null, when);
     pushCoach(s, businessId, "coach", id.coach.demoAnswer, topic, demoProvider.label, when);
     pushEvent(s, businessId, "coach_tanya", { topik: topic }, when);
+    const slotAt = Date.parse(when);
+    s.coachQuota.push({
+      businessId,
+      at: slotAt,
+      finishedAt: slotAt,
+      result: "dijawab",
+      inputTokens: null,
+      outputTokens: null,
+    });
   }
   if (!item.answers || !item.startedAt) return;
 

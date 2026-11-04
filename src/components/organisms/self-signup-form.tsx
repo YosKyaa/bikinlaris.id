@@ -10,6 +10,7 @@ import { ChoiceChips } from "@/components/molecules/choice-chips";
 import { InlineError } from "@/components/molecules/inline-error";
 import { LocationPicker } from "@/components/molecules/location-picker";
 import { ProfileSelectItems } from "@/components/molecules/profile-select-items";
+import { TurnstileWidget } from "@/components/molecules/turnstile-widget";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -58,12 +59,15 @@ const errorText = (error: HookFieldError | undefined) =>
 /**
  * /ikut: one short page, one tile per group. Four typed fields, two dropdowns, three
  * tap-to-choose rows, consent with the button in the last (mint) tile. On success the private
- * link is already saved on this phone; next comes the saved-link screen.
+ * link is already saved on this phone; next comes the saved-link screen. With Turnstile set up
+ * (`turnstileSiteKey`), Cloudflare's bot check runs quietly in the last tile.
  */
-export function SelfSignupForm() {
+export function SelfSignupForm({ turnstileSiteKey }: { turnstileSiteKey: string | null }) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Tokens are single use: a refused sign-up starts a fresh check.
+  const [checkRound, setCheckRound] = useState(0);
   const form = useForm<SelfSignupInput>({
     resolver: zodResolver(selfSignupSchema),
     defaultValues: {
@@ -84,10 +88,14 @@ export function SelfSignupForm() {
   }, [form]);
 
   const onSubmit = form.handleSubmit((values) => {
+    if (turnstileSiteKey && !values.captcha) return setServerError(copy.errors.captchaPending);
     setServerError(null);
     startTransition(async () => {
       const result = await registerBusinessAction(values);
-      if (!result.ok) return setServerError(result.error);
+      if (!result.ok) {
+        if (turnstileSiteKey) setCheckRound((round) => round + 1);
+        return setServerError(result.error);
+      }
       router.push(ROUTES.signupDone);
     });
   });
@@ -244,6 +252,14 @@ export function SelfSignupForm() {
           )}
         />
 
+        {turnstileSiteKey ? (
+          <TurnstileWidget
+            siteKey={turnstileSiteKey}
+            resetKey={checkRound}
+            onToken={(token) => form.setValue("captcha", token ?? undefined)}
+            onUnavailable={() => setServerError(copy.errors.captchaUnavailable)}
+          />
+        ) : null}
         <InlineError message={serverError} />
         <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:static lg:border-0 lg:bg-transparent lg:p-0">
           <div className="mx-auto max-w-md lg:max-w-none">

@@ -1,9 +1,10 @@
 import type { CellValue, DataBarRuleType, Workbook } from "exceljs";
 
 import { id } from "@/content/id";
-import { buildRows, type Cell, type DataTable } from "@/lib/data/research";
+import { buildRows, type Cell, type DataTable, type FollowUpData } from "@/lib/data/research";
 import type { Participant } from "@/lib/data/types";
 import { rules, sections, getSection } from "@/lib/diagnosis/bank";
+import { formatDateShort, todayIso } from "@/lib/format";
 import { regencyName, provinceName } from "@/lib/wilayah";
 
 import { finishTable, font, solid, styleBody, styleHeader } from "./styles";
@@ -30,6 +31,7 @@ export function addParticipantSheet(
   workbook: Workbook,
   participants: Participant[],
   today: string,
+  followUp: FollowUpData,
 ) {
   const copy = id.report.list;
   const sheet = workbook.addWorksheet(id.report.sheets.list, {
@@ -56,6 +58,8 @@ export function addParticipantSheet(
     { header: copy.followUp, width: 12, format: DATE },
     { header: copy.sent, width: 17, format: DATE_TIME },
     { header: copy.done, width: 17, format: DATE_TIME },
+    { header: copy.assignee, width: 18 },
+    { header: copy.lastContact, width: 24 },
     { header: copy.hardest, width: 20 },
     { header: copy.sopCount, width: 10 },
     ...sections.map((section) => ({ header: copy.score(section.label), width: 14 })),
@@ -68,7 +72,7 @@ export function addParticipantSheet(
   sheet.addRow(columns.map((c) => c.header)).eachCell(styleHeader);
 
   const byId = new Map(participants.map((p) => [p.business.id, p]));
-  for (const row of buildRows(participants, today)) {
+  for (const row of buildRows(participants, today, followUp.notes)) {
     const participant = byId.get(row.businessId);
     if (!participant) continue;
     const { business: b } = participant;
@@ -88,6 +92,10 @@ export function addParticipantSheet(
       day(pack?.followUpOn ?? null),
       wib(pack?.questionnaireSentAt ?? null),
       wib(pack?.questionnaireDoneAt ?? null),
+      row.assignedTo ? (followUp.memberNames.get(row.assignedTo) ?? null) : null,
+      row.lastContact
+        ? `${id.contact.outcomes[row.lastContact.outcome]} · ${formatDateShort(todayIso(new Date(row.lastContact.createdAt)))}`
+        : null,
       pack ? getSection(pack.hardestSection).label : null,
       pack?.sops.length ?? null,
       ...sections.map((section) => (pack ? pack.map[section.id].score : null)),

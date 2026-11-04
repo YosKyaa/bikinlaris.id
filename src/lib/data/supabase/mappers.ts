@@ -22,13 +22,18 @@ import { toJson } from "@/lib/json";
 import { LEGACY_LOCATIONS } from "@/lib/wilayah";
 import type { Json, TableRow } from "@/types/database";
 
+import { ERROR_SOURCES, type ErrorReport } from "@/lib/monitoring/types";
+
 import {
   COACH_ROLES,
+  CONTACT_OUTCOMES,
   EVENT_ACTIONS,
   SIGNUP_VIAS,
   type Business,
   type CoachMessage,
   type CoachTurn,
+  type CoachUsage,
+  type ContactNote,
   type Diagnosis,
   type EventMeta,
   type NewParticipant,
@@ -59,6 +64,8 @@ const businessRowSchema = z.object({
   created_at: z.string(),
   /** Staff rows only: umkm_state strips it from the owner's view. */
   created_by: z.string().nullable().optional(),
+  /** Staff rows only; missing before migration 20261104000000. */
+  pendamping_id: z.string().nullable().optional(),
   /** Missing on databases from before the self-registration migration. */
   daftar_via: z.enum(SIGNUP_VIAS).optional(),
 });
@@ -79,6 +86,7 @@ export function toBusiness(row: unknown): Business {
     ownerRole: r.peran,
     createdAt: r.created_at,
     createdBy: r.created_by ?? null,
+    assignedTo: r.pendamping_id ?? null,
     signupVia: r.daftar_via ?? "pendamping",
   };
 }
@@ -230,6 +238,94 @@ const inviteRowSchema = z.object({
 export function toInvite(row: TableRow<"staff_invites">): TeamInvite {
   const r = inviteRowSchema.parse(row);
   return { email: r.email, role: r.role, code: r.kode };
+}
+
+const contactRowSchema = z.object({
+  id: z.number(),
+  business_id: z.string(),
+  staff_id: z.string().nullable(),
+  hasil: z.enum(CONTACT_OUTCOMES),
+  catatan: z.string().nullable(),
+  created_at: z.string(),
+});
+
+export function toContactNote(row: TableRow<"kontak_catatan">): ContactNote {
+  const r = contactRowSchema.parse(row);
+  return {
+    id: r.id,
+    businessId: r.business_id,
+    staffId: r.staff_id,
+    outcome: r.hasil,
+    note: r.catatan,
+    createdAt: r.created_at,
+  };
+}
+
+const usageSchema = z.object({
+  hari: z.array(
+    z.object({
+      tanggal: z.string(),
+      jatah: z.number(),
+      dijawab: z.number(),
+      di_luar_topik: z.number(),
+      gagal: z.number(),
+      ditolak: z.number(),
+      token_masuk: z.number(),
+      token_keluar: z.number(),
+    }),
+  ),
+  ditolak_terbaru: z.array(
+    z.object({
+      kode: z.string(),
+      business_id: z.string(),
+      isi: z.string(),
+      created_at: z.string(),
+    }),
+  ),
+});
+
+/** Result of tim_pemakaian_coach. */
+export function toCoachUsage(value: unknown): CoachUsage {
+  const r = usageSchema.parse(value);
+  return {
+    days: r.hari.map((d) => ({
+      date: d.tanggal,
+      reserved: d.jatah,
+      answered: d.dijawab,
+      offTopic: d.di_luar_topik,
+      failed: d.gagal,
+      refused: d.ditolak,
+      inputTokens: d.token_masuk,
+      outputTokens: d.token_keluar,
+    })),
+    latestRefusals: r.ditolak_terbaru.map((x) => ({
+      businessId: x.business_id,
+      code: x.kode,
+      text: x.isi,
+      createdAt: x.created_at,
+    })),
+  };
+}
+
+const errorRowSchema = z.object({
+  sumber: z.enum(ERROR_SOURCES),
+  pesan: z.string(),
+  digest: z.string().nullable(),
+  jalur: z.string().nullable(),
+  konteks: z.string().nullable(),
+  created_at: z.string(),
+});
+
+export function toErrorReport(row: TableRow<"galat">): ErrorReport {
+  const r = errorRowSchema.parse(row);
+  return {
+    source: r.sumber,
+    message: r.pesan,
+    digest: r.digest,
+    path: r.jalur,
+    context: r.konteks,
+    at: r.created_at,
+  };
 }
 
 export function metaToJson(meta: EventMeta | null): Json {

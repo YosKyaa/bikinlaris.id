@@ -25,6 +25,11 @@ export interface Business extends BusinessProfile {
   createdAt: string;
   /** Team member who added the participant; null when self-registered or the account was removed. */
   createdBy: string | null;
+  /**
+   * Team member who looks after this participant (pendamping). Starts as the one who added
+   * it; null = not assigned yet (self-registration, or the member left the team).
+   */
+  assignedTo: string | null;
   signupVia: SignupVia;
 }
 
@@ -117,6 +122,7 @@ export const EVENT_ACTIONS = [
   "cetak",
   "diagnosa_ulang",
   "coach_tanya",
+  "unduh_pdf",
 ] as const;
 export type EventAction = (typeof EVENT_ACTIONS)[number];
 
@@ -155,6 +161,56 @@ export interface CoachMessage extends CoachTurn {
   topic: string | null;
   /** AI provider and model that wrote a coach answer, e.g. "openai:gpt-6-luna". */
   source: string | null;
+}
+
+/** Result of one attempt to reach the owner (table kontak_catatan), e.g. at day 30. */
+export const CONTACT_OUTCOMES = [
+  "tersambung",
+  "tidak_diangkat",
+  "nomor_salah",
+  "minta_nanti",
+  "menolak",
+] as const;
+export type ContactOutcome = (typeof CONTACT_OUTCOMES)[number];
+
+export interface ContactNote {
+  id: number;
+  businessId: string;
+  /** Team member who wrote it; null once their login account is gone. */
+  staffId: string | null;
+  outcome: ContactOutcome;
+  note: string | null;
+  createdAt: string;
+}
+
+/** Coach use on one day (WIB), for the admin's cost view. */
+export interface CoachUsageDay {
+  /** yyyy-mm-dd */
+  date: string;
+  /** Slots taken = AI calls started. */
+  reserved: number;
+  answered: number;
+  /** The model answered with the off-topic marker. */
+  offTopic: number;
+  /** Slot taken, answer never stored (AI error or time-out). */
+  failed: number;
+  /** Turned away by the app's own check, no AI call (no tokens). */
+  refused: number;
+  inputTokens: number;
+  outputTokens: number;
+}
+
+/** A question the app's check turned away, so the admin can spot wrong refusals. */
+export interface CoachRefusal {
+  businessId: string;
+  code: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface CoachUsage {
+  days: CoachUsageDay[];
+  latestRefusals: CoachRefusal[];
 }
 
 /** Input for a new participant, entered by the enumerator. */
@@ -231,6 +287,11 @@ export interface ParticipantRow {
   dayNumber: number | null;
   followUpOn: string | null;
   stage: ParticipantStage;
+  /** Team member looking after this participant, or null. */
+  assignedTo: string | null;
+  /** Newest contact note, or null when nobody has reached out yet. */
+  lastContact: Pick<ContactNote, "outcome" | "createdAt"> | null;
+  contactCount: number;
 }
 
 /** Uniform Server Action result (CLAUDE.md "Clean code"). */

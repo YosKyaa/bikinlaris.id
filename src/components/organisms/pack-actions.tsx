@@ -1,12 +1,13 @@
 "use client";
 
-import { PrinterIcon, SendIcon } from "lucide-react";
+import { DownloadIcon, PrinterIcon, SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { trackPackOpenedAction, trackShareAction } from "@/lib/actions/owner";
 import { PACK_ACTIONS_ID } from "@/lib/anchors";
+import { ROUTES } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
 const PRINT_DELAY_MS = 100;
@@ -20,7 +21,11 @@ function printPack() {
   setTimeout(() => window.print(), PRINT_DELAY_MS);
 }
 
-/** "Kirim ke WhatsApp" (primary) and "Cetak atau simpan PDF". Both are logged as research events. */
+/**
+ * "Kirim ke WhatsApp" (primary), "Unduh PDF" (a file made on the server: no print dialog, which
+ * is many taps on Android), and "Cetak" on laptops. All three are logged as research events
+ * (the download by the route handler).
+ */
 export function PackActions({ whatsAppUrl }: { whatsAppUrl: string }) {
   return (
     <div id={PACK_ACTIONS_ID} className="flex flex-col gap-3 sm:flex-row print:hidden">
@@ -30,7 +35,14 @@ export function PackActions({ whatsAppUrl }: { whatsAppUrl: string }) {
           {id.pack.actions.whatsapp}
         </a>
       </Button>
-      <Button variant="outline" size="lg" onClick={printPack}>
+      {/* A plain link: the response is a file download, so the page stays open. */}
+      <Button asChild variant="outline" size="lg">
+        <a href={ROUTES.packPdf}>
+          <DownloadIcon aria-hidden />
+          {id.pack.actions.pdf}
+        </a>
+      </Button>
+      <Button variant="ghost" size="lg" onClick={printPack} className="hidden lg:inline-flex">
         <PrinterIcon aria-hidden />
         {id.pack.actions.print}
       </Button>
@@ -74,14 +86,14 @@ export function PackStickyActions({ whatsAppUrl }: { whatsAppUrl: string }) {
             {id.pack.actions.whatsapp}
           </a>
         </Button>
-        <Button
-          variant="outline"
-          size="icon-lg"
-          onClick={printPack}
-          aria-label={id.pack.actions.print}
-          tabIndex={visible ? undefined : -1}
-        >
-          <PrinterIcon aria-hidden />
+        <Button asChild variant="outline" size="icon-lg">
+          <a
+            href={ROUTES.packPdf}
+            aria-label={id.pack.actions.pdf}
+            tabIndex={visible ? undefined : -1}
+          >
+            <DownloadIcon aria-hidden />
+          </a>
         </Button>
       </div>
     </div>

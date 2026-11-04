@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { id } from "@/content/id";
 import { ownerLogoutAction } from "@/lib/actions/owner";
 import { isCoachEnabled } from "@/lib/ai";
-import { ROUTES } from "@/lib/auth/constants";
+import { NOTICE_PARAM, PDF_FAILED_NOTICE, ROUTES } from "@/lib/auth/constants";
 import { COACH_DAILY_LIMIT, QUESTION_MAX_LENGTH } from "@/lib/coach/rules";
 import { data } from "@/lib/data";
 import { resolveOwnerStep } from "@/lib/data/flow";
@@ -34,8 +34,9 @@ async function loadCoach(token: string) {
   }
 }
 
-export default async function PackPage() {
+export default async function PackPage({ searchParams }: PageProps<"/paket">) {
   const state = await requireOwnerState();
+  const pdfFailed = (await searchParams)[NOTICE_PARAM] === PDF_FAILED_NOTICE;
   const { business, pack } = state;
   if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
   if (pack.status !== "siap") redirect(ROUTES.generating);
@@ -72,6 +73,7 @@ export default async function PackPage() {
         locationLabel={regencyName(business.location)}
         whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack))}
         coach={await loadCoach(state.token)}
+        pdfFailed={pdfFailed}
       />
       <Toaster position="top-center" />
     </AppShell>

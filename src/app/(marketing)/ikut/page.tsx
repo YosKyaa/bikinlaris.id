@@ -7,7 +7,7 @@ import { AuthLayout } from "@/components/templates/auth-layout";
 import { Button } from "@/components/ui/button";
 import { id } from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
-import { env } from "@/lib/env";
+import { env, turnstile } from "@/lib/env";
 
 export const metadata: Metadata = { title: id.signup.eyebrow };
 
@@ -38,7 +38,7 @@ export default function SignupPage() {
     >
       {/* Bottom room on phones for the fixed "Daftar dan mulai" bar. */}
       <div className="grid gap-3 pb-24 sm:gap-4 lg:pb-0">
-        <SelfSignupForm />
+        <SelfSignupForm turnstileSiteKey={turnstile?.siteKey ?? null} />
         <BentoTile className="py-4 text-sm text-muted-foreground sm:py-4">
           {copy.haveLink}
         </BentoTile>

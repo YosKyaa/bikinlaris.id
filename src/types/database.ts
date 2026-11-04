@@ -1,5 +1,5 @@
 /**
- * Tipe database Supabase, ditulis tangan dari supabase/migrations/20261008000000_init.sql.
+ * Tipe database Supabase, ditulis tangan dari supabase/migrations (sampai 20261104000000).
  * Setelah migrasi terpasang, ganti dengan hasil:
  * `npx supabase gen types typescript --project-id <id> > src/types/database.ts`
  */
@@ -24,6 +24,7 @@ export type Database = {
           lokasi: string;
           nama: string;
           pemilik: string;
+          pendamping_id: string | null;
           peran: string;
           produk: string;
           sektor: string;
@@ -41,6 +42,7 @@ export type Database = {
           lokasi: string;
           nama: string;
           pemilik: string;
+          pendamping_id?: string | null;
           peran: string;
           produk: string;
           sektor: string;
@@ -58,6 +60,7 @@ export type Database = {
           lokasi?: string;
           nama?: string;
           pemilik?: string;
+          pendamping_id?: string | null;
           peran?: string;
           produk?: string;
           sektor?: string;
@@ -166,6 +169,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "events_business_id_fkey";
+            columns: ["business_id"];
+            isOneToOne: false;
+            referencedRelation: "businesses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      galat: {
+        Row: {
+          created_at: string;
+          digest: string | null;
+          id: number;
+          jalur: string | null;
+          konteks: string | null;
+          pesan: string;
+          sumber: string;
+        };
+        Insert: {
+          created_at?: string;
+          digest?: string | null;
+          id?: never;
+          jalur?: string | null;
+          konteks?: string | null;
+          pesan: string;
+          sumber: string;
+        };
+        Update: {
+          created_at?: string;
+          digest?: string | null;
+          id?: never;
+          jalur?: string | null;
+          konteks?: string | null;
+          pesan?: string;
+          sumber?: string;
+        };
+        Relationships: [];
+      };
+      kontak_catatan: {
+        Row: {
+          business_id: string;
+          catatan: string | null;
+          created_at: string;
+          hasil: string;
+          id: number;
+          staff_id: string | null;
+        };
+        Insert: {
+          business_id: string;
+          catatan?: string | null;
+          created_at?: string;
+          hasil: string;
+          id?: never;
+          staff_id?: string | null;
+        };
+        Update: {
+          business_id?: string;
+          catatan?: string | null;
+          created_at?: string;
+          hasil?: string;
+          id?: never;
+          staff_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "kontak_catatan_business_id_fkey";
             columns: ["business_id"];
             isOneToOne: false;
             referencedRelation: "businesses";
@@ -293,9 +361,24 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      catat_galat: {
+        Args: {
+          p_digest: string | null;
+          p_jalur: string | null;
+          p_konteks: string | null;
+          p_pesan: string;
+          p_sumber: string;
+        };
+        Returns: undefined;
+      };
       claim_staff_invite: { Args: never; Returns: boolean };
       is_admin: { Args: never; Returns: boolean };
       is_staff: { Args: never; Returns: boolean };
+      tim_atur_pendamping: {
+        Args: { p_businesses: string[]; p_pendamping: string | null };
+        Returns: number;
+      };
+      tim_pemakaian_coach: { Args: { p_hari: number }; Returns: Json };
       umkm_catat: {
         Args: { p_action: string; p_meta: Json; p_token: string };
         Returns: undefined;
@@ -318,14 +401,18 @@ export type Database = {
       };
       umkm_coach_simpan: {
         Args: {
+          p_di_luar_topik?: boolean;
           p_jawab: string;
           p_sumber: string;
           p_tanya: string;
           p_token: string;
+          p_token_keluar?: number | null;
+          p_token_masuk?: number | null;
           p_topik: string | null;
         };
         Returns: undefined;
       };
+      umkm_coach_tolak: { Args: { p_tanya: string; p_token: string }; Returns: undefined };
       umkm_mulai_paket: {
         Args: {
           p_hari_tindak_lanjut: number;

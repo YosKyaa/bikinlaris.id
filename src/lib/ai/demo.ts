@@ -16,7 +16,7 @@ export const demoProvider: AiProvider = {
 
   async generateText() {
     await new Promise((resolve) => setTimeout(resolve, DEMO_LATENCY_MS));
-    return id.coach.demoAnswer;
+    return { text: id.coach.demoAnswer, usage: null };
   },
 
   async generateJson() {

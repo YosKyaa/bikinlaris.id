@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { isCoachEnabled } from "@/lib/ai";
 import { data } from "@/lib/data";
-import { coachCsv, eventsCsv, summaryCsv } from "@/lib/data/research";
+import { coachCsv, eventsCsv, summaryCsv, type FollowUpData } from "@/lib/data/research";
 import { getStaffUser } from "@/lib/data/staff-session";
 import { todayIso } from "@/lib/format";
 import { buildReport, XLSX_TYPE } from "@/lib/report/workbook";
@@ -13,6 +13,19 @@ const BOM = "﻿";
 const TABLES = ["ringkasan", "events", "coach", "laporan"] as const;
 type Table = (typeof TABLES)[number];
 type CsvTable = Exclude<Table, "laporan">;
+
+/** Assignment names and the contact log (empty before migration 20261104000000). */
+async function followUpData(): Promise<FollowUpData> {
+  const staff = data().staff;
+  const [notes, team] = await Promise.all([
+    staff.listContactNotes().catch(() => []),
+    staff.listTeam(),
+  ]);
+  return {
+    notes,
+    memberNames: new Map(team.members.map((m) => [m.id, m.name ?? m.email])),
+  };
+}
 
 async function buildCsv(table: CsvTable, today: string): Promise<string> {
   const staff = data().staff;
@@ -26,19 +39,20 @@ async function buildCsv(table: CsvTable, today: string): Promise<string> {
   const [participants, events] = await Promise.all([staff.listParticipants(), staff.listEvents()]);
   return table === "events"
     ? eventsCsv(participants, events)
-    : summaryCsv(participants, events, today);
+    : summaryCsv(participants, events, today, await followUpData());
 }
 
 /** Excel report (dashboard + charts, participant list, raw tables). */
 async function buildExcel(today: string) {
   const staff = data().staff;
-  const [participants, events, coachMessages] = await Promise.all([
+  const [participants, events, coachMessages, followUp] = await Promise.all([
     staff.listParticipants(),
     staff.listEvents(),
     // The coach table may not exist yet on an older database: leave the sheet out then.
     isCoachEnabled() ? staff.listCoachMessages().catch(() => null) : Promise.resolve(null),
+    followUpData(),
   ]);
-  return buildReport({ participants, events, coachMessages, today });
+  return buildReport({ participants, events, coachMessages, followUp, today });
 }
 
 export async function GET(request: NextRequest) {

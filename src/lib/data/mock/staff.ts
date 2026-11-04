@@ -2,10 +2,22 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
+import { mockErrorLog } from "@/lib/monitoring/report";
+import { addDays, todayIso } from "@/lib/format";
+
 import type { StaffStore } from "../source";
-import type { Participant, StaffUser } from "../types";
+import type { CoachUsageDay, Participant, StaffUser } from "../types";
 import { clearMockSession, readMockSession, setMockSession } from "./session";
 import { newId, nextCode, pushEvent, store, tokenOf, type MockStaff } from "./store";
+
+/** Same as umkm_coach_simpan: a slot older than this without an answer counts as failed. */
+const SLOT_SAVE_WINDOW_MS = 2 * 60 * 1000;
+const LATEST_REFUSALS = 10;
+
+async function signedIn(): Promise<MockStaff | null> {
+  const email = await readMockSession();
+  return (email && store().staff.get(email)) || null;
+}
 
 const TOKEN_BYTES = 16;
 const INVITE_CODE_BYTES = 4;
@@ -89,6 +101,7 @@ export const mockStaffStore: StaffStore = {
       code: nextCode(s),
       createdAt: new Date().toISOString(),
       createdBy: (email && s.staff.get(email)?.id) || null,
+      assignedTo: (email && s.staff.get(email)?.id) || null,
       signupVia: "pendamping",
     });
     s.tokens.set(token, businessId);
@@ -143,10 +156,15 @@ export const mockStaffStore: StaffStore = {
     return store().invites.delete(email);
   },
 
+  /** Their participants become unassigned (on delete set null in Supabase). */
   async removeMember(userId) {
     const s = store();
     const member = [...s.staff.values()].find((m) => m.id === userId);
-    return member ? s.staff.delete(member.email) : false;
+    if (!member) return false;
+    for (const business of s.businesses.values()) {
+      if (business.assignedTo === userId) business.assignedTo = null;
+    }
+    return s.staff.delete(member.email);
   },
 
   async deleteParticipant(businessId) {
@@ -157,7 +175,105 @@ export const mockStaffStore: StaffStore = {
     for (const [token, owner] of s.tokens) if (owner === businessId) s.tokens.delete(token);
     s.events = s.events.filter((e) => e.businessId !== businessId);
     s.coach = s.coach.filter((m) => m.businessId !== businessId);
+    s.contactNotes = s.contactNotes.filter((n) => n.businessId !== businessId);
+    s.coachQuota = s.coachQuota.filter((q) => q.businessId !== businessId);
+    s.coachRefusals = s.coachRefusals.filter((r) => r.businessId !== businessId);
     return true;
+  },
+
+  /** Same rules as tim_atur_pendamping. */
+  async assignParticipants(businessIds, staffId) {
+    const s = store();
+    const me = await signedIn();
+    if (!me) throw new Error("bukan_tim");
+    if (staffId !== null && ![...s.staff.values()].some((m) => m.id === staffId)) {
+      throw new Error("bukan_anggota");
+    }
+    if (me.role !== "admin" && staffId !== null && staffId !== me.id) {
+      throw new Error("khusus_admin");
+    }
+    let changed = 0;
+    for (const businessId of new Set(businessIds)) {
+      const business = s.businesses.get(businessId);
+      if (!business || business.assignedTo === staffId) continue;
+      const allowed =
+        me.role === "admin" ||
+        (staffId === me.id && business.assignedTo === null) ||
+        (staffId === null && business.assignedTo === me.id);
+      if (!allowed) continue;
+      business.assignedTo = staffId;
+      changed += 1;
+    }
+    return changed;
+  },
+
+  async listContactNotes(businessId) {
+    const notes = store().contactNotes.filter((n) => !businessId || n.businessId === businessId);
+    return notes.toSorted((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id - a.id);
+  },
+
+  async addContactNote(businessId, outcome, note) {
+    const s = store();
+    const me = await signedIn();
+    if (!me || !s.businesses.has(businessId)) throw new Error("catatan_gagal");
+    s.contactNotes.push({
+      id: s.nextContactId++,
+      businessId,
+      staffId: me.id,
+      outcome,
+      note,
+      createdAt: new Date().toISOString(),
+    });
+  },
+
+  async deleteContactNote(noteId) {
+    const s = store();
+    const me = await signedIn();
+    const note = s.contactNotes.find((n) => n.id === noteId);
+    if (!me || !note || (note.staffId !== me.id && me.role !== "admin")) return false;
+    s.contactNotes = s.contactNotes.filter((n) => n.id !== noteId);
+    return true;
+  },
+
+  /** Same figures as tim_pemakaian_coach. */
+  async coachUsage(days) {
+    const s = store();
+    const today = todayIso();
+    const now = Date.now();
+    const dayOf = (time: number | string) => todayIso(new Date(time));
+    const usage: CoachUsageDay[] = Array.from({ length: days }, (_, index) => {
+      const date = addDays(today, index - (days - 1));
+      const slots = s.coachQuota.filter((q) => dayOf(q.at) === date);
+      return {
+        date,
+        reserved: slots.length,
+        answered: slots.filter((q) => q.result === "dijawab").length,
+        offTopic: slots.filter((q) => q.result === "di_luar_topik").length,
+        failed: slots.filter((q) => q.finishedAt === null && now - q.at > SLOT_SAVE_WINDOW_MS)
+          .length,
+        refused: s.coachRefusals.filter((r) => dayOf(r.createdAt) === date).length,
+        inputTokens: slots.reduce((sum, q) => sum + (q.inputTokens ?? 0), 0),
+        outputTokens: slots.reduce((sum, q) => sum + (q.outputTokens ?? 0), 0),
+      };
+    });
+    const latestRefusals = s.coachRefusals
+      .slice(-LATEST_REFUSALS)
+      .reverse()
+      .map((r) => ({
+        businessId: r.businessId,
+        code: s.businesses.get(r.businessId)?.code ?? "",
+        text: r.text,
+        createdAt: r.createdAt,
+      }));
+    return { days: usage, latestRefusals };
+  },
+
+  async listErrors() {
+    return [...mockErrorLog()];
+  },
+
+  async clearErrors() {
+    mockErrorLog().length = 0;
   },
 
   async setRole(userId, role) {

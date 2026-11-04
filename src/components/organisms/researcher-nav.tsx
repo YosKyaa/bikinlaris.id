@@ -5,6 +5,7 @@ import {
   LayoutDashboardIcon,
   ListChecksIcon,
   LogOutIcon,
+  ShieldCheckIcon,
   UserPlusIcon,
   UsersIcon,
   type LucideIcon,
@@ -73,12 +74,20 @@ function navItems(isAdmin: boolean): NavItem[] {
     },
   ];
   if (isAdmin) {
-    items.push({
-      label: menu.team,
-      href: ROUTES.team,
-      icon: UsersIcon,
-      isActive: startsWith(ROUTES.team),
-    });
+    items.push(
+      {
+        label: menu.team,
+        href: ROUTES.team,
+        icon: UsersIcon,
+        isActive: startsWith(ROUTES.team),
+      },
+      {
+        label: menu.system,
+        href: ROUTES.system,
+        icon: ShieldCheckIcon,
+        isActive: startsWith(ROUTES.system),
+      },
+    );
   }
   return items;
 }

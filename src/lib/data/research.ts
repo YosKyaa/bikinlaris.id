@@ -8,6 +8,7 @@ import { provinceName, regencyName } from "@/lib/wilayah";
 import {
   EVENT_ACTIONS,
   type CoachMessage,
+  type ContactNote,
   type DueGroup,
   type DueItem,
   type FunnelStep,
@@ -36,6 +37,25 @@ export const PARTICIPANT_FILTERS = [
 ] as const;
 export type ParticipantFilter = (typeof PARTICIPANT_FILTERS)[number];
 
+/** Address parameter of the "Pendamping" filter on the participant list. */
+export const ASSIGNEE_PARAM = "pendamping";
+/** null = everyone; "saya" = the signed-in member; "belum" = not assigned; else a member id. */
+export type AssigneeFilterValue = string | null;
+
+export function parseAssigneeFilter(value: string | string[] | undefined): AssigneeFilterValue {
+  return typeof value === "string" && value.length > 0 && value.length <= 64 ? value : null;
+}
+
+export function filterByAssignee(
+  rows: ParticipantRow[],
+  filter: AssigneeFilterValue,
+  currentUserId: string,
+): ParticipantRow[] {
+  if (filter === null) return rows;
+  const wanted = filter === "saya" ? currentUserId : filter === "belum" ? null : filter;
+  return rows.filter((row) => row.assignedTo === wanted);
+}
+
 /** Most urgent first in the table. */
 export const STAGE_ORDER: Record<ParticipantStage, number> = {
   siap_dikirim: 0,
@@ -59,9 +79,25 @@ export function participantStage(
   return "belum_mulai";
 }
 
-export function toRow(participant: Participant, today: string): ParticipantRow {
+/** Contact notes per participant, newest first (notes arrive newest first from the store). */
+export function notesByBusiness(notes: ContactNote[]): Map<string, ContactNote[]> {
+  const byBusiness = new Map<string, ContactNote[]>();
+  for (const note of notes) {
+    const list = byBusiness.get(note.businessId);
+    if (list) list.push(note);
+    else byBusiness.set(note.businessId, [note]);
+  }
+  return byBusiness;
+}
+
+export function toRow(
+  participant: Participant,
+  today: string,
+  notes: ContactNote[] = [],
+): ParticipantRow {
   const { business, pack } = participant;
   const ready = pack?.status === "siap" ? pack : null;
+  const last = notes[0];
   return {
     businessId: business.id,
     code: business.code,
@@ -73,12 +109,20 @@ export function toRow(participant: Participant, today: string): ParticipantRow {
     dayNumber: ready ? dayNumber(ready.createdOn, today) : null,
     followUpOn: ready?.followUpOn ?? null,
     stage: participantStage(participant, today),
+    assignedTo: business.assignedTo,
+    lastContact: last ? { outcome: last.outcome, createdAt: last.createdAt } : null,
+    contactCount: notes.length,
   };
 }
 
-export function buildRows(participants: Participant[], today: string): ParticipantRow[] {
+export function buildRows(
+  participants: Participant[],
+  today: string,
+  notes: ContactNote[] = [],
+): ParticipantRow[] {
+  const byBusiness = notesByBusiness(notes);
   return participants
-    .map((participant) => toRow(participant, today))
+    .map((participant) => toRow(participant, today, byBusiness.get(participant.business.id)))
     .sort(
       (a, b) =>
         STAGE_ORDER[a.stage] - STAGE_ORDER[b.stage] ||
@@ -168,12 +212,24 @@ function toCsv({ header, rows }: DataTable): string {
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
-/** One row per participant: profile, answers per question, map, pack, questionnaire, usage. */
+/** Who looks after the participants and how reaching them went (summary CSV, Excel). */
+export interface FollowUpData {
+  notes: ContactNote[];
+  /** Team member id → name (or e-mail). */
+  memberNames: Map<string, string>;
+}
+
+/**
+ * One row per participant: profile, answers per question, map, pack, questionnaire, usage,
+ * then who looks after them and the contact log (columns added at the end, 4 November 2026).
+ */
 export function summaryTable(
   participants: Participant[],
   events: ResearchEvent[],
   today: string,
+  followUp: FollowUpData,
 ): DataTable {
+  const notes = notesByBusiness(followUp.notes);
   const header = [
     "kode",
     "business_id",
@@ -207,12 +263,17 @@ export function summaryTable(
     "kuesioner_selesai",
     "sop_dibuka_unik",
     ...EVENT_ACTIONS.map((a) => `event_${a}`),
+    "pendamping",
+    "kontak_jumlah",
+    "kontak_terakhir_hasil",
+    "kontak_terakhir",
   ];
   const rows = participants.map((participant) => {
     const { business: b, diagnosis } = participant;
     const pack = participant.pack?.status === "siap" ? participant.pack : null;
     const own = events.filter((e) => e.businessId === b.id);
     const answers = diagnosis?.answers ?? {};
+    const contacts = notes.get(b.id) ?? [];
     const openedSops = new Set(
       own.flatMap((e) =>
         e.action === "sop_buka" && typeof e.meta?.sop === "string" ? [e.meta.sop] : [],
@@ -253,6 +314,10 @@ export function summaryTable(
       pack?.questionnaireDoneAt ?? null,
       openedSops.size,
       ...EVENT_ACTIONS.map((a) => own.filter((e) => e.action === a).length),
+      b.assignedTo ? (followUp.memberNames.get(b.assignedTo) ?? null) : null,
+      contacts.length,
+      contacts[0]?.outcome ?? null,
+      contacts[0]?.createdAt ?? null,
     ];
   });
   return { header, rows };

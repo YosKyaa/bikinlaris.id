@@ -22,7 +22,7 @@ export function ExportPanel({ coachExport }: { coachExport: boolean }) {
   return (
     <section
       aria-labelledby="unduh-data"
-      className="grid gap-5 rounded-2xl border bg-card p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center"
+      className="grid grid-cols-1 gap-5 rounded-2xl border bg-card p-5 *:min-w-0 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center"
     >
       <div>
         <h2 id="unduh-data" className="text-lg font-semibold">
@@ -35,7 +35,7 @@ export function ExportPanel({ coachExport }: { coachExport: boolean }) {
           asChild
           variant="outline"
           size="lg"
-          className="h-auto min-h-12 justify-start border-primary/40 bg-success-soft py-2 text-left hover:bg-success-soft/70"
+          className="h-auto min-h-12 justify-start border-primary/40 bg-success-soft py-2 text-left whitespace-normal hover:bg-success-soft/70"
         >
           <a href={ROUTES.researcherExport("laporan")} download>
             <FileSpreadsheetIcon aria-hidden className="size-5 text-success" />

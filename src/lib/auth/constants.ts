@@ -19,6 +19,10 @@ export const ROUTES = {
   summary: "/diagnosis/ringkasan",
   generating: "/paket/menyusun",
   pack: "/paket",
+  /** The pack as a PDF file (route handler, downloads instead of opening a page). */
+  packPdf: "/paket/unduh",
+  /** Shown by the service worker when a page is not saved on the phone and there is no signal. */
+  offline: "/offline",
   login: "/masuk",
   signUp: "/daftar",
   authConfirm: "/auth/konfirmasi",
@@ -35,6 +39,8 @@ export const ROUTES = {
   researcherBusiness: (businessId: string) => `/tim/umkm/${businessId}`,
   editParticipant: (businessId: string) => `/tim/umkm/${businessId}/ubah`,
   team: "/tim/anggota",
+  /** Admin only: AI use and cost, safeguards, error log. */
+  system: "/tim/sistem",
   researcherExport: (table: "ringkasan" | "events" | "coach" | "laporan") =>
     `/api/tim/ekspor?tabel=${table}`,
 } as const;
@@ -46,6 +52,8 @@ export const STAFF_PREFIXES = ["/tim"] as const;
 
 export const NEXT_PARAM = "lanjut";
 export const NOTICE_PARAM = "info";
+/** `/paket?info=pdf`: the PDF could not be made (the pack page shows a notice). */
+export const PDF_FAILED_NOTICE = "pdf";
 
 /** Private link tokens: 32 hex characters in Supabase, short readable words in mock mode. */
 export const OWNER_TOKEN_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;

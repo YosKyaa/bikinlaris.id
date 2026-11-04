@@ -61,3 +61,16 @@ export function formatDateTime(isoDateTime: string): string {
     timeZone: TIME_ZONE,
   }).format(new Date(isoDateTime));
 }
+
+/** "12.345": whole numbers with Indonesian thousands separators. */
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(value);
+}
+
+/** "1,25": money estimates with two decimals. */
+export function formatDecimal(value: number): string {
+  return new Intl.NumberFormat(LOCALE, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}

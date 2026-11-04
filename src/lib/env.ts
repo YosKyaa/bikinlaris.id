@@ -25,6 +25,18 @@ const serverEnvSchema = z
     MOCK_SESSION_SECRET: z.string().min(32).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
+    /**
+     * Server-only secret key (sb_secret_… or the legacy service_role key). Used for two calls
+     * only: self-registration after the Turnstile check, and the error log. Never sent to the
+     * browser. Without it, registration falls back to the public key (Sistem page warns).
+     */
+    SUPABASE_SECRET_KEY: z.string().min(1).optional(),
+    /**
+     * Cloudflare Turnstile on /ikut (bot check before self-registration). Both or neither;
+     * the panel's Sistem page warns while they are empty.
+     */
+    TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+    TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
     /** Which company answers the AI features: "openai" or "anthropic" (lib/ai). */
     AI_PROVIDER: z.enum(["openai", "anthropic"]).default("openai"),
     OPENAI_API_KEY: z.string().min(1).optional(),
@@ -33,6 +45,12 @@ const serverEnvSchema = z
     OPENAI_BASE_URL: z.url().default(DEFAULT_OPENAI_BASE_URL),
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     ANTHROPIC_MODEL: z.string().min(1).default(DEFAULT_ANTHROPIC_MODEL),
+    /**
+     * Price in US dollars per one million tokens of the model in use, copied from the
+     * provider's price page. Only for the cost estimate on the Sistem page; empty = tokens only.
+     */
+    AI_PRICE_INPUT_USD: z.coerce.number().positive().optional(),
+    AI_PRICE_OUTPUT_USD: z.coerce.number().positive().optional(),
     /** AI rewrites the SOP texts so they mention the business (template text otherwise). */
     USE_LLM: z
       .enum(["true", "false"])
@@ -72,6 +90,9 @@ const serverEnvSchema = z
       require("NEXT_PUBLIC_SUPABASE_URL", "DATA_SOURCE=supabase");
       require("NEXT_PUBLIC_SUPABASE_ANON_KEY", "DATA_SOURCE=supabase");
     }
+    if (Boolean(env.TURNSTILE_SITE_KEY) !== Boolean(env.TURNSTILE_SECRET_KEY)) {
+      require(env.TURNSTILE_SITE_KEY ? "TURNSTILE_SECRET_KEY" : "TURNSTILE_SITE_KEY", "Turnstile");
+    }
     if (env.DATA_SOURCE === "mock" && env.NODE_ENV === "production") {
       require("MOCK_SESSION_SECRET", "build produksi dengan DATA_SOURCE=mock");
     }
@@ -107,3 +128,15 @@ export const mockSessionSecret = env.MOCK_SESSION_SECRET ?? DEV_MOCK_SECRET;
 export const isMockData = env.DATA_SOURCE === "mock";
 export const isGoogleLogin = env.GOOGLE_LOGIN && !isMockData;
 export const isProduction = env.NODE_ENV === "production";
+
+/** Cloudflare Turnstile keys, or null while it is not set up. */
+export const turnstile =
+  env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY
+    ? { siteKey: env.TURNSTILE_SITE_KEY, secretKey: env.TURNSTILE_SECRET_KEY }
+    : null;
+
+/** Cost estimate per one million tokens, or null when the prices are not set. */
+export const aiPrices =
+  env.AI_PRICE_INPUT_USD && env.AI_PRICE_OUTPUT_USD
+    ? { inputUsd: env.AI_PRICE_INPUT_USD, outputUsd: env.AI_PRICE_OUTPUT_USD }
+    : null;

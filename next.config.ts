@@ -2,15 +2,21 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
+/** Cloudflare Turnstile on /ikut: its script and its check frame (lib/security). */
+const TURNSTILE = "https://challenges.cloudflare.com";
+
 /**
  * Content Security Policy without nonces (Next.js guide "content-security-policy", section
- * "Without Nonces"): keeps static pages static. Everything loads from this origin; Supabase and
- * Claude are only called from the server, so the browser needs no other host.
+ * "Without Nonces"): keeps static pages static. Everything loads from this origin except the
+ * Turnstile check on /ikut; Supabase and the AI are only called from the server.
  * `unsafe-eval` only in development (React Refresh).
  */
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' ${TURNSTILE}${isDev ? " 'unsafe-eval'" : ""}`,
+  `frame-src ${TURNSTILE}`,
+  "worker-src 'self'",
+  "manifest-src 'self'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data:",
   "font-src 'self'",
@@ -36,6 +42,10 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The pack PDF reads its fonts from disk at request time (lib/pdf/fonts.ts).
+  outputFileTracingIncludes: {
+    "/paket/unduh": ["./src/lib/pdf/fonts/*.ttf"],
+  },
   images: {
     // 60 for photos (visually the same on phones, ~25% smaller than 75), 75 = Next default.
     qualities: [60, 75],
@@ -46,6 +56,16 @@ const nextConfig: NextConfig = {
       // The private link carries the owner's token: never send it on as a referrer.
       // Listed last, so it wins over the general Referrer-Policy above.
       { source: "/u/:token", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
+      // Service worker (offline pack): always fetched fresh, so an update reaches phones at once
+      // (Next.js guide "progressive-web-apps", section "Securing your application").
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+        ],
+      },
     ];
   },
   // The team panel moved from /peneliti to /tim (owner request, 3 November 2026). Old

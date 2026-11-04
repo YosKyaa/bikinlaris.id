@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { id } from "@/content/id";
-import { AiError, getAiProvider } from "@/lib/ai";
+import { AiError, failureOf, getAiProvider, type AiTextResult } from "@/lib/ai";
 import {
   ANSWER_MAX_LENGTH,
   ANSWER_MAX_TOKENS,
@@ -20,6 +20,7 @@ import { getOwnerState } from "@/lib/data/owner-session";
 import type { CoachQuotaStatus } from "@/lib/data/source";
 import type { Result } from "@/lib/data/types";
 import { env } from "@/lib/env";
+import { errorMessage, reportError } from "@/lib/monitoring/report";
 
 const questionSchema = z.object({
   question: z.string().trim().min(1, "empty").max(QUESTION_MAX_LENGTH, "tooLong"),
@@ -44,6 +45,17 @@ function failureMessage(error: unknown): string {
   return copy.failed;
 }
 
+/** For the admin's error log: what failed in the coach, never the owner's text. */
+function logCoachError(message: string): Promise<void> {
+  return reportError({
+    source: "server",
+    message,
+    digest: null,
+    path: "/paket",
+    context: "coach",
+  });
+}
+
 const QUOTA_ERRORS: Record<Exclude<CoachQuotaStatus, "ok">, string> = {
   terlalu_cepat: id.coach.errors.tooFast,
   batas_harian: id.coach.errors.limit,
@@ -54,11 +66,13 @@ const QUOTA_ERRORS: Record<Exclude<CoachQuotaStatus, "ok">, string> = {
  * "Tanya coach": one question from the owner (private link cookie), answered by the AI provider
  * with this owner's pack as context. Guarded so tokens cannot run away:
  * 1. owner session, pack ready, length limit;
- * 2. plainly off-topic or rule-breaking questions get a fixed reply, with no AI call;
+ * 2. plainly off-topic or rule-breaking questions get a fixed reply, with no AI call (the
+ *    question is kept for the admin, to spot wrong refusals);
  * 3. one slot is taken in the database before the AI call (pause, per-owner and all-owners
  *    daily limits, atomic, never handed back);
  * 4. the question goes to the model as quoted data; an off-topic marker becomes the fixed reply.
- * Question and answer are stored for the study.
+ * Question and answer are stored for the study, with the tokens used (admin cost view); the
+ * database only stores an answer for a slot taken just before (no made-up conversations).
  */
 export async function askCoachAction(
   question: string,
@@ -87,6 +101,11 @@ export async function askCoachAction(
     return { ok: false, error: copy.failed };
   }
   if (!guarded.ok) {
+    try {
+      await owner.logCoachRefusal(state.token, parsed.data.question);
+    } catch {
+      // Only the admin's copy is missing; the owner still gets the fixed reply.
+    }
     return {
       ok: true,
       data: {
@@ -101,14 +120,15 @@ export async function askCoachAction(
   let quota;
   try {
     quota = await owner.reserveCoach(state.token);
-  } catch {
+  } catch (error) {
+    await logCoachError(errorMessage(error));
     return { ok: false, error: copy.failed };
   }
   if (quota.status !== "ok") return { ok: false, error: QUOTA_ERRORS[quota.status] };
 
-  let answer: string;
+  let reply: AiTextResult;
   try {
-    answer = await provider.generateText({
+    reply = await provider.generateText({
       instructions: coachInstructions(state.business, pack),
       messages: [
         ...history.turns
@@ -124,9 +144,11 @@ export async function askCoachAction(
       timeoutMs: ANSWER_TIMEOUT_MS,
     });
   } catch (error) {
+    await logCoachError(`ai_${failureOf(error)}`);
     return { ok: false, error: failureMessage(error) };
   }
-  answer = isOffTopicAnswer(answer) ? id.coach.offTopic : answer.slice(0, ANSWER_MAX_LENGTH);
+  const offTopic = isOffTopicAnswer(reply.text);
+  const answer = offTopic ? id.coach.offTopic : reply.text.slice(0, ANSWER_MAX_LENGTH);
 
   try {
     await owner.saveCoachExchange(state.token, {
@@ -134,9 +156,12 @@ export async function askCoachAction(
       topic: parsed.data.topic,
       answer,
       source: provider.label,
+      offTopic,
+      usage: reply.usage,
     });
-  } catch {
+  } catch (error) {
     // The owner still gets the answer; only the research copy is missing.
+    await logCoachError(errorMessage(error));
   }
   return {
     ok: true,

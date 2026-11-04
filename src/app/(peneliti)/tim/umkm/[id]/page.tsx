@@ -5,8 +5,10 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 
 import { CopyField } from "@/components/molecules/copy-field";
+import { AssigneeControl } from "@/components/organisms/assignee-control";
 import { BusinessDetail } from "@/components/organisms/business-detail";
 import { CoachTranscript } from "@/components/organisms/coach-transcript";
+import { ContactLog } from "@/components/organisms/contact-log";
 import { DeleteParticipantButton } from "@/components/organisms/delete-participant-button";
 import { ParticipantNextStep } from "@/components/organisms/participant-next-step";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,14 +30,18 @@ export default async function ParticipantPage({
   const businessId = z.uuid().safeParse((await params).id);
   if (!businessId.success) notFound();
   const staff = data().staff;
-  const [user, participant, events, coachMessages] = await Promise.all([
+  const [user, participant, events, coachMessages, notes, team] = await Promise.all([
     requireStaffPage(),
     staff.getParticipant(businessId.data),
     staff.listEvents(businessId.data),
     // The coach table may not exist yet on an older database: show no conversation then.
     staff.listCoachMessages(businessId.data).catch(() => []),
+    // Same for the contact log (migration 20261104000000).
+    staff.listContactNotes(businessId.data).catch(() => []),
+    staff.listTeam(),
   ]);
   if (!participant) notFound();
+  const members = team.members.map((m) => ({ id: m.id, name: m.name ?? m.email }));
 
   const { business, pack } = participant;
   const isNew = (await searchParams)[NOTICE_PARAM] === "baru";
@@ -77,7 +83,13 @@ export default async function ParticipantPage({
           sentAt={pack?.questionnaireSentAt ?? null}
           doneAt={pack?.questionnaireDoneAt ?? null}
         />
-        <section className="rounded-2xl border bg-card p-5 sm:p-6">
+        <section className="space-y-5 rounded-2xl border bg-card p-5 sm:p-6">
+          <AssigneeControl
+            businessId={business.id}
+            assignedTo={business.assignedTo}
+            members={members}
+            user={{ id: user.id, role: user.role }}
+          />
           <CopyField
             label={copy.detail.link}
             value={links.ownerUrl}
@@ -89,6 +101,12 @@ export default async function ParticipantPage({
         </section>
       </div>
 
+      <ContactLog
+        businessId={business.id}
+        notes={notes}
+        memberNames={Object.fromEntries(members.map((m) => [m.id, m.name]))}
+        user={user}
+      />
       <BusinessDetail participant={participant} events={[...events].reverse()} />
       <CoachTranscript messages={coachMessages} />
 

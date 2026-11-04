@@ -1,11 +1,16 @@
 import type { QuestionId, SectionId, SopId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
+import type { AiUsage } from "@/lib/ai/types";
+import type { ErrorReport } from "@/lib/monitoring/types";
 import type { Json } from "@/types/database";
 
 import type {
   BusinessMap,
   CoachHistory,
   CoachMessage,
+  CoachUsage,
+  ContactNote,
+  ContactOutcome,
   EventAction,
   EventMeta,
   NewParticipant,
@@ -63,8 +68,13 @@ export interface OwnerStore {
   register(input: NewParticipant): Promise<RegisterResult>;
   /** "Tanya coach": recent messages and today's question count. */
   coachHistory(token: string): Promise<CoachHistory>;
-  /** Stores one question with its answer, and logs `coach_tanya`. */
+  /**
+   * Stores one question with its answer, and logs `coach_tanya`. Only for a slot taken with
+   * reserveCoach in the last two minutes, once per slot (the database refuses otherwise).
+   */
   saveCoachExchange(token: string, exchange: CoachExchange): Promise<void>;
+  /** A question the app turned away without an AI call (at most 20 kept per owner per day). */
+  logCoachRefusal(token: string, question: string): Promise<void>;
   /**
    * Takes one coach slot before the AI is called, atomically (the database queues callers):
    * pause between questions, per-owner and all-owners daily limits. A taken slot stays taken.
@@ -90,6 +100,9 @@ export interface CoachExchange {
   answer: string;
   /** Provider and model that answered. */
   source: string;
+  /** The model said the question is outside the coach's scope (answer = fixed reply). */
+  offTopic: boolean;
+  usage: AiUsage | null;
 }
 
 export type SignInResult =
@@ -134,6 +147,25 @@ export interface StaffStore {
   logEvent(businessId: string, action: EventAction, meta: EventMeta | null): Promise<void>;
   /** Coach conversations, oldest first; one participant or everyone (CSV). */
   listCoachMessages(businessId?: string): Promise<CoachMessage[]>;
+
+  /**
+   * Gives participants to a team member (null = not assigned). Admin: anyone. Pendamping:
+   * only unassigned ones to themselves, or their own back. Returns how many changed.
+   */
+  assignParticipants(businessIds: string[], staffId: string | null): Promise<number>;
+  /** Contact log, newest first; one participant or everyone (list page, CSV). */
+  listContactNotes(businessId?: string): Promise<ContactNote[]>;
+  /** Written as the signed-in member (the database fills in the author). */
+  addContactNote(businessId: string, outcome: ContactOutcome, note: string | null): Promise<void>;
+  /** The author or an admin. False when not allowed or already gone. */
+  deleteContactNote(noteId: number): Promise<boolean>;
+
+  /** Admin only: coach use per day for the last `days` days, newest refusals. */
+  coachUsage(days: number): Promise<CoachUsage>;
+  /** Admin only: newest application errors. */
+  listErrors(): Promise<ErrorReport[]>;
+  /** Admin only: empties the error log. */
+  clearErrors(): Promise<void>;
 
   listTeam(): Promise<{ members: TeamMember[]; invites: TeamInvite[] }>;
   invite(email: string, role: TeamInvite["role"]): Promise<InviteResult>;

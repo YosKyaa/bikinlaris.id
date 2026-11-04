@@ -2,6 +2,7 @@ import { PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AssigneeFilter } from "@/components/organisms/assignee-filter";
 import { ExportPanel } from "@/components/organisms/export-panel";
 import { FILTER_PARAM, ParticipantFilter } from "@/components/organisms/participant-filter";
 import { ParticipantTable } from "@/components/organisms/participant-table";
@@ -11,8 +12,11 @@ import { isCoachEnabled } from "@/lib/ai";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import {
+  ASSIGNEE_PARAM,
   buildRows,
   countByFilter,
+  filterByAssignee,
+  parseAssigneeFilter,
   PARTICIPANT_FILTERS,
   type ParticipantFilter as Filter,
 } from "@/lib/data/research";
@@ -25,14 +29,25 @@ function parseFilter(value: string | string[] | undefined): Filter {
   return PARTICIPANT_FILTERS.find((f) => f === value) ?? "semua";
 }
 
-/** Every participant with the stage filter (shareable links), then the CSV downloads. */
+/**
+ * Every participant with the stage and pendamping filters (shareable links), then the
+ * downloads. Admins tick participants to give them to a pendamping.
+ */
 export default async function ParticipantListPage({ searchParams }: PageProps<"/tim/umkm">) {
-  const filter = parseFilter((await searchParams)[FILTER_PARAM]);
-  const [user, participants] = await Promise.all([
+  const params = await searchParams;
+  const filter = parseFilter(params[FILTER_PARAM]);
+  const assignee = parseAssigneeFilter(params[ASSIGNEE_PARAM]);
+  const staff = data().staff;
+  const [user, participants, notes, team] = await Promise.all([
     requireStaffPage(),
-    data().staff.listParticipants(),
+    staff.listParticipants(),
+    // The contact log may not exist yet on an older database (migration 20261104000000).
+    staff.listContactNotes().catch(() => []),
+    staff.listTeam(),
   ]);
-  const rows = buildRows(participants, todayIso());
+  const members = team.members.map((m) => ({ id: m.id, name: m.name ?? m.email }));
+  const rows = filterByAssignee(buildRows(participants, todayIso(), notes), assignee, user.id);
+  const isAdmin = user.role === "admin";
   const copy = id.researcher.list;
 
   return (
@@ -50,15 +65,21 @@ export default async function ParticipantListPage({ searchParams }: PageProps<"/
         </Button>
       </header>
 
-      <ParticipantFilter
-        filters={PARTICIPANT_FILTERS}
-        active={filter}
-        counts={countByFilter(rows)}
-      />
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <ParticipantFilter
+          filters={PARTICIPANT_FILTERS}
+          active={filter}
+          counts={countByFilter(rows)}
+          keep={assignee ? { [ASSIGNEE_PARAM]: assignee } : {}}
+        />
+        <AssigneeFilter value={assignee} members={members} />
+      </div>
       <ParticipantTable
         rows={filter === "semua" ? rows : rows.filter((row) => row.stage === filter)}
         filter={filter}
-        canDelete={user.role === "admin"}
+        members={members}
+        canDelete={isAdmin}
+        canAssign={isAdmin}
       />
       <ExportPanel coachExport={isCoachEnabled()} />
     </>

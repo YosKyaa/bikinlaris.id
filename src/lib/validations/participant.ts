@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { TURNSTILE_TOKEN_MAX_LENGTH } from "@/lib/security/turnstile-config";
+
 import { businessProfileSchema, NAME_MAX_LENGTH } from "./business";
 
 /** Indonesian mobile number in international format without "+": 62 then 8–13 digits. */
@@ -37,12 +39,14 @@ export type ParticipantInput = z.infer<typeof participantSchema>;
 
 /**
  * Self-registration at /ikut: the same data, plus consent to take part in the study.
- * `website` is a field people never see (bots fill it); `startedAt` is when the form opened.
+ * `website` is a field people never see (bots fill it); `startedAt` is when the form opened;
+ * `captcha` is the Cloudflare Turnstile token (checked on the server when Turnstile is set up).
  */
 export const selfSignupSchema = participantSchema.extend({
   consent: z.literal(true, "consent"),
   website: z.string().max(0).optional(),
   startedAt: z.number(),
+  captcha: z.string().max(TURNSTILE_TOKEN_MAX_LENGTH).optional(),
 });
 
 export type SelfSignupInput = z.infer<typeof selfSignupSchema>;

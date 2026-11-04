@@ -1,4 +1,4 @@
-import { ChevronDownIcon, PrinterIcon } from "lucide-react";
+import { ChevronDownIcon, DownloadIcon } from "lucide-react";
 
 import { ChecklistGrid } from "@/components/molecules/checklist-grid";
 import { TaskList } from "@/components/molecules/task-list";
@@ -98,7 +98,7 @@ export function SopDocument({
           ) : null}
           {daily.length > 0 ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <PrinterIcon aria-hidden className="size-4 shrink-0" />
+              <DownloadIcon aria-hidden className="size-4 shrink-0" />
               {id.pack.sop.printOnlyGrid}
             </p>
           ) : null}

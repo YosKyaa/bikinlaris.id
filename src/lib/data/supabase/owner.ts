@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 import { toJson } from "@/lib/json";
+import { createSecretClient } from "@/lib/supabase/secret";
 import { createAnonClient } from "@/lib/supabase/server";
 
 import type { OwnerStore } from "../source";
@@ -90,8 +91,13 @@ export const supabaseOwnerStore: OwnerStore = {
     if (error) throw error;
   },
 
+  /**
+   * Through the secret key when it is set: after migration 20261104010000 the public key can
+   * no longer call umkm_daftar, so the Turnstile check in the action cannot be skipped.
+   */
   async register(input) {
-    const { data, error } = await createAnonClient().rpc("umkm_daftar", {
+    const client = createSecretClient() ?? createAnonClient();
+    const { data, error } = await client.rpc("umkm_daftar", {
       p_nama: input.name,
       p_pemilik: input.ownerName,
       p_wa: input.whatsapp,
@@ -135,6 +141,17 @@ export const supabaseOwnerStore: OwnerStore = {
       p_topik: exchange.topic,
       p_jawab: exchange.answer,
       p_sumber: exchange.source,
+      p_di_luar_topik: exchange.offTopic,
+      p_token_masuk: exchange.usage?.inputTokens ?? null,
+      p_token_keluar: exchange.usage?.outputTokens ?? null,
+    });
+    if (error) throw error;
+  },
+
+  async logCoachRefusal(token, question) {
+    const { error } = await createAnonClient().rpc("umkm_coach_tolak", {
+      p_token: token,
+      p_tanya: question,
     });
     if (error) throw error;
   },

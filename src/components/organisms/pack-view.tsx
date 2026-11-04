@@ -2,7 +2,9 @@ import type { ComponentProps } from "react";
 
 import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
+import { OfflineBanner } from "@/components/atoms/offline-banner";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { InlineError } from "@/components/molecules/inline-error";
 import { id } from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSop, rules } from "@/lib/diagnosis/bank";
@@ -23,13 +25,22 @@ interface PackViewProps {
   whatsAppUrl: string;
   /** "Tanya coach", or null when the coach is off. */
   coach: ComponentProps<typeof CoachWidget> | null;
+  /** The PDF download failed (the route sent the owner back here). */
+  pdfFailed?: boolean;
 }
 
 /**
  * The peak of the journey, as a bento: the title, the first step (--brand-deep) beside the
  * 30-day status, the two share actions, then the documents and the business map.
  */
-export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: PackViewProps) {
+export function PackView({
+  business,
+  pack,
+  locationLabel,
+  whatsAppUrl,
+  coach,
+  pdfFailed = false,
+}: PackViewProps) {
   const documents = pack.sops.map((packSop, index) => {
     const sop = getSop(packSop.sopId);
     const props = {
@@ -47,6 +58,8 @@ export function PackView({ business, pack, locationLabel, whatsAppUrl, coach }: 
     // Room at the bottom for the phone action bar, and for the floating coach button when on.
     <div className={cn("space-y-6 sm:space-y-8", coach ? "pb-40 lg:pb-24" : "pb-20 lg:pb-0")}>
       <PackViewTracker />
+      <OfflineBanner message={id.offline.banner} />
+      {pdfFailed ? <InlineError message={id.pack.pdf.failed} /> : null}
       <BentoGrid className="sm:grid-cols-2 print:hidden">
         <BentoTile tone="mint" as="header" className="p-6 sm:col-span-2 sm:p-8">
           <Eyebrow tone="chip">{id.pack.eyebrow}</Eyebrow>

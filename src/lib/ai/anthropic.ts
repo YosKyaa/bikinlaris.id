@@ -47,7 +47,13 @@ export function anthropicProvider(config: { apiKey: string; model: string }): Ai
         if (!text) {
           throw new AiError(response.stop_reason === "max_tokens" ? "terpotong" : "format");
         }
-        return text;
+        return {
+          text,
+          usage: {
+            inputTokens: response.usage.input_tokens,
+            outputTokens: response.usage.output_tokens,
+          },
+        };
       } catch (error) {
         throw toAiError(error);
       }

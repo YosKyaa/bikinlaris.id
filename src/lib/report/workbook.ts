@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
 
 import { id } from "@/content/id";
-import { coachTable, eventsTable, summaryTable } from "@/lib/data/research";
+import { coachTable, eventsTable, summaryTable, type FollowUpData } from "@/lib/data/research";
 import type { CoachMessage, Participant, ResearchEvent } from "@/lib/data/types";
 
 import { addBarCharts } from "./charts";
@@ -15,6 +15,7 @@ interface ReportInput {
   events: ResearchEvent[];
   /** Null while the coach is off: the sheet is left out. */
   coachMessages: CoachMessage[] | null;
+  followUp: FollowUpData;
   today: string;
 }
 
@@ -26,6 +27,7 @@ export async function buildReport({
   participants,
   events,
   coachMessages,
+  followUp,
   today,
 }: ReportInput): Promise<Uint8Array> {
   const sheets = id.report.sheets;
@@ -35,8 +37,8 @@ export async function buildReport({
   workbook.created = new Date();
 
   const charts = addDashboardSheet(workbook, participants, today);
-  addParticipantSheet(workbook, participants, today);
-  addDataSheet(workbook, sheets.raw, summaryTable(participants, events, today));
+  addParticipantSheet(workbook, participants, today, followUp);
+  addDataSheet(workbook, sheets.raw, summaryTable(participants, events, today, followUp));
   addDataSheet(workbook, sheets.events, eventsTable(participants, events));
   if (coachMessages) {
     addDataSheet(workbook, sheets.coach, coachTable(participants, coachMessages), ["isi"]);

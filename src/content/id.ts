@@ -12,6 +12,7 @@ import type { CoachTopic } from "@/lib/coach/rules";
 import type { ActiveDayBucket, AlertKind, DurationBucket } from "@/lib/data/monitoring/types";
 import type {
   CoachRole,
+  ContactOutcome,
   EventAction,
   FunnelStepKey,
   ParticipantStage,
@@ -32,6 +33,19 @@ export const id = {
     description:
       "Jawab pertanyaan tentang cara kerja usaha Anda, lihat bagian yang perlu dibenahi dulu, lalu bawa pulang SOP yang siap dipakai.",
     skipToContent: "Langsung ke isi halaman",
+    // Installed on the phone (web app manifest), 4 November 2026.
+    shortName: "bikinlaris",
+    installDescription: "Paket SOP usaha Anda, tetap bisa dibuka saat sinyal lemah.",
+  },
+
+  // Shown when a page is opened without internet and is not saved on the phone.
+  offline: {
+    title: "Anda sedang offline",
+    body: "Halaman ini belum tersimpan di HP. Sambungkan internet, lalu buka lagi.",
+    packHint: "Paket SOP yang pernah dibuka di HP ini tetap bisa dibaca tanpa internet.",
+    openPack: "Buka paket SOP",
+    banner:
+      "Anda sedang offline. Ini paket yang tersimpan di HP. Tanya coach dan kirim WhatsApp butuh internet.",
   },
 
   common: {
@@ -318,6 +332,13 @@ export const id = {
         "Nomor ini sudah terdaftar. Buka tautan pribadi dari WhatsApp Anda, atau hubungi tim bikinlaris.",
       busy: "Pendaftaran sedang ramai. Coba lagi beberapa menit lagi.",
       failed: "Pendaftaran belum berhasil. Periksa internet Anda, lalu coba lagi.",
+      // Cloudflare Turnstile (bot check), 4 November 2026.
+      captchaPending:
+        "Pemeriksaan keamanan belum selesai. Tunggu sebentar, lalu tekan Daftar lagi.",
+      captchaFailed: "Pemeriksaan keamanan belum lolos. Tekan Daftar sekali lagi.",
+      captchaUnavailable:
+        "Pemeriksaan keamanan tidak bisa dimuat. Periksa internet Anda, lalu muat ulang halaman.",
+      captchaDown: "Pendaftaran sedang terganggu. Coba lagi beberapa menit lagi.",
     },
     done: {
       title: "Pendaftaran berhasil",
@@ -621,7 +642,33 @@ export const id = {
     title: (business: string) => `Paket SOP untuk ${business}`,
     actions: {
       whatsapp: "Kirim ke WhatsApp",
-      print: "Cetak atau simpan PDF",
+      pdf: "Unduh PDF",
+      print: "Cetak",
+    },
+    // The downloaded pack (PDF, 4 November 2026). Same content as the printed version.
+    pdf: {
+      fileName: (code: string) => `paket-sop-${code}.pdf`,
+      docTitle: (business: string) => `Paket SOP ${business}`,
+      brand: "bikinlaris.id",
+      eyebrow: "Paket SOP",
+      title: (business: string) => `Paket SOP untuk ${business}`,
+      meta: (product: string, location: string, date: string) =>
+        `${product} · ${location} · dibuat ${date}`,
+      code: (code: string) => `Kode peserta: ${code}`,
+      howToTitle: "Cara pakai paket ini",
+      howTo: [
+        "Mulai dari SOP 1. Kerjakan satu dulu sampai jadi kebiasaan.",
+        "Kerjakan bagian Siapkan dulu sekali saja.",
+        "Coret tabel 14 hari setiap tugas harian selesai.",
+        "Bagikan ke karyawan yang ikut menjalankan.",
+      ],
+      contents: "Isi paket",
+      followUp: (date: string) =>
+        `Sekitar ${date} tim bikinlaris mengirim kuesioner singkat lewat WhatsApp.`,
+      minutes: (n: number) => `±${n} menit`,
+      footer: (business: string) => `bikinlaris.id · Paket SOP ${business}`,
+      page: (n: number, total: number) => `Halaman ${n} dari ${total}`,
+      failed: "PDF belum bisa dibuat. Coba lagi sebentar lagi, atau kirim paketnya ke WhatsApp.",
     },
     firstStep: {
       eyebrow: "Mulai dari sini",
@@ -647,7 +694,7 @@ export const id = {
     sop: {
       why: (business: string) => `Kenapa ini untuk ${business}`,
       whyToggle: "Kenapa SOP ini?",
-      printOnlyGrid: "Tabel coret 2 minggu ada di versi cetak.",
+      printOnlyGrid: "Tabel coret 2 minggu ada di PDF dan versi cetak.",
       fromAnswers: "Dari jawaban Anda:",
       setup: "Siapkan dulu, sekali saja",
       daily: "Tiap hari",
@@ -779,6 +826,7 @@ export const id = {
       monitoring: "Pantauan",
       newParticipant: "Tambah UMKM",
       team: "Anggota tim",
+      system: "Sistem",
       logout: "Keluar",
     },
     funnel: {
@@ -816,6 +864,8 @@ export const id = {
       packDate: "Paket dibuat",
       day: "Hari ke-",
       stage: "Tahap",
+      assignee: "Pendamping",
+      lastContact: "Kontak terakhir",
       detail: (business: string) => `Lihat detail ${business}`,
       search: "Cari UMKM",
       searchPlaceholder: "Cari nama, kode, pemilik, kota",
@@ -945,6 +995,7 @@ export const id = {
       cetak: "Cetak",
       diagnosa_ulang: "Ulang cek usaha",
       coach_tanya: "Tanya coach",
+      unduh_pdf: "Unduh PDF",
     } satisfies Record<EventAction, string>,
     signupVia: {
       pendamping: "Ditambahkan pendamping",
@@ -1003,11 +1054,177 @@ export const id = {
       done: "Kuesioner diisi",
       hardest: "Paling bikin repot",
       sopCount: "Jumlah SOP",
+      assignee: "Pendamping",
+      lastContact: "Kontak terakhir",
       score: (section: string) => `Skor ${section}`,
     },
     readyNote: "Lihat sheet Daftar UMKM.",
     rawNote:
       "Sheet Data lengkap memakai kolom yang sama dengan CSV ringkasan, untuk analisis lanjutan.",
+  },
+
+  // Contact log per participant (owner request, 4 November 2026).
+  contact: {
+    title: "Catatan kontak",
+    body: "Catat setiap kali menghubungi pemilik, terutama di hari ke-30.",
+    outcomeLabel: "Hasilnya",
+    outcomes: {
+      tersambung: "Tersambung",
+      tidak_diangkat: "Tidak diangkat",
+      nomor_salah: "Nomor salah",
+      minta_nanti: "Minta dihubungi lagi",
+      menolak: "Tidak mau lanjut",
+    } satisfies Record<ContactOutcome, string>,
+    noteLabel: "Catatan (boleh kosong)",
+    notePlaceholder: "Contoh: minta ditelepon sore hari",
+    counter: (length: number, max: number) => `${length}/${max} huruf`,
+    save: "Simpan catatan",
+    saving: "Menyimpan…",
+    saved: "Catatan kontak tersimpan.",
+    historyLabel: "Riwayat kontak",
+    emptyTitle: "Belum ada catatan kontak",
+    emptyBody: "Setelah menghubungi pemilik, catat hasilnya di sini supaya tim tahu.",
+    formerMember: "Mantan anggota tim",
+    you: "Anda",
+    deleteLabel: (date: string) => `Hapus catatan ${date}`,
+    deleteTitle: "Hapus catatan kontak ini?",
+    deleteBody: "Catatan ini hilang dari riwayat. Kalau keliru, tulis ulang dengan isi yang benar.",
+    deleteConfirm: "Hapus catatan",
+    deleting: "Menghapus…",
+    deleted: "Catatan dihapus.",
+    never: "Belum dihubungi",
+    count: (n: number) => `${n} kali dihubungi`,
+    errors: {
+      outcome: "Pilih hasilnya dulu.",
+      tooLong: (max: number) => `Catatan terlalu panjang. Paling banyak ${max} huruf.`,
+      failed: "Catatan belum tersimpan. Periksa internet Anda, lalu coba lagi.",
+      deleteFailed: "Catatan belum terhapus. Muat ulang halaman, lalu coba lagi.",
+    },
+  },
+
+  // Who looks after which participant (owner request, 4 November 2026).
+  assign: {
+    label: "Pendamping",
+    none: "Belum dibagi",
+    choose: "Pilih pendamping",
+    take: "Ambil UMKM ini",
+    release: "Lepas dari saya",
+    save: "Simpan pendamping",
+    taken: "UMKM ini sekarang Anda dampingi.",
+    released: "UMKM ini dilepas. Sekarang belum dibagi.",
+    changed: (name: string) => `Pendamping diganti ke ${name}.`,
+    cleared: "Pendamping dikosongkan.",
+    hintAdmin: "Pendamping yang menghubungi pemilik, terutama di hari ke-30.",
+    hintMember: "Ambil UMKM yang belum dibagi, supaya tim tahu siapa yang menghubunginya.",
+    hintOther: "Hanya admin yang bisa mengganti pendamping.",
+    filterLabel: "Saring menurut pendamping",
+    filters: { semua: "Semua pendamping", saya: "UMKM saya", belum: "Belum dibagi" },
+    bulk: {
+      selected: (n: number) => `${n} UMKM dipilih`,
+      to: "Bagikan ke",
+      apply: "Bagikan",
+      applying: "Membagikan…",
+      cancel: "Batal pilih",
+      done: (n: number, name: string) => `${n} UMKM dibagikan ke ${name}.`,
+      doneCleared: (n: number) => `Pendamping ${n} UMKM dikosongkan.`,
+      selectPage: "Pilih semua UMKM di halaman ini",
+      selectRow: (name: string) => `Pilih ${name}`,
+    },
+    errors: {
+      failed: "Pembagian belum tersimpan. Coba lagi.",
+      nothing:
+        "Tidak ada yang berubah. UMKM ini mungkin sudah diambil anggota lain. Muat ulang halaman.",
+      notMember: "Anggota itu sudah tidak ada di tim. Muat ulang halaman.",
+    },
+  },
+
+  // Admin page: AI use and cost, safeguards, error log (owner request, 4 November 2026).
+  system: {
+    title: "Sistem",
+    subtitle: "Pemakaian AI, pengaman, dan galat terbaru. Khusus admin.",
+    safety: {
+      title: "Pengaman",
+      body: "Yang menjaga biaya AI dan data tetap aman.",
+      on: "Aktif",
+      off: "Belum aktif",
+      turnstile: {
+        label: "Cek bukan robot di pendaftaran",
+        on: "Pendaftaran mandiri diperiksa Cloudflare Turnstile.",
+        off: "Isi TURNSTILE_SITE_KEY dan TURNSTILE_SECRET_KEY di pengaturan server.",
+      },
+      secretKey: {
+        label: "Kunci rahasia Supabase",
+        on: "Pendaftaran dan catatan galat lewat server. Pastikan migrasi 20261104010000 sudah dijalankan.",
+        off: "Isi SUPABASE_SECRET_KEY di pengaturan server, lalu jalankan migrasi 20261104010000.",
+      },
+      coach: {
+        label: "Coach AI",
+        on: (model: string) => `Menyala, memakai ${model}.`,
+        off: "Mati. Nyalakan dengan AI_COACH=true.",
+      },
+      limits: {
+        label: "Batas coach",
+        body: (perOwner: number, all: number, pause: number) =>
+          `${perOwner} pertanyaan per UMKM per hari, ${all} untuk semua UMKM, jeda ${pause} detik.`,
+      },
+    },
+    today: {
+      title: "Coach hari ini",
+      used: (n: number, max: number) => `${n} dari ${max} jatah terpakai`,
+      left: (n: number) => `Sisa ${n} jatah untuk semua UMKM hari ini.`,
+      meter: "Jatah coach semua UMKM yang terpakai hari ini",
+    },
+    daily: {
+      title: "Pertanyaan coach per hari",
+      body: (days: number) => `${days} hari terakhir. Satu batang untuk satu hari.`,
+      chart: "Grafik batang bertumpuk jumlah pertanyaan coach per hari",
+      series: {
+        answered: "Dijawab",
+        offTopic: "Di luar topik",
+        refused: "Ditolak saringan",
+        failed: "Gagal",
+      },
+      date: "Tanggal",
+      total: "Jumlah",
+    },
+    tokens: {
+      title: "Token AI",
+      body: (days: number) => `${days} hari terakhir, dari laporan penyedia AI.`,
+      input: "Token masuk",
+      output: "Token keluar",
+      cost: "Perkiraan biaya",
+      costValue: (usd: string) => `US$${usd}`,
+      noPrice:
+        "Isi AI_PRICE_INPUT_USD dan AI_PRICE_OUTPUT_USD di pengaturan server untuk melihat perkiraan biaya.",
+      packs: (n: number) =>
+        `${n} paket SOP ditulis ulang AI (sekali per UMKM, di luar hitungan token ini).`,
+    },
+    refusals: {
+      title: "Ditolak saringan terbaru",
+      body: "Pertanyaan yang tidak diteruskan ke AI. Periksa kalau ada yang seharusnya dijawab.",
+      empty: "Belum ada pertanyaan yang ditolak.",
+    },
+    errors: {
+      title: "Galat terbaru",
+      body: "Kesalahan di server atau di HP pengguna, paling baru di atas.",
+      emptyTitle: "Belum ada galat tercatat",
+      emptyBody: "Kalau ada yang rusak di server atau di HP pengguna, catatannya muncul di sini.",
+      noKey: "Catatan galat butuh SUPABASE_SECRET_KEY. Sementara ini, lihat log di Vercel.",
+      source: { server: "Server", browser: "Browser" },
+      time: "Waktu",
+      where: "Tempat",
+      message: "Pesan",
+      tableLabel: "Tabel galat terbaru, bisa digeser ke samping",
+      digest: (digest: string) => `Kode galat ${digest}`,
+      clear: "Bersihkan catatan galat",
+      clearTitle: "Bersihkan semua catatan galat?",
+      clearBody: "Semua catatan galat dihapus. Galat baru tetap tercatat.",
+      clearConfirm: "Bersihkan",
+      cleared: "Catatan galat dibersihkan.",
+      clearFailed: "Catatan galat belum terhapus. Coba lagi.",
+    },
+    unavailable:
+      "Data pemakaian belum bisa dimuat. Pastikan migrasi 20261104000000 sudah dijalankan di Supabase.",
   },
 
   coach: {

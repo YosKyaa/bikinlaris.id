@@ -19,7 +19,7 @@ import {
   DUE_WINDOW_DAYS,
 } from "@/lib/data/research";
 import { requireStaffPage } from "@/lib/data/staff-session";
-import { formatDate, todayIso } from "@/lib/format";
+import { formatDate, formatDateShort, todayIso } from "@/lib/format";
 import { questionnaireHref } from "@/lib/research-links";
 
 export const metadata: Metadata = { title: id.researcher.dashboard.title };
@@ -32,20 +32,40 @@ const URGENT_ROWS = 6;
  * and the most urgent participants. Adding a participant is the one primary action.
  */
 export default async function ResearcherDashboardPage() {
-  const [user, participants] = await Promise.all([
+  const staff = data().staff;
+  const [user, participants, notes, team] = await Promise.all([
     requireStaffPage(),
-    data().staff.listParticipants(),
+    staff.listParticipants(),
+    // The contact log may not exist yet on an older database (migration 20261104000000).
+    staff.listContactNotes().catch(() => []),
+    staff.listTeam(),
   ]);
+  const members = team.members.map((m) => ({ id: m.id, name: m.name ?? m.email }));
   const copy = id.researcher.dashboard;
   const today = todayIso();
-  const rows = buildRows(participants, today);
+  const rows = buildRows(participants, today, notes);
   const counts = countByFilter(rows);
   const funnel = buildFunnel(participants, today);
   const packs = funnel.find((step) => step.key === "packsCreated")?.count ?? 0;
-  const due = buildDueList(participants, today).map((item) => ({
-    ...item,
-    sendHref: questionnaireHref(item),
-  }));
+  const names = new Map(members.map((m) => [m.id, m.name]));
+  const rowById = new Map(rows.map((row) => [row.businessId, row]));
+  const due = buildDueList(participants, today).map((item) => {
+    const row = rowById.get(item.businessId);
+    const assignedTo = row?.assignedTo ?? null;
+    return {
+      ...item,
+      sendHref: questionnaireHref(item),
+      assigneeName: assignedTo
+        ? (names.get(assignedTo) ?? id.contact.formerMember)
+        : id.assign.none,
+      lastContact: row?.lastContact
+        ? {
+            outcome: row.lastContact.outcome,
+            label: formatDateShort(todayIso(new Date(row.lastContact.createdAt))),
+          }
+        : null,
+    };
+  });
   const urgent = rows.filter((row) => row.stage !== "selesai").slice(0, URGENT_ROWS);
   const firstName = (user.name ?? user.email).split(/[\s@]/)[0];
 
@@ -95,7 +115,7 @@ export default async function ResearcherDashboardPage() {
         </div>
         {/* Everyone done: nothing urgent, and the empty state would wrongly say "add the first". */}
         {urgent.length > 0 || counts.semua === 0 ? (
-          <ParticipantTable rows={urgent} filter="semua" compact />
+          <ParticipantTable rows={urgent} filter="semua" members={members} compact />
         ) : null}
       </section>
     </>

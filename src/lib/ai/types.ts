@@ -10,6 +10,18 @@ export interface AiMessage {
   content: string;
 }
 
+/** Tokens billed for one call, as the provider reports them (cost view for the admin). */
+export interface AiUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
+export interface AiTextResult {
+  text: string;
+  /** Null when the provider did not report usage. */
+  usage: AiUsage | null;
+}
+
 export interface AiTextRequest {
   instructions: string;
   messages: AiMessage[];
@@ -54,7 +66,7 @@ export const failureOf = (error: unknown): AiFailure =>
 export interface AiProvider {
   /** Provider and model, e.g. "openai:gpt-6-luna". Stored next to every AI answer. */
   readonly label: string;
-  generateText(request: AiTextRequest): Promise<string>;
+  generateText(request: AiTextRequest): Promise<AiTextResult>;
   /** The parsed object; throws AiError("format") when the output does not fit the schema. */
   generateJson<T>(request: AiJsonRequest<T>): Promise<T>;
 }
