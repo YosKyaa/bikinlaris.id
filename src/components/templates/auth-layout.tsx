@@ -9,7 +9,7 @@ import { Logo } from "@/components/atoms/logo";
 import { HeaderMorph, TRANSITION_HOOKS } from "@/components/atoms/route-transition";
 import { AuthShowcase } from "@/components/organisms/auth-showcase";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { LEAVE_APP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";

@@ -6,7 +6,7 @@ import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { signUpAction, type SignUpState } from "@/lib/actions/auth";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validations/auth";
 

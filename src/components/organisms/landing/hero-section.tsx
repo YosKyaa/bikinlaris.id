@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { TRANSITION_HOOKS } from "@/components/atoms/route-transition";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { totalQuestions } from "@/lib/diagnosis/bank";
 import { ENTER_APP } from "@/lib/transitions";

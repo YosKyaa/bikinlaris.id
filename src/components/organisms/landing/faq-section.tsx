@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "lucide-react";
 
 import { Eyebrow } from "@/components/atoms/eyebrow";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import { LANDING_ANCHORS } from "../site-header";
 

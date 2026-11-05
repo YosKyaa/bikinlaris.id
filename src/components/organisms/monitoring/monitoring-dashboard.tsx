@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import type { Monitoring } from "@/lib/data/monitoring";
 

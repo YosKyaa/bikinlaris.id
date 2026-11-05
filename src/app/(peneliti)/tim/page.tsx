@@ -8,7 +8,7 @@ import { DueThisWeek } from "@/components/organisms/due-this-week";
 import { ParticipantTable } from "@/components/organisms/participant-table";
 import { ResearchFunnel } from "@/components/organisms/research-funnel";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import {

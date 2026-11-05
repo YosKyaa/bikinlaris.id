@@ -2,7 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { OWNER_COOKIE } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { ownerCookieOptions } from "@/lib/data/owner-session";

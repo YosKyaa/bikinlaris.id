@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { inviteAction, removeInviteAction } from "@/lib/actions/research";
 import type { StaffRole } from "@/lib/data/types";
 import { STAFF_ROLES } from "@/lib/validations/auth";

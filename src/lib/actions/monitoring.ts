@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { Result } from "@/lib/data/types";
 import { reportError } from "@/lib/monitoring/report";
 

@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { featuredProvinces, otherProvinces, regenciesOf } from "@/lib/wilayah";
 
 interface LocationPickerProps {

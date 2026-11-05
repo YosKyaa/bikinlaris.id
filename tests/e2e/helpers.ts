@@ -11,6 +11,7 @@ export const DEMO = {
   packToken: "demo",
   packBusiness: "Dapur Bu Rini",
   packCode: "BL-001",
+  packBusinessId: "00000000-0000-4000-8000-000000000001",
   /** Ready to receive the questionnaire (day 34). */
   dueBusiness: "Katering Mbak Sari",
 } as const;

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import { AiError, type AiProvider } from "./types";
 

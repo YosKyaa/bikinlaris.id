@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ContactOutcomeBadge } from "@/components/molecules/contact-outcome-badge";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Badge } from "@/components/ui/badge";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import type { ContactOutcome, DueGroup, DueItem } from "@/lib/data/types";
 import { formatDate } from "@/lib/format";

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { SectionStatusBadge } from "@/components/atoms/section-status-badge";
 import type { SectionColor } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 const BAR_COLOR = { hijau: "bg-success", kuning: "bg-warning", merah: "bg-destructive" } as const;

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PrintButton } from "@/components/atoms/print-button";
 import { MonitoringDashboard } from "@/components/organisms/monitoring/monitoring-dashboard";
 import { MonitoringFilters } from "@/components/organisms/monitoring/monitoring-filters";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { data } from "@/lib/data";
 import { buildMonitoring, parseMonitoringFilters } from "@/lib/data/monitoring";
 import { formatDate, todayIso } from "@/lib/format";

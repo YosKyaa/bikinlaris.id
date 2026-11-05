@@ -1,7 +1,7 @@
 import { BarList } from "@/components/molecules/bar-list";
 import { ChartCard } from "@/components/molecules/chart-card";
 import { StatCard } from "@/components/molecules/stat-card";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { DurationStats } from "@/lib/data/monitoring";
 
 interface CheckDurationProps {

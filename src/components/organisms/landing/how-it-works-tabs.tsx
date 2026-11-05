@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 export interface HowStep {

@@ -1,6 +1,6 @@
 import type { Workbook, Worksheet } from "exceljs";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { buildSectionHealth } from "@/lib/data/monitoring/insights";
 import { readyPacks } from "@/lib/data/monitoring/progress";
 import {

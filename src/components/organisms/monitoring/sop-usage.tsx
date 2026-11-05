@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { SopUsageRow } from "@/lib/data/monitoring";
 import { getSop } from "@/lib/diagnosis/bank";
 

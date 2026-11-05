@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { formatDateTime } from "@/lib/format";
 import type { ErrorReport } from "@/lib/monitoring/types";
 

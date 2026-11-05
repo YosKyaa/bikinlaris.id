@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { COACH_TOPICS, type CoachTopic } from "@/lib/coach/rules";
 import type { CoachRole } from "@/lib/data/types";
 

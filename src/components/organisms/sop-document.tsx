@@ -3,7 +3,7 @@ import { ChevronDownIcon, DownloadIcon } from "lucide-react";
 import { ChecklistGrid } from "@/components/molecules/checklist-grid";
 import { TaskList } from "@/components/molecules/task-list";
 import type { Problem, Sop } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 interface SopDocumentProps {

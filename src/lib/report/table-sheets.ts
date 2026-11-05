@@ -1,6 +1,6 @@
 import type { CellValue, DataBarRuleType, Workbook } from "exceljs";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { buildRows, type Cell, type DataTable, type FollowUpData } from "@/lib/data/research";
 import type { Participant } from "@/lib/data/types";
 import { rules, sections, getSection } from "@/lib/diagnosis/bank";

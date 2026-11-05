@@ -2,7 +2,7 @@ import { CircleCheckIcon } from "lucide-react";
 import type { CSSProperties } from "react";
 
 import { PhotoFrame } from "@/components/molecules/photo-frame";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { photos } from "@/content/photos";
 
 import { SopDocumentPreview } from "./sop-document-preview";

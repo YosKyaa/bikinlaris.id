@@ -1,6 +1,6 @@
 import { Document, Page, renderToBuffer, Text, View } from "@react-pdf/renderer";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSop } from "@/lib/diagnosis/bank";
 import { formatDate } from "@/lib/format";

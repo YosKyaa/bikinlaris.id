@@ -2,7 +2,7 @@ import { CheckIcon } from "lucide-react";
 
 import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { PhotoFrame } from "@/components/molecules/photo-frame";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { photos } from "@/content/photos";
 import { rules, totalQuestions } from "@/lib/diagnosis/bank";
 

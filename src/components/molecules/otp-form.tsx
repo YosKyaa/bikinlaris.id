@@ -6,7 +6,7 @@ import { useEffect, useId, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import { InlineError } from "./inline-error";
 

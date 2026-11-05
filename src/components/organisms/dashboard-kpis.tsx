@@ -10,7 +10,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BentoGrid, BentoTile, type TileTone } from "@/components/atoms/bento-tile";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { percentOf } from "@/lib/viz";
 import { cn } from "@/lib/utils";

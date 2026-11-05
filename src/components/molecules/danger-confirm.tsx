@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /**
  * Confirmation before something that cannot be undone. "Batal" has the focus first, the

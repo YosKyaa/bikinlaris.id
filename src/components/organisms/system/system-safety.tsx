@@ -2,7 +2,7 @@ import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
 import { Badge } from "@/components/ui/badge";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 export interface SafetyStatus {
   turnstile: boolean;

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import "./globals.css";
 

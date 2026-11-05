@@ -1,6 +1,6 @@
 import { HandIcon } from "lucide-react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 import { sampleSop } from "../sample-sop-dialog";

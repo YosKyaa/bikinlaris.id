@@ -7,7 +7,7 @@ import { CopyField } from "@/components/molecules/copy-field";
 import { AuthLayout } from "@/components/templates/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ownerLinkUrl } from "@/lib/app-url";
 import { ROUTES } from "@/lib/auth/constants";
 import { getOwnerState } from "@/lib/data/owner-session";

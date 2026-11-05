@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { registerBusinessAction } from "@/lib/actions/signup";
 import { ROUTES } from "@/lib/auth/constants";
 import {

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 
 /** Brand colours (globals.css): --brand-deep for the icon tile, white for the splash screen. */

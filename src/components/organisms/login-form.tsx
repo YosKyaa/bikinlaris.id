@@ -7,7 +7,7 @@ import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { loginAction, type LoginState } from "@/lib/actions/auth";
 
 const INITIAL_STATE: LoginState = { email: "", fieldErrors: {}, error: null };

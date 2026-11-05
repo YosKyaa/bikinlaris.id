@@ -1,0 +1,28 @@
+export const design = {
+  title: "Design system",
+  subtitle: "Alat review visual. Hanya aktif saat development.",
+  colors: "Token warna",
+  tiles: "Tile bento",
+  typography: "Tipografi",
+  buttons: "Tombol",
+  inputs: "Isian",
+  atoms: "Atoms",
+  molecules: "Molecules",
+  sampleText: "Rapikan cara kerja usaha Anda.",
+  sampleBody: "Teks isi 16px dengan jarak baris 1,6. Kalimat pendek, satu ide per kalimat.",
+  sampleError: "Contoh pesan error: apa yang terjadi dan apa yang bisa dilakukan.",
+  sampleEmpty: {
+    title: "Belum ada data",
+    body: "Contoh empty state yang memberi arah langkah berikutnya.",
+    action: "Langkah berikutnya",
+  },
+  buttonLabels: {
+    default: "Tombol utama",
+    outline: "Outline",
+    ghost: "Ghost",
+    link: "Tautan",
+    disabled: "Nonaktif",
+    destructive: "Hapus",
+  },
+  statLabel: "Contoh angka",
+} as const;

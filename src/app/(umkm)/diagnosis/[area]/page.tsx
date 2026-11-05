@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { DiagnosisStepper } from "@/components/organisms/diagnosis-stepper";
 import { ExitLaterDialog } from "@/components/organisms/exit-later-dialog";
 import { FocusLayout } from "@/components/templates/focus-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { requireOwnerState } from "@/lib/data/owner-session";
 import {

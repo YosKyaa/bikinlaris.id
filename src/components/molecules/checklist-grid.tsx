@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 export const CHECKLIST_WEEKS = 2;
 

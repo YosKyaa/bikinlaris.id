@@ -2,7 +2,7 @@ import { InfoIcon } from "lucide-react";
 import Link from "next/link";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 
 import { GoogleSignIn } from "@/components/molecules/google-sign-in";

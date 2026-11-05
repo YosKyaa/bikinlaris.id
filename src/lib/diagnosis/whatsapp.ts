@@ -1,5 +1,5 @@
 import { TASK_KINDS } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { Pack } from "@/lib/data/types";
 import { formatDate } from "@/lib/format";
 

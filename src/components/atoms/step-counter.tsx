@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 /** "Bagian 2 dari 6" */

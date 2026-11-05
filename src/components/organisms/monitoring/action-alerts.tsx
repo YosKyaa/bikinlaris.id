@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 
 import { ChartCard } from "@/components/molecules/chart-card";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { ALERT_PREVIEW, type AlertGroup, type AlertKind } from "@/lib/data/monitoring";
 

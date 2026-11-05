@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SECTION_COLORS, type SectionColor } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { SectionHealthRow } from "@/lib/data/monitoring";
 import { getSection } from "@/lib/diagnosis/bank";
 

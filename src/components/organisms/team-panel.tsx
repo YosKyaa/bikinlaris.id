@@ -3,7 +3,7 @@ import { MessageCircleIcon } from "lucide-react";
 import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { TeamInvite, TeamMember } from "@/lib/data/types";
 
 import { InviteForm, RemoveInviteButton } from "./invite-form";

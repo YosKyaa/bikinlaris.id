@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { Logo } from "@/components/atoms/logo";
 import { PageTransition } from "@/components/atoms/page-transition";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import type { TableParticipant } from "@/components/molecules/participant-cells";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { STAGE_ORDER, type ParticipantFilter } from "@/lib/data/research";
 import type { ParticipantRow } from "@/lib/data/types";

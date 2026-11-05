@@ -6,7 +6,7 @@ import { ErrorLog } from "@/components/organisms/system/error-log";
 import { RefusalList } from "@/components/organisms/system/refusal-list";
 import { SystemSafety } from "@/components/organisms/system/system-safety";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { getAiProvider, isCoachEnabled } from "@/lib/ai";
 import { COACH_ALL_DAILY_LIMIT, COACH_DAILY_LIMIT, COACH_PAUSE_SECONDS } from "@/lib/coach/rules";
 import { data } from "@/lib/data";

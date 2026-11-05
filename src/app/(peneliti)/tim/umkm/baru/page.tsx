@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { ParticipantForm } from "@/components/organisms/participant-form";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 
 export const metadata: Metadata = { title: id.participant.newTitle };

@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { PROVINCES, REGENCIES } from "@/content/wilayah";
 
 /** Lookups over the Kemendagri list (content/wilayah.ts). Pure, safe on server and client. */

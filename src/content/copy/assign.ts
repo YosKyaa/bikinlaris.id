@@ -1,0 +1,35 @@
+// Who looks after which participant (owner request, 4 November 2026).
+export const assign = {
+  label: "Pendamping",
+  none: "Belum dibagi",
+  choose: "Pilih pendamping",
+  take: "Ambil UMKM ini",
+  release: "Lepas dari saya",
+  save: "Simpan pendamping",
+  taken: "UMKM ini sekarang Anda dampingi.",
+  released: "UMKM ini dilepas. Sekarang belum dibagi.",
+  changed: (name: string) => `Pendamping diganti ke ${name}.`,
+  cleared: "Pendamping dikosongkan.",
+  hintAdmin: "Pendamping yang menghubungi pemilik, terutama di hari ke-30.",
+  hintMember: "Ambil UMKM yang belum dibagi, supaya tim tahu siapa yang menghubunginya.",
+  hintOther: "Hanya admin yang bisa mengganti pendamping.",
+  filterLabel: "Saring menurut pendamping",
+  filters: { semua: "Semua pendamping", saya: "UMKM saya", belum: "Belum dibagi" },
+  bulk: {
+    selected: (n: number) => `${n} UMKM dipilih`,
+    to: "Bagikan ke",
+    apply: "Bagikan",
+    applying: "Membagikan…",
+    cancel: "Batal pilih",
+    done: (n: number, name: string) => `${n} UMKM dibagikan ke ${name}.`,
+    doneCleared: (n: number) => `Pendamping ${n} UMKM dikosongkan.`,
+    selectPage: "Pilih semua UMKM di halaman ini",
+    selectRow: (name: string) => `Pilih ${name}`,
+  },
+  errors: {
+    failed: "Pembagian belum tersimpan. Coba lagi.",
+    nothing:
+      "Tidak ada yang berubah. UMKM ini mungkin sudah diambil anggota lain. Muat ulang halaman.",
+    notMember: "Anggota itu sudah tidak ada di tim. Muat ulang halaman.",
+  },
+} as const;

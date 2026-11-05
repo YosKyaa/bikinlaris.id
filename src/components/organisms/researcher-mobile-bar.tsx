@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Logo } from "@/components/atoms/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 
 import { ResearcherNav, type ResearcherNavProps } from "./researcher-nav";

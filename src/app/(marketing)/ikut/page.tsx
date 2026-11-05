@@ -5,7 +5,7 @@ import { BentoTile } from "@/components/atoms/bento-tile";
 import { SelfSignupForm } from "@/components/organisms/self-signup-form";
 import { AuthLayout } from "@/components/templates/auth-layout";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { env, turnstile } from "@/lib/env";
 

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { AiError, failureOf, getAiProvider, type AiTextResult } from "@/lib/ai";
 import {
   ANSWER_MAX_LENGTH,

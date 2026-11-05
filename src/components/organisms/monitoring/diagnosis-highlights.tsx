@@ -1,7 +1,7 @@
 import { BarList } from "@/components/molecules/bar-list";
 import { ChartCard } from "@/components/molecules/chart-card";
 import type { ProblemId, SectionId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { CountRow } from "@/lib/data/monitoring";
 import { getProblem, getSection } from "@/lib/diagnosis/bank";
 

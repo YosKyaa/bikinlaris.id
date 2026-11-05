@@ -4,7 +4,7 @@ import { DownloadIcon, PrinterIcon, SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { trackPackOpenedAction, trackShareAction } from "@/lib/actions/owner";
 import { PACK_ACTIONS_ID } from "@/lib/anchors";
 import { ROUTES } from "@/lib/auth/constants";

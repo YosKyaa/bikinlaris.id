@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ASSIGNEE_PARAM, type AssigneeFilterValue } from "@/lib/data/research";
 
 import type { MemberOption } from "./assignee-control";

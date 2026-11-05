@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SectionStatusBadge } from "@/components/atoms/section-status-badge";
 import type { SectionColor } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { finishDiagnosisAction } from "@/lib/actions/owner";
 import { ROUTES } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";

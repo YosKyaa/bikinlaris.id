@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { askCoachAction } from "@/lib/actions/coach";
 import type { CoachTopic } from "@/lib/coach/rules";
 import type { CoachRole } from "@/lib/data/types";

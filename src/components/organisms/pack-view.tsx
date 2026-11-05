@@ -5,7 +5,7 @@ import { Eyebrow } from "@/components/atoms/eyebrow";
 import { OfflineBanner } from "@/components/atoms/offline-banner";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { InlineError } from "@/components/molecules/inline-error";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSop, rules } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";

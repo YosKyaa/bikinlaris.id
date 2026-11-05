@@ -18,7 +18,7 @@ import { PAGE_SIZES, TablePagination } from "@/components/molecules/table-pagina
 import { TableSearch } from "@/components/molecules/table-search";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 import type { MemberOption } from "./assignee-control";

@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /**
  * Number (or short text such as a date) with label. `null` renders "—": no display numbers

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SectionStatusBadge } from "@/components/atoms/section-status-badge";
 import { Button } from "@/components/ui/button";
 import type { SectionColor } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 export interface ReviewSection {

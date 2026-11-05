@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { JoinGuide } from "@/components/organisms/join-guide";
 import { MarketingLayout } from "@/components/templates/marketing-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import { getOwnerState, JOIN_NOTICES } from "@/lib/data/owner-session";
 import { env } from "@/lib/env";

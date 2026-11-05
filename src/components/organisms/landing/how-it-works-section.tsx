@@ -6,7 +6,7 @@ import { StepCounter } from "@/components/atoms/step-counter";
 import { AreaScoreBar } from "@/components/molecules/area-score-bar";
 import type { SectionColor } from "@/content/diagnosis.types";
 import type { QuestionId, SectionId, SopId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import {
   getQuestion,
   getSection,

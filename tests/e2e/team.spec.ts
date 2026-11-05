@@ -109,3 +109,25 @@ test.describe("panel on a phone", () => {
     });
   }
 });
+
+test("an owner's visit is still logged for the study (written after the redirect)", async ({
+  page,
+  browser,
+}) => {
+  await signIn(page, DEMO.admin);
+  const detail = `/tim/umkm/${DEMO.packBusinessId}`;
+  const visits = async () => {
+    await page.goto(detail);
+    return page.getByRole("cell", { name: "Buka tautan", exact: true }).count();
+  };
+  const before = await visits();
+
+  const owner = await browser.newContext();
+  const ownerPage = await owner.newPage();
+  await ownerPage.goto(`/u/${DEMO.packToken}`);
+  // Straight to the pack: no stop at /beranda.
+  await expect(ownerPage).toHaveURL(/\/paket$/);
+  await owner.close();
+
+  await expect.poll(visits, { timeout: 10_000 }).toBe(before + 1);
+});

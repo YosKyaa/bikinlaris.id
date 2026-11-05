@@ -1,7 +1,7 @@
 import { PhoneIcon } from "lucide-react";
 
 import { ContactOutcomeBadge } from "@/components/molecules/contact-outcome-badge";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { ContactNote, StaffUser } from "@/lib/data/types";
 import { formatDateTime } from "@/lib/format";
 

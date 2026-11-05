@@ -1,13 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 
 import type { QuestionId, SectionId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { data } from "@/lib/data";
 import { clearOwnerCookie, getOwnerState, getOwnerToken, joinHref } from "@/lib/data/owner-session";
-import type { Result } from "@/lib/data/types";
+import type { EventAction, EventMeta, Result } from "@/lib/data/types";
 import { rules } from "@/lib/diagnosis/bank";
 import { personalizePack } from "@/lib/diagnosis/personalize";
 import {
@@ -18,6 +19,7 @@ import {
   isSectionComplete,
 } from "@/lib/diagnosis/scoring";
 import { dayNumber } from "@/lib/format";
+import { errorMessage, reportError } from "@/lib/monitoring/report";
 import { saveAnswerSchema, sectionIdSchema, sopIdSchema } from "@/lib/validations/diagnosis";
 
 /**
@@ -27,6 +29,27 @@ import { saveAnswerSchema, sectionIdSchema, sopIdSchema } from "@/lib/validation
 
 const noLink = { ok: false, error: id.owner.errors.noLink } as const;
 const done: Result<null> = { ok: true, data: null };
+
+/**
+ * Passive research events are written after the answer has gone back to the phone (`after`),
+ * so the owner never waits for them: Next.js runs one action at a time per page, and a slow
+ * log would hold up the next answer. A failed log goes to the error log, never to the owner.
+ */
+function logLater(token: string, action: EventAction, meta: EventMeta | null) {
+  after(async () => {
+    try {
+      await data().owner.log(token, action, meta);
+    } catch (error) {
+      await reportError({
+        source: "server",
+        message: errorMessage(error),
+        digest: null,
+        path: null,
+        context: `log ${action}`,
+      });
+    }
+  });
+}
 
 export async function saveAnswerAction(questionId: string, answer: string): Promise<Result<null>> {
   const token = await getOwnerToken();
@@ -40,7 +63,7 @@ export async function saveAnswerAction(questionId: string, answer: string): Prom
       parsed.data.questionId as QuestionId,
       parsed.data.answer,
     );
-    if (first) await owner.log(token, "diagnosa_mulai", null);
+    if (first) logLater(token, "diagnosa_mulai", null);
     return done;
   } catch {
     return { ok: false, error: id.diagnosis.errors.saveFailed };
@@ -55,12 +78,8 @@ export async function completeSectionAction(sectionId: string): Promise<Result<n
   if (!parsed.success || !isSectionComplete(parsed.data as SectionId, answers)) {
     return { ok: false, error: id.diagnosis.errors.advanceFailed };
   }
-  try {
-    await data().owner.log(state.token, "diagnosa_bagian", { bagian: parsed.data });
-    return done;
-  } catch {
-    return { ok: false, error: id.diagnosis.errors.advanceFailed };
-  }
+  logLater(state.token, "diagnosa_bagian", { bagian: parsed.data });
+  return done;
 }
 
 /** Closes the diagnosis and creates the pack structure (rule-based, from bank.json). */
@@ -83,7 +102,7 @@ export async function finishDiagnosisAction(hardest: string): Promise<Result<nul
       ...buildPack(answers, section),
       followUpDays: rules.followUpDays,
     });
-    await owner.log(state.token, "diagnosa_selesai", {
+    logLater(state.token, "diagnosa_selesai", {
       repot: section,
       ...countColors(computeMap(answers)),
     });
@@ -107,7 +126,7 @@ export async function generatePackAction(): Promise<Result<null>> {
     const result = await personalizePack(business, diagnosis, pack);
     const owner = data().owner;
     const ready = await owner.finishPack(token, result);
-    await owner.log(token, "paket_dibuat", {
+    logLater(token, "paket_dibuat", {
       sop: ready.sops.map((sop) => sop.sopId),
       masalah: ready.problems.length,
       sumber: ready.source,
@@ -122,9 +141,8 @@ export async function redoDiagnosisAction(): Promise<Result<null>> {
   const token = await getOwnerToken();
   if (!token) return noLink;
   try {
-    const owner = data().owner;
-    await owner.log(token, "diagnosa_ulang", null);
-    await owner.reset(token);
+    await data().owner.reset(token);
+    logLater(token, "diagnosa_ulang", null);
     return done;
   } catch {
     return { ok: false, error: id.pack.redo.failed };
@@ -133,27 +151,21 @@ export async function redoDiagnosisAction(): Promise<Result<null>> {
 
 /* ---------- passive research events from the pack page; failures never block the owner ---------- */
 
-async function logForPack(log: (token: string, createdOn: string) => Promise<void>) {
+async function logForPack(action: EventAction, meta: (createdOn: string) => EventMeta | null) {
   const state = await getOwnerState();
   if (!state?.pack) return noLink;
-  try {
-    await log(state.token, state.pack.createdOn);
-    return done;
-  } catch {
-    return { ok: false, error: id.common.trackFailed } as const;
-  }
+  logLater(state.token, action, meta(state.pack.createdOn));
+  return done;
 }
 
 export async function trackPackOpenedAction(): Promise<Result<null>> {
-  return logForPack((token, createdOn) =>
-    data().owner.log(token, "hasil_buka", { hari: dayNumber(createdOn) }),
-  );
+  return logForPack("hasil_buka", (createdOn) => ({ hari: dayNumber(createdOn) }));
 }
 
 export async function trackSopOpenedAction(sopId: string): Promise<Result<null>> {
   const parsed = sopIdSchema.safeParse(sopId);
   if (!parsed.success) return { ok: false, error: id.common.trackFailed };
-  return logForPack((token) => data().owner.log(token, "sop_buka", { sop: parsed.data }));
+  return logForPack("sop_buka", () => ({ sop: parsed.data }));
 }
 
 const shareSchema = z.enum(["kirim_wa", "cetak"]);
@@ -161,7 +173,7 @@ const shareSchema = z.enum(["kirim_wa", "cetak"]);
 export async function trackShareAction(action: string): Promise<Result<null>> {
   const parsed = shareSchema.safeParse(action);
   if (!parsed.success) return { ok: false, error: id.common.trackFailed };
-  return logForPack((token) => data().owner.log(token, parsed.data, null));
+  return logForPack(parsed.data, () => null);
 }
 
 /** "Keluar dari HP ini": forgets the private link on this device (e.g. a shared phone). */

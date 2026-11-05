@@ -1,5 +1,5 @@
 import type { Task } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /** A titled group of SOP tasks with printable tick boxes. */
 export function TaskList({

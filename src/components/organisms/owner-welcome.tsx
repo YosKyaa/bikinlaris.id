@@ -4,7 +4,7 @@ import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { TimeEstimate } from "@/components/atoms/time-estimate";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ownerLogoutAction } from "@/lib/actions/owner";
 import { sections, totalQuestions } from "@/lib/diagnosis/bank";
 

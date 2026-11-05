@@ -1,6 +1,6 @@
 import { PageTransition } from "@/components/atoms/page-transition";
 import { Skeleton } from "@/components/ui/skeleton";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /**
  * Instant feedback while a step loads (Doherty threshold). On the canvas like the pages it

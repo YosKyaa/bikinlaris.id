@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import type { ParticipantFilter as Filter } from "@/lib/data/research";
 import { cn } from "@/lib/utils";

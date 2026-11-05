@@ -1,6 +1,6 @@
 import "server-only";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { OFF_TOPIC_MARKER } from "@/lib/coach/guard";
 import type { Business, Pack } from "@/lib/data/types";
 import { getProblem, getSection, getSop, sections } from "@/lib/diagnosis/bank";

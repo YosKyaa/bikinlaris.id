@@ -8,7 +8,7 @@ import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { SopId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { generatePackAction } from "@/lib/actions/owner";
 import { ROUTES } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";

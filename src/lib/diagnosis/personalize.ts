@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { failureOf, getAiProvider } from "@/lib/ai";
 import type { PackResult } from "@/lib/data/source";
 import type { Business, Diagnosis, Pack, PackSop } from "@/lib/data/types";

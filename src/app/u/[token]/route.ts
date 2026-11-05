@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 
 import { OWNER_COOKIE, ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
+import { resolveOwnerStep } from "@/lib/data/flow";
 import {
   isOwnerToken,
   joinHref,
@@ -11,8 +12,9 @@ import {
 
 /**
  * The owner's private link (sent over WhatsApp). Remembers the token on this device in an
- * httpOnly cookie, logs `login`, then resumes at the current step. Link previews (WhatsApp,
- * Telegram, …) fetch this URL too: they get the redirect but no cookie and no event.
+ * httpOnly cookie, logs `login`, then goes straight to the current step (no extra hop through
+ * /beranda). Link previews (WhatsApp, Telegram, …) fetch this URL too: they get the redirect
+ * but no cookie and no event.
  */
 const LINK_PREVIEW_AGENTS =
   /bot|crawl|spider|preview|whatsapp|facebookexternalhit|telegram|slack|discord|twitter|skype|line\//i;
@@ -43,15 +45,12 @@ export async function GET(request: NextRequest, { params }: RouteContext<"/u/[to
   }
   if (!state) return fail("tautan");
 
-  const response = redirectTo(ROUTES.start, request);
+  const response = redirectTo(resolveOwnerStep(state) ?? ROUTES.start, request);
   const isPreview = LINK_PREVIEW_AGENTS.test(request.headers.get("user-agent") ?? "");
   if (isPreview) return response;
 
   response.cookies.set(OWNER_COOKIE, token, ownerCookieOptions);
-  try {
-    await owner.log(token, "login", null);
-  } catch {
-    // The log is passive research data: never block the owner because of it.
-  }
+  // Passive research data, written after the redirect has gone out: never makes the owner wait.
+  after(() => owner.log(token, "login", null).catch(() => undefined));
   return response;
 }

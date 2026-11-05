@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { ParticipantForm } from "@/components/organisms/participant-form";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { localWhatsApp } from "@/lib/validations/participant";

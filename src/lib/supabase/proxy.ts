@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { SUPABASE_COOKIE_PREFIX } from "@/lib/auth/constants";
 import type { Database } from "@/types/database";
 
 import { getSupabaseConfig } from "./config";
@@ -13,6 +14,11 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   let response = NextResponse.next({ request });
   const config = getSupabaseConfig();
   if (!config) return response;
+  // Owners and visitors have no Supabase session: nothing to refresh, skip the client.
+  const hasSession = request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith(SUPABASE_COOKIE_PREFIX) && name.includes("auth-token"));
+  if (!hasSession) return response;
 
   const supabase = createServerClient<Database>(config.url, config.anonKey, {
     cookies: {

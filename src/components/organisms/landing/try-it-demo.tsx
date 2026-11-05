@@ -8,7 +8,7 @@ import { SectionStatusBadge } from "@/components/atoms/section-status-badge";
 import { QuestionField } from "@/components/molecules/question-field";
 import { Button } from "@/components/ui/button";
 import type { AnswerValue, SectionColor, StoredAnswer } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { ENTER_APP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";

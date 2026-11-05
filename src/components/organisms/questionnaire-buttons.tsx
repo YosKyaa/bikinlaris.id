@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { setQuestionnaireAction } from "@/lib/actions/research";
 
 type Size = "default" | "lg" | "sm";

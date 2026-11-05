@@ -1,0 +1,40 @@
+import type { ContactOutcome } from "@/lib/data/types";
+
+// Contact log per participant (owner request, 4 November 2026).
+export const contact = {
+  title: "Catatan kontak",
+  body: "Catat setiap kali menghubungi pemilik, terutama di hari ke-30.",
+  outcomeLabel: "Hasilnya",
+  outcomes: {
+    tersambung: "Tersambung",
+    tidak_diangkat: "Tidak diangkat",
+    nomor_salah: "Nomor salah",
+    minta_nanti: "Minta dihubungi lagi",
+    menolak: "Tidak mau lanjut",
+  } satisfies Record<ContactOutcome, string>,
+  noteLabel: "Catatan (boleh kosong)",
+  notePlaceholder: "Contoh: minta ditelepon sore hari",
+  counter: (length: number, max: number) => `${length}/${max} huruf`,
+  save: "Simpan catatan",
+  saving: "Menyimpan…",
+  saved: "Catatan kontak tersimpan.",
+  historyLabel: "Riwayat kontak",
+  emptyTitle: "Belum ada catatan kontak",
+  emptyBody: "Setelah menghubungi pemilik, catat hasilnya di sini supaya tim tahu.",
+  formerMember: "Mantan anggota tim",
+  you: "Anda",
+  deleteLabel: (date: string) => `Hapus catatan ${date}`,
+  deleteTitle: "Hapus catatan kontak ini?",
+  deleteBody: "Catatan ini hilang dari riwayat. Kalau keliru, tulis ulang dengan isi yang benar.",
+  deleteConfirm: "Hapus catatan",
+  deleting: "Menghapus…",
+  deleted: "Catatan dihapus.",
+  never: "Belum dihubungi",
+  count: (n: number) => `${n} kali dihubungi`,
+  errors: {
+    outcome: "Pilih hasilnya dulu.",
+    tooLong: (max: number) => `Catatan terlalu panjang. Paling banyak ${max} huruf.`,
+    failed: "Catatan belum tersimpan. Periksa internet Anda, lalu coba lagi.",
+    deleteFailed: "Catatan belum terhapus. Muat ulang halaman, lalu coba lagi.",
+  },
+} as const;

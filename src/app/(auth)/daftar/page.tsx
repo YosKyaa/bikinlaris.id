@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { GoogleSignIn } from "@/components/molecules/google-sign-in";
 import { SignUpForm } from "@/components/organisms/sign-up-form";
 import { AuthLayout } from "@/components/templates/auth-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { MOCK_INVITE } from "@/lib/data/mock/store";
 import { getStaffUser } from "@/lib/data/staff-session";

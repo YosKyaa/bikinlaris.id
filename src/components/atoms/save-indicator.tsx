@@ -1,6 +1,6 @@
 import { CircleAlertIcon, CircleCheckIcon, LoaderCircleIcon } from "lucide-react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";

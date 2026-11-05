@@ -10,7 +10,7 @@ import {
   StageBadge,
   type TableParticipant,
 } from "@/components/molecules/participant-cells";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 /** Cell padding matches the tile padding (20px, 24px from sm), so the table lines up. */

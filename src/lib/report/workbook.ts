@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { coachTable, eventsTable, summaryTable, type FollowUpData } from "@/lib/data/research";
 import type { CoachMessage, Participant, ResearchEvent } from "@/lib/data/types";
 

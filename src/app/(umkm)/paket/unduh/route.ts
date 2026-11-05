@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { NOTICE_PARAM, PDF_FAILED_NOTICE, ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { getOwnerState, joinHref } from "@/lib/data/owner-session";
@@ -35,11 +35,12 @@ export async function GET(request: NextRequest) {
     return redirectTo(`${ROUTES.pack}?${NOTICE_PARAM}=${PDF_FAILED_NOTICE}`, request);
   }
 
-  try {
-    await data().owner.log(state.token, "unduh_pdf", null);
-  } catch {
-    // Passive research log: never block the download because of it.
-  }
+  // Passive research log, written after the file has gone out.
+  after(() =>
+    data()
+      .owner.log(state.token, "unduh_pdf", null)
+      .catch(() => undefined),
+  );
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

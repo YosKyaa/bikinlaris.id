@@ -12,7 +12,7 @@ import { BentoGrid, BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { totalQuestions } from "@/lib/diagnosis/bank";
 import { ENTER_APP } from "@/lib/transitions";
 

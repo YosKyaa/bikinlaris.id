@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { Eyebrow } from "@/components/atoms/eyebrow";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { rules, sections, totalQuestions } from "@/lib/diagnosis/bank";
 import { cn } from "@/lib/utils";
 

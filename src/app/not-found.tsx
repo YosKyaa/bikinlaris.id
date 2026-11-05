@@ -3,7 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Button } from "@/components/ui/button";
 import { FocusLayout } from "@/components/templates/focus-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 
 export default function NotFound() {

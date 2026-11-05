@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /** Colour tokens from CLAUDE.md plus documented additions. Names are code, not UI copy. */
 const COLOR_TOKENS = [

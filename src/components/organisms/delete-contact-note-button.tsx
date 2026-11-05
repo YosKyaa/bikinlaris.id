@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { DangerConfirm } from "@/components/molecules/danger-confirm";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { deleteContactNoteAction } from "@/lib/actions/follow-up";
 
 /** Small "hapus" on a contact note the member wrote (admins: any note), with a confirmation. */

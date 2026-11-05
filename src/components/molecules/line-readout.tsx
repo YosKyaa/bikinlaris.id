@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /**
  * Values of every series at the chosen date. Works as the legend (line keys + names) and as

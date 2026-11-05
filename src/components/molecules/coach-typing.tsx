@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /** After this long, "reading your pack" turns into "writing the answer". */
 const STEP_MS = 2200;

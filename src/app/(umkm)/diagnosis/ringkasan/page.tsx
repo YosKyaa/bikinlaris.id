@@ -8,7 +8,7 @@ import { ExitLaterDialog } from "@/components/organisms/exit-later-dialog";
 import { FocusLayout } from "@/components/templates/focus-layout";
 import type { QuestionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { requireOwnerState } from "@/lib/data/owner-session";
 import { questionsOf, sections } from "@/lib/diagnosis/bank";

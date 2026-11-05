@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { NOTICE_PARAM, ROUTES, safeNextPath } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import type { SignInResult, SignUpResult } from "@/lib/data/source";

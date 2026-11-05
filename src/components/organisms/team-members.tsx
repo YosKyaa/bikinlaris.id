@@ -2,7 +2,7 @@ import { CheckIcon } from "lucide-react";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
 import { Badge } from "@/components/ui/badge";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { StaffRole, TeamMember } from "@/lib/data/types";
 import { STAFF_ROLES } from "@/lib/validations/auth";
 

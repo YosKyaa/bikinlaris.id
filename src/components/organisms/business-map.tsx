@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { AreaScoreBar } from "@/components/molecules/area-score-bar";
 import type { SectionId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { BusinessMap as BusinessMapData } from "@/lib/data/types";
 import { getSection, questionsOf, rules, sections } from "@/lib/diagnosis/bank";
 import { compareSections } from "@/lib/diagnosis/scoring";

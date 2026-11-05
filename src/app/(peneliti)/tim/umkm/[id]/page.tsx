@@ -13,7 +13,7 @@ import { DeleteParticipantButton } from "@/components/organisms/delete-participa
 import { ParticipantNextStep } from "@/components/organisms/participant-next-step";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { NOTICE_PARAM, ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { participantStage } from "@/lib/data/research";

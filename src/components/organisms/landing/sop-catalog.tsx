@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 export interface CatalogSection {

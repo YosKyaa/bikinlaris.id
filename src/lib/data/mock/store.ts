@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import type { QuestionId, SectionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { demoProvider } from "@/lib/ai/demo";
 import { rules } from "@/lib/diagnosis/bank";
 import { buildPack } from "@/lib/diagnosis/scoring";

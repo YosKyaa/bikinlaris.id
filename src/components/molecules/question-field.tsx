@@ -10,7 +10,7 @@ import {
   type AnswerValue,
   type StoredAnswer,
 } from "@/content/diagnosis.types";
-import { id as copy } from "@/content/id";
+import * as copy from "@/content/id";
 import { cn } from "@/lib/utils";
 
 interface QuestionFieldProps {

@@ -2,7 +2,7 @@ import { MessageCircleIcon, SmartphoneIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { ParticipantStage } from "@/lib/data/types";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { ParticipantLinks } from "@/lib/research-links";

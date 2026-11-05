@@ -2,7 +2,7 @@ import { Text, View } from "@react-pdf/renderer";
 import { Fragment } from "react";
 
 import type { Problem, Sop, Task } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import { styles } from "./styles";
 

@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { FunnelStep } from "@/lib/data/types";
 import { percentOf, rampColor } from "@/lib/viz";
 

@@ -1,6 +1,6 @@
 import { ClockIcon } from "lucide-react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 /** "Sekitar 10 menit" with a clock icon. */

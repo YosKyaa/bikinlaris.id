@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { DangerConfirm } from "@/components/molecules/danger-confirm";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { clearErrorsAction } from "@/lib/actions/follow-up";
 
 /** "Bersihkan catatan galat" with a confirmation; new errors keep being recorded. */

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { DesignComponents } from "@/components/organisms/design-components";
 import { DesignFoundations } from "@/components/organisms/design-showcase";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 export const metadata: Metadata = { title: id.design.title, robots: { index: false } };
 

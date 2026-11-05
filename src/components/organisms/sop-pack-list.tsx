@@ -8,7 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { trackSopOpenedAction } from "@/lib/actions/owner";
 import { sopAnchor } from "@/lib/anchors";
 

@@ -31,7 +31,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { redoDiagnosisAction } from "@/lib/actions/owner";
 import { ROUTES } from "@/lib/auth/constants";
 

@@ -1,7 +1,7 @@
 import { DashboardShell } from "@/components/templates/dashboard-shell";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Toaster } from "@/components/ui/sonner";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { logoutAction } from "@/lib/actions/auth";
 import { isCoachEnabled } from "@/lib/ai";
 import { requireStaffPage } from "@/lib/data/staff-session";

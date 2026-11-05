@@ -1,6 +1,6 @@
 import { BarList } from "@/components/molecules/bar-list";
 import { ChartCard } from "@/components/molecules/chart-card";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { CountRow, SampleProfile as Profile } from "@/lib/data/monitoring";
 import { regencyName } from "@/lib/wilayah";
 

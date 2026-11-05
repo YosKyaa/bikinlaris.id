@@ -2,6 +2,8 @@ import "server-only";
 
 import { getAppUrl } from "@/lib/app-url";
 import { ROUTES } from "@/lib/auth/constants";
+import type { PostgrestError } from "@supabase/supabase-js";
+
 import { createClient } from "@/lib/supabase/server";
 
 import type { SignUpResult, StaffStore } from "../source";
@@ -31,6 +33,44 @@ const INVITE_REJECTIONS = ["undangan_tidak_cocok", "Database error saving new us
 const PAGE_SIZE = 1000;
 /** Newest entries shown on the Sistem page. */
 const ERRORS_SHOWN = 50;
+/**
+ * Pack columns the panel reads. `llm_raw` (the AI's raw answer, kept for the audit trail) is
+ * left out: it is the largest column and no page shows it.
+ */
+const PACK_COLUMNS =
+  "id, business_id, diagnosa_id, repot, peta, masalah, sops, sop_lain, dibuat, h30, status, sumber, generation_started_at, kuesioner_dikirim_at, kuesioner_selesai_at";
+
+interface PageResult<Row> {
+  data: Row[] | null;
+  error: PostgrestError | null;
+  count: number | null;
+}
+
+/**
+ * Every row of a list, PAGE_SIZE at a time. The first page also asks for the total, so the
+ * other pages are fetched at the same time instead of one after another (one round trip to
+ * the database instead of one per thousand rows). Pages must be ordered by `id` ascending:
+ * new rows then land after the last page and never shift the others.
+ */
+async function allPages<Row>(
+  page: (from: number, to: number, count: boolean) => PromiseLike<PageResult<Row>>,
+): Promise<Row[]> {
+  const first = await page(0, PAGE_SIZE - 1, true);
+  if (first.error) throw first.error;
+  const rows = [...(first.data ?? [])];
+  const total = first.count ?? rows.length;
+  const rest: PromiseLike<PageResult<Row>>[] = [];
+  for (let from = PAGE_SIZE; from < total; from += PAGE_SIZE) {
+    rest.push(page(from, from + PAGE_SIZE - 1, false));
+  }
+  for (const result of await Promise.all(rest)) {
+    if (result.error) throw result.error;
+    rows.push(...(result.data ?? []));
+  }
+  return rows;
+}
+
+const withCount = (count: boolean) => (count ? { count: "exact" as const } : undefined);
 
 type Client = Awaited<ReturnType<typeof createClient>>;
 
@@ -57,7 +97,7 @@ async function rejoin(supabase: Client, userId: string): Promise<StaffUser | nul
 async function participantsWhere(supabase: Client, businessId?: string): Promise<Participant[]> {
   const businesses = supabase.from("businesses").select("*").order("created_at");
   const diagnoses = supabase.from("diagnosa").select("*");
-  const packs = supabase.from("paket").select("*");
+  const packs = supabase.from("paket").select(PACK_COLUMNS);
   const [b, d, p] = await Promise.all(
     businessId
       ? [
@@ -209,36 +249,30 @@ export const supabaseStaffStore: StaffStore = {
     return data.length > 0;
   },
 
-  async listEvents(businessId) {
+  async listEvents(businessId): Promise<ResearchEvent[]> {
     const supabase = await createClient();
-    const events: ResearchEvent[] = [];
-    for (let from = 0; ; from += PAGE_SIZE) {
+    const rows = await allPages((from, to, count) => {
       const query = supabase
         .from("events")
-        .select("*")
+        .select("*", withCount(count))
         .order("id")
-        .range(from, from + PAGE_SIZE - 1);
-      const { data, error } = await (businessId ? query.eq("business_id", businessId) : query);
-      if (error) throw error;
-      events.push(...data.map(toEvent));
-      if (data.length < PAGE_SIZE) return events;
-    }
+        .range(from, to);
+      return businessId ? query.eq("business_id", businessId) : query;
+    });
+    return rows.map(toEvent);
   },
 
-  async listCoachMessages(businessId) {
+  async listCoachMessages(businessId): Promise<CoachMessage[]> {
     const supabase = await createClient();
-    const messages: CoachMessage[] = [];
-    for (let from = 0; ; from += PAGE_SIZE) {
+    const rows = await allPages((from, to, count) => {
       const query = supabase
         .from("coach_pesan")
-        .select("*")
+        .select("*", withCount(count))
         .order("id")
-        .range(from, from + PAGE_SIZE - 1);
-      const { data, error } = await (businessId ? query.eq("business_id", businessId) : query);
-      if (error) throw error;
-      messages.push(...data.map(toCoachMessage));
-      if (data.length < PAGE_SIZE) return messages;
-    }
+        .range(from, to);
+      return businessId ? query.eq("business_id", businessId) : query;
+    });
+    return rows.map(toCoachMessage);
   },
 
   async assignParticipants(businessIds, staffId) {
@@ -251,21 +285,18 @@ export const supabaseStaffStore: StaffStore = {
     return data;
   },
 
-  async listContactNotes(businessId) {
+  /** Newest first: fetched in id order (stable pages), then reversed. */
+  async listContactNotes(businessId): Promise<ContactNote[]> {
     const supabase = await createClient();
-    const notes: ContactNote[] = [];
-    for (let from = 0; ; from += PAGE_SIZE) {
+    const rows = await allPages((from, to, count) => {
       const query = supabase
         .from("kontak_catatan")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .order("id", { ascending: false })
-        .range(from, from + PAGE_SIZE - 1);
-      const { data, error } = await (businessId ? query.eq("business_id", businessId) : query);
-      if (error) throw error;
-      notes.push(...data.map(toContactNote));
-      if (data.length < PAGE_SIZE) return notes;
-    }
+        .select("*", withCount(count))
+        .order("id")
+        .range(from, to);
+      return businessId ? query.eq("business_id", businessId) : query;
+    });
+    return rows.map(toContactNote).reverse();
   },
 
   async addContactNote(businessId, outcome, note) {

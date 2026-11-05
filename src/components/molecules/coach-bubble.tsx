@@ -1,5 +1,5 @@
 import { TypewriterText } from "@/components/atoms/typewriter-text";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { CoachRole } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 

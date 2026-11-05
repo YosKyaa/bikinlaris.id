@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/atoms/logo";
 import { HeaderMorph } from "@/components/atoms/route-transition";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { ENTER_APP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";

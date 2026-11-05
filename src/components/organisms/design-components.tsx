@@ -19,7 +19,7 @@ import { TaskList } from "@/components/molecules/task-list";
 import { Button } from "@/components/ui/button";
 import { diagnosisBank } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 import { DesignSection } from "./design-showcase";
 

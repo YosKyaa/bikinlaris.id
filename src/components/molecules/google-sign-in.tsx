@@ -1,6 +1,6 @@
 import { GoogleMark } from "@/components/atoms/google-mark";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /**
  * "Masuk dengan Google" for invited team members, with a divider to the e-mail form below.

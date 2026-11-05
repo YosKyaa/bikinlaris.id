@@ -1,5 +1,5 @@
 import { EmptyState } from "@/components/molecules/empty-state";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { CoachMessage } from "@/lib/data/types";
 import { formatDateTime } from "@/lib/format";
 

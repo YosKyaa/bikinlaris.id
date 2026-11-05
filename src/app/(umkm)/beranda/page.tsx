@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { OwnerWelcome } from "@/components/organisms/owner-welcome";
 import { FocusLayout } from "@/components/templates/focus-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { resolveOwnerStep } from "@/lib/data/flow";
 import { requireOwnerState } from "@/lib/data/owner-session";

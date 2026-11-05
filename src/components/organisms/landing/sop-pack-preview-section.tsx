@@ -1,5 +1,5 @@
 import { Eyebrow } from "@/components/atoms/eyebrow";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { sections, sopsOf } from "@/lib/diagnosis/bank";
 
 import { SampleSopDialog } from "../sample-sop-dialog";

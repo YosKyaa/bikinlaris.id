@@ -1,5 +1,5 @@
 import { Eyebrow } from "@/components/atoms/eyebrow";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /** Interest: everyday situations as plain sentences. A list, not an icon-card grid. */
 export function ProblemSection() {

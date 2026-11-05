@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { CoachUsageDay } from "@/lib/data/types";
 import { formatDayMonth, formatDecimal, formatNumber } from "@/lib/format";
 import { percentOf } from "@/lib/viz";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import type { CoachRefusal } from "@/lib/data/types";
 import { formatDateTime } from "@/lib/format";

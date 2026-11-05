@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { SopId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { sopAnchor } from "@/lib/anchors";
 import type { PackProblem } from "@/lib/data/types";
 import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";

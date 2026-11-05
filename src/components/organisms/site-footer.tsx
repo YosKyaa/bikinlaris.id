@@ -1,5 +1,5 @@
 import { Logo } from "@/components/atoms/logo";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 /** Minimal footer on --brand-deep. */
 export function SiteFooter() {

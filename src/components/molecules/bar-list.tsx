@@ -1,4 +1,4 @@
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { percentOf, rampColor } from "@/lib/viz";
 
 export interface BarRow {

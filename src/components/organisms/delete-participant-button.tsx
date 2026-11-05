@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { DangerConfirm } from "@/components/molecules/danger-confirm";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { deleteParticipantAction } from "@/lib/actions/research";
 
 /**

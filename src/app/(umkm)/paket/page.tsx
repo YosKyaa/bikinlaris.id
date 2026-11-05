@@ -5,14 +5,14 @@ import { AccountMenu } from "@/components/organisms/account-menu";
 import { PackView } from "@/components/organisms/pack-view";
 import { AppShell } from "@/components/templates/app-shell";
 import { Toaster } from "@/components/ui/sonner";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ownerLogoutAction } from "@/lib/actions/owner";
 import { isCoachEnabled } from "@/lib/ai";
 import { NOTICE_PARAM, PDF_FAILED_NOTICE, ROUTES } from "@/lib/auth/constants";
 import { COACH_DAILY_LIMIT, QUESTION_MAX_LENGTH } from "@/lib/coach/rules";
 import { data } from "@/lib/data";
 import { resolveOwnerStep } from "@/lib/data/flow";
-import { requireOwnerState } from "@/lib/data/owner-session";
+import { getOwnerToken, requireOwnerState } from "@/lib/data/owner-session";
 import { buildWhatsAppText, whatsAppUrl } from "@/lib/diagnosis/whatsapp";
 import { regencyName } from "@/lib/wilayah";
 
@@ -35,7 +35,12 @@ async function loadCoach(token: string) {
 }
 
 export default async function PackPage({ searchParams }: PageProps<"/paket">) {
-  const state = await requireOwnerState();
+  // The coach history only needs the token from the cookie: load it alongside the pack.
+  const token = await getOwnerToken();
+  const [state, coach] = await Promise.all([
+    requireOwnerState(),
+    token ? loadCoach(token) : Promise.resolve(null),
+  ]);
   const pdfFailed = (await searchParams)[NOTICE_PARAM] === PDF_FAILED_NOTICE;
   const { business, pack } = state;
   if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
@@ -72,7 +77,7 @@ export default async function PackPage({ searchParams }: PageProps<"/paket">) {
         pack={pack}
         locationLabel={regencyName(business.location)}
         whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack))}
-        coach={await loadCoach(state.token)}
+        coach={coach}
         pdfFailed={pdfFailed}
       />
       <Toaster position="top-center" />

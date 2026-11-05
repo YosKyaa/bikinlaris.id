@@ -3,7 +3,7 @@
 import { CheckIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { cn } from "@/lib/utils";
 
 const DAYS = id.pack.sop.days;

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { ownerLinkUrl, surveyLink } from "@/lib/app-url";
 import type { Participant } from "@/lib/data/types";
 import { whatsAppUrl } from "@/lib/diagnosis/whatsapp";

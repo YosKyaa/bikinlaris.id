@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { assignParticipantsAction } from "@/lib/actions/follow-up";
 
 import { UNASSIGNED, type MemberOption } from "./assignee-control";

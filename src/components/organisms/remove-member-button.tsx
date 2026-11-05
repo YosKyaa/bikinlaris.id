@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { DangerConfirm } from "@/components/molecules/danger-confirm";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { removeMemberAction } from "@/lib/actions/research";
 
 /** Admin only: let a team member go, after a confirmation that says what stays. */

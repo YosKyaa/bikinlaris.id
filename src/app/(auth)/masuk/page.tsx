@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { LoginPanel } from "@/components/organisms/login-panel";
 import { AuthLayout } from "@/components/templates/auth-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { NEXT_PARAM, NOTICE_PARAM, ROUTES, safeNextPath } from "@/lib/auth/constants";
 import { MOCK_PASSWORD } from "@/lib/data/mock/store";
 import { getStaffUser } from "@/lib/data/staff-session";

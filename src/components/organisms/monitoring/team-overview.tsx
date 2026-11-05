@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { TeamRow } from "@/lib/data/monitoring";
 
 const COLUMNS = ["added", "packs", "done"] as const;

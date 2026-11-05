@@ -1,7 +1,7 @@
 import { ChartCard } from "@/components/molecules/chart-card";
 import { StatCard } from "@/components/molecules/stat-card";
 import { Progress } from "@/components/ui/progress";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { PACE_WINDOW_WEEKS, type ProgramProgress as Program } from "@/lib/data/monitoring";
 import { DUE_WINDOW_DAYS } from "@/lib/data/research";
 import { LOCALE } from "@/lib/format";

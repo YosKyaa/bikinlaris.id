@@ -1,5 +1,5 @@
 import { diagnosisBank, type SopId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { getProblem, getSop } from "@/lib/diagnosis/bank";
 
 import { SampleSopTrigger } from "./sample-sop-trigger";

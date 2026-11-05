@@ -8,7 +8,7 @@ import { InlineError } from "@/components/molecules/inline-error";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { addContactNoteAction } from "@/lib/actions/follow-up";
 import { CONTACT_OUTCOMES, type ContactOutcome } from "@/lib/data/types";
 import { CONTACT_NOTE_MAX_LENGTH } from "@/lib/validations/contact";

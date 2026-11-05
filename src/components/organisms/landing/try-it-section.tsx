@@ -1,6 +1,6 @@
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import type { QuestionId } from "@/content/diagnosis";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { getProblem, getQuestion, getSection, getSop, totalQuestions } from "@/lib/diagnosis/bank";
 
 import { TryItDemo, type DemoQuestion } from "./try-it-demo";

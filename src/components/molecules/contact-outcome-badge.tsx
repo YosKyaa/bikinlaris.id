@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import type { ContactOutcome } from "@/lib/data/types";
 
 /** Reached the owner = green; try again = amber; wrong number or will not go on = red. */

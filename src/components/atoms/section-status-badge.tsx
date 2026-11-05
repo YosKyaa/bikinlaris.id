@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { SectionColor } from "@/content/diagnosis.types";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 
 const VARIANT = { hijau: "success", kuning: "warning", merah: "danger" } as const;
 

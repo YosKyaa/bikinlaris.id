@@ -7,7 +7,7 @@ import { ExportPanel } from "@/components/organisms/export-panel";
 import { FILTER_PARAM, ParticipantFilter } from "@/components/organisms/participant-filter";
 import { ParticipantTable } from "@/components/organisms/participant-table";
 import { Button } from "@/components/ui/button";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { isCoachEnabled } from "@/lib/ai";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { Button } from "@/components/ui/button";
 import { FocusLayout } from "@/components/templates/focus-layout";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { reportClientErrorAction } from "@/lib/actions/monitoring";
 
 /** Shortest useful text of a browser error for the admin's error log. */

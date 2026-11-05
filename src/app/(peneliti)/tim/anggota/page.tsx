@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { TeamPanel } from "@/components/organisms/team-panel";
-import { id } from "@/content/id";
+import * as id from "@/content/id";
 import { getAppUrl } from "@/lib/app-url";
 import { ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
