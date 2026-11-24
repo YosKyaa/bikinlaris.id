@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 
-import type { QuestionId, SectionId } from "@/content/diagnosis";
+import type { SectionId } from "@/content/diagnosis";
 import * as id from "@/content/id";
 import { data } from "@/lib/data";
 import { clearOwnerCookie, getOwnerState, getOwnerToken, joinHref } from "@/lib/data/owner-session";
-import type { EventAction, EventMeta, Result } from "@/lib/data/types";
+import type { Answers, EventAction, EventMeta, Result } from "@/lib/data/types";
 import { rules } from "@/lib/diagnosis/bank";
 import { personalizePack } from "@/lib/diagnosis/personalize";
 import {
@@ -20,7 +20,7 @@ import {
 } from "@/lib/diagnosis/scoring";
 import { dayNumber } from "@/lib/format";
 import { errorMessage, reportError } from "@/lib/monitoring/report";
-import { saveAnswerSchema, sectionIdSchema, sopIdSchema } from "@/lib/validations/diagnosis";
+import { answersPayloadSchema, sectionIdSchema, sopIdSchema } from "@/lib/validations/diagnosis";
 
 /**
  * Owner actions. The owner is identified by the private link token in an httpOnly cookie
@@ -51,35 +51,55 @@ function logLater(token: string, action: EventAction, meta: EventMeta | null) {
   });
 }
 
-export async function saveAnswerAction(questionId: string, answer: string): Promise<Result<null>> {
+/** Stores answers in one round trip; the first answers of a diagnosis log `diagnosa_mulai`. */
+async function storeAnswers(token: string, answers: Answers): Promise<Answers> {
+  const saved = await data().owner.saveAnswers(token, answers);
+  if (saved.first) logLater(token, "diagnosa_mulai", null);
+  return saved.answers;
+}
+
+/**
+ * Autosave. The stepper collects the answers tapped in quick succession and sends them
+ * together, so five taps cost one request instead of five queued ones.
+ */
+export async function saveAnswersAction(answers: Record<string, string>): Promise<Result<null>> {
   const token = await getOwnerToken();
   if (!token) return noLink;
-  const parsed = saveAnswerSchema.safeParse({ questionId, answer });
-  if (!parsed.success) return { ok: false, error: id.diagnosis.errors.saveFailed };
+  const parsed = answersPayloadSchema.safeParse(answers);
+  if (!parsed.success || Object.keys(parsed.data).length === 0) {
+    return { ok: false, error: id.diagnosis.errors.saveFailed };
+  }
   try {
-    const owner = data().owner;
-    const { first } = await owner.saveAnswer(
-      token,
-      parsed.data.questionId as QuestionId,
-      parsed.data.answer,
-    );
-    if (first) logLater(token, "diagnosa_mulai", null);
+    await storeAnswers(token, parsed.data);
     return done;
   } catch {
     return { ok: false, error: id.diagnosis.errors.saveFailed };
   }
 }
 
-export async function completeSectionAction(sectionId: string): Promise<Result<null>> {
-  const state = await getOwnerState();
-  if (!state) return noLink;
-  const parsed = sectionIdSchema.safeParse(sectionId);
-  const answers = state.diagnosis?.answers ?? {};
-  if (!parsed.success || !isSectionComplete(parsed.data as SectionId, answers)) {
-    return { ok: false, error: id.diagnosis.errors.advanceFailed };
+/**
+ * "Lanjut": stores this section's answers once more (so an autosave lost on a weak signal is
+ * not lost for good) and checks the section is complete against what the database now holds,
+ * in a single round trip.
+ */
+export async function completeSectionAction(
+  sectionId: string,
+  answers: Record<string, string>,
+): Promise<Result<null>> {
+  const token = await getOwnerToken();
+  if (!token) return noLink;
+  const section = sectionIdSchema.safeParse(sectionId);
+  const payload = answersPayloadSchema.safeParse(answers);
+  const advanceFailed = { ok: false, error: id.diagnosis.errors.advanceFailed } as const;
+  if (!section.success || !payload.success) return advanceFailed;
+  try {
+    const stored = await storeAnswers(token, payload.data);
+    if (!isSectionComplete(section.data as SectionId, stored)) return advanceFailed;
+    logLater(token, "diagnosa_bagian", { bagian: section.data });
+    return done;
+  } catch {
+    return advanceFailed;
   }
-  logLater(state.token, "diagnosa_bagian", { bagian: parsed.data });
-  return done;
 }
 
 /** Closes the diagnosis and creates the pack structure (rule-based, from bank.json). */
@@ -137,12 +157,22 @@ export async function generatePackAction(): Promise<Result<null>> {
   }
 }
 
+/**
+ * "Ulang cek usaha". Closed once the day-30 questionnaire has been sent: from then on the
+ * answers and the pack are research data. The old answers go into the event log before they
+ * are removed, so a redo never erases what the owner first said.
+ */
 export async function redoDiagnosisAction(): Promise<Result<null>> {
-  const token = await getOwnerToken();
-  if (!token) return noLink;
+  const state = await getOwnerState();
+  if (!state) return noLink;
+  if (state.pack?.questionnaireSentAt) return { ok: false, error: id.pack.redo.locked };
   try {
-    await data().owner.reset(token);
-    logLater(token, "diagnosa_ulang", null);
+    await data().owner.reset(state.token);
+    logLater(state.token, "diagnosa_ulang", {
+      jawaban_lama: state.diagnosis ? JSON.stringify(state.diagnosis.answers) : null,
+      repot_lama: state.pack?.hardestSection ?? null,
+      paket_lama: state.pack?.createdOn ?? null,
+    });
     return done;
   } catch {
     return { ok: false, error: id.pack.redo.failed };

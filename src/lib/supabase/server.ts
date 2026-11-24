@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 import type { Database } from "@/types/database";
@@ -35,19 +36,31 @@ export async function createClient() {
 }
 
 /**
- * Anonymous client for the owner side. Owners have no account: every call goes through a
- * SECURITY DEFINER function that checks the private link token. No session cookies involved.
+ * A database call that has not answered by then is given up. The action then returns a clear
+ * error the phone can retry, instead of leaving the owner on a spinner (and, because Next.js
+ * runs one action at a time per page, holding up every answer after it).
  */
-export function createAnonClient() {
+const ANON_REQUEST_TIMEOUT_MS = 10_000;
+
+function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit) {
+  const timeout = AbortSignal.timeout(ANON_REQUEST_TIMEOUT_MS);
+  const signal = init?.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
+  return fetch(input, { ...init, signal });
+}
+
+let anonClient: SupabaseClient<Database> | null = null;
+
+/**
+ * Anonymous client for the owner side. Owners have no account: every call goes through a
+ * SECURITY DEFINER function that checks the private link token. No session and no cookies,
+ * so one client is shared by every request this server instance handles.
+ */
+export function createAnonClient(): SupabaseClient<Database> {
+  if (anonClient) return anonClient;
   const config = requireConfig();
-  return createServerClient<Database>(config.url, config.anonKey, {
-    cookies: {
-      getAll() {
-        return [];
-      },
-      setAll() {
-        // No session for owners.
-      },
-    },
+  anonClient = createSupabaseClient<Database>(config.url, config.anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: { fetch: fetchWithTimeout },
   });
+  return anonClient;
 }

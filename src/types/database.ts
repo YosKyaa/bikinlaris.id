@@ -11,6 +11,75 @@ export type Database = {
   };
   public: {
     Tables: {
+      bank_teks: {
+        Row: {
+          diubah_at: string;
+          diubah_oleh: string | null;
+          jenis: string;
+          kolom: string;
+          kunci: string;
+          nilai: string;
+          varian: string;
+        };
+        Insert: {
+          diubah_at?: string;
+          diubah_oleh?: string | null;
+          jenis: string;
+          kolom: string;
+          kunci: string;
+          nilai: string;
+          varian: string;
+        };
+        Update: {
+          diubah_at?: string;
+          diubah_oleh?: string | null;
+          jenis?: string;
+          kolom?: string;
+          kunci?: string;
+          nilai?: string;
+          varian?: string;
+        };
+        Relationships: [];
+      };
+      bank_teks_riwayat: {
+        Row: {
+          created_at: string;
+          id: number;
+          jenis: string;
+          kolom: string;
+          kunci: string;
+          nilai_baru: string | null;
+          nilai_lama: string | null;
+          oleh: string | null;
+          oleh_nama: string | null;
+          varian: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          jenis: string;
+          kolom: string;
+          kunci: string;
+          nilai_baru?: string | null;
+          nilai_lama?: string | null;
+          oleh?: string | null;
+          oleh_nama?: string | null;
+          varian: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          jenis?: string;
+          kolom?: string;
+          kunci?: string;
+          nilai_baru?: string | null;
+          nilai_lama?: string | null;
+          oleh?: string | null;
+          oleh_nama?: string | null;
+          varian?: string;
+        };
+        Relationships: [];
+      };
       businesses: {
         Row: {
           access_token: string;
@@ -77,6 +146,7 @@ export type Database = {
           peta: Json | null;
           repot: string | null;
           started_at: string;
+          versi_teks: number | null;
         };
         Insert: {
           business_id: string;
@@ -86,6 +156,7 @@ export type Database = {
           peta?: Json | null;
           repot?: string | null;
           started_at?: string;
+          versi_teks?: number | null;
         };
         Update: {
           business_id?: string;
@@ -95,6 +166,7 @@ export type Database = {
           peta?: Json | null;
           repot?: string | null;
           started_at?: string;
+          versi_teks?: number | null;
         };
         Relationships: [
           {
@@ -361,6 +433,17 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      admin_ubah_teks: {
+        Args: {
+          p_jenis: string;
+          p_kolom: string;
+          p_kunci: string;
+          p_nilai: string | null;
+          p_varian: string;
+        };
+        Returns: number;
+      };
+      bank_teks_versi: { Args: never; Returns: number };
       catat_galat: {
         Args: {
           p_digest: string | null;
@@ -432,6 +515,10 @@ export type Database = {
       umkm_simpan_jawaban: {
         Args: { p_jawaban: string; p_pertanyaan: string; p_token: string };
         Returns: boolean;
+      };
+      umkm_simpan_jawaban_banyak: {
+        Args: { p_jawaban: Json; p_token: string };
+        Returns: Json;
       };
       umkm_state: { Args: { p_token: string }; Returns: Json };
       umkm_ulang: { Args: { p_token: string }; Returns: undefined };

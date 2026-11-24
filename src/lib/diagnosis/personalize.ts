@@ -8,9 +8,10 @@ import type { PackResult } from "@/lib/data/source";
 import type { Business, Diagnosis, Pack, PackSop } from "@/lib/data/types";
 import { env } from "@/lib/env";
 import { toJson } from "@/lib/json";
+import { wordingFor } from "@/lib/data/text-edits";
 import { regencyName } from "@/lib/wilayah";
 
-import { getProblem, getQuestion, getSection, getSop } from "./bank";
+import { getProblem, getQuestion, getSection, getSop, type Wording } from "./bank";
 
 /**
  * SOP personalisation (spec `claude_api`, docs/keputusan.md: one call per diagnosis, template
@@ -49,7 +50,7 @@ const outputSchema = z.object({
 });
 type Output = z.infer<typeof outputSchema>;
 
-function promptInput(business: Business, diagnosis: Diagnosis, pack: Pack) {
+function promptInput(business: Business, diagnosis: Diagnosis, pack: Pack, wording: Wording) {
   const options = id.profile.options;
   return {
     usaha: {
@@ -59,18 +60,18 @@ function promptInput(business: Business, diagnosis: Diagnosis, pack: Pack) {
       lokasi: regencyName(business.location),
       karyawan: options.employees[business.employees],
     },
-    paling_repot: getSection(pack.hardestSection).label,
+    paling_repot: getSection(pack.hardestSection, wording).label,
     sops: pack.sops.map((packSop) => {
-      const sop = getSop(packSop.sopId);
+      const sop = getSop(packSop.sopId, wording);
       const problems = pack.problems.filter((p) => packSop.problemIds.includes(p.id));
       return {
         sop_id: sop.id,
         judul: sop.title,
         tujuan: sop.goal,
-        kenapa_template: problems.map((p) => getProblem(p.id).rootCause).join(" "),
+        kenapa_template: problems.map((p) => getProblem(p.id, wording).rootCause).join(" "),
         dari_jawaban: problems.flatMap((p) =>
           p.evidence.map((questionId) => ({
-            pertanyaan: getQuestion(questionId).text,
+            pertanyaan: getQuestion(questionId, wording).text,
             jawaban: diagnosis.answers[questionId] ?? null,
           })),
         ),
@@ -125,7 +126,9 @@ export async function personalizePack(
   try {
     const output = await provider.generateJson({
       instructions: SYSTEM_PROMPT,
-      input: JSON.stringify(promptInput(business, diagnosis, pack)),
+      input: JSON.stringify(
+        promptInput(business, diagnosis, pack, await wordingFor(business.sector)),
+      ),
       schema: outputSchema,
       name: OUTPUT_NAME,
       maxOutputTokens: MAX_TOKENS,

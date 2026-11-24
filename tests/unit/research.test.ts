@@ -35,24 +35,28 @@ test("the pendamping filter: mine, unassigned, one member, everyone", () => {
   expect(ids(null)).toHaveLength(3);
 });
 
-test("the summary CSV adds the follow-up columns at the end (SmartPLS columns unchanged)", () => {
+test("the summary CSV adds new columns at the end (SmartPLS columns unchanged)", () => {
   const p = participant({ assignedTo: MEMBER_A, packDaysAgo: 31 });
   const table = summaryTable([p], [], TODAY, {
     notes: [note(p.business.id, "tersambung", "2026-11-04T03:00:00.000Z")],
     memberNames: new Map([[MEMBER_A, "Tim Lapangan"]]),
   });
   expect(table.header.slice(0, 2)).toEqual(["kode", "business_id"]);
-  expect(table.header.slice(-4)).toEqual([
+  expect(table.header.slice(-6)).toEqual([
     "pendamping",
     "kontak_jumlah",
     "kontak_terakhir_hasil",
     "kontak_terakhir",
+    "teks_untuk",
+    "teks_versi",
   ]);
-  expect(table.rows[0].slice(-4)).toEqual([
+  expect(table.rows[0].slice(-6)).toEqual([
     "Tim Lapangan",
     1,
     "tersambung",
     "2026-11-04T03:00:00.000Z",
+    "umum",
+    null,
   ]);
   expect(table.header).toContain("event_unduh_pdf");
 });

@@ -4,6 +4,7 @@ import * as id from "@/content/id";
 import { NOTICE_PARAM, PDF_FAILED_NOTICE, ROUTES } from "@/lib/auth/constants";
 import { data } from "@/lib/data";
 import { getOwnerState, joinHref } from "@/lib/data/owner-session";
+import { wordingFor } from "@/lib/data/text-edits";
 import { errorMessage, reportError } from "@/lib/monitoring/report";
 import { renderPackPdf } from "@/lib/pdf/pack-document";
 import { regencyName } from "@/lib/wilayah";
@@ -23,7 +24,12 @@ export async function GET(request: NextRequest) {
 
   let pdf: Buffer;
   try {
-    pdf = await renderPackPdf({ business, pack, locationLabel: regencyName(business.location) });
+    pdf = await renderPackPdf({
+      business,
+      pack,
+      locationLabel: regencyName(business.location),
+      wording: await wordingFor(business.sector),
+    });
   } catch (error) {
     await reportError({
       source: "server",

@@ -18,10 +18,12 @@ export interface PdfSop {
 
 function TaskGroup({
   title,
+  hint,
   tasks,
   texts,
 }: {
   title: string;
+  hint: string;
   tasks: Task[];
   texts: PdfSop["taskTexts"];
 }) {
@@ -29,6 +31,7 @@ function TaskGroup({
   return (
     <View style={styles.section} wrap={false}>
       <Text style={styles.h3}>{title}</Text>
+      <Text style={[styles.small, { marginBottom: 4 }]}>{hint}</Text>
       {tasks.map((task) => (
         <View key={task.id} style={styles.task}>
           <View style={styles.box} />
@@ -114,9 +117,24 @@ export function SopPage({
           </Text>
         </View>
       ) : null}
-      <TaskGroup title={copy.setup} tasks={byKind("siapkan")} texts={taskTexts} />
-      <TaskGroup title={copy.daily} tasks={byKind("harian")} texts={taskTexts} />
-      <TaskGroup title={copy.weekly} tasks={byKind("mingguan")} texts={taskTexts} />
+      <TaskGroup
+        title={copy.setup}
+        hint={copy.hints.siapkan}
+        tasks={byKind("siapkan")}
+        texts={taskTexts}
+      />
+      <TaskGroup
+        title={copy.daily}
+        hint={copy.hints.harian}
+        tasks={byKind("harian")}
+        texts={taskTexts}
+      />
+      <TaskGroup
+        title={copy.weekly}
+        hint={copy.hints.mingguan}
+        tasks={byKind("mingguan")}
+        texts={taskTexts}
+      />
       <TickTable
         rows={byKind("harian").map((t) => ({ id: t.id, label: taskTexts?.[t.id] ?? t.text }))}
       />

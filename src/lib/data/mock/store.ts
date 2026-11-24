@@ -6,6 +6,7 @@ import type { QuestionId, SectionId } from "@/content/diagnosis";
 import type { StoredAnswer } from "@/content/diagnosis.types";
 import * as id from "@/content/id";
 import { demoProvider } from "@/lib/ai/demo";
+import type { TextEdit, TextEditHistoryItem } from "@/lib/diagnosis/edits";
 import { rules } from "@/lib/diagnosis/bank";
 import { buildPack } from "@/lib/diagnosis/scoring";
 import { addDays, todayIso } from "@/lib/format";
@@ -77,7 +78,13 @@ interface MockStore {
   coachRefusals: { businessId: string; text: string; createdAt: string }[];
   contactNotes: ContactNote[];
   nextContactId: number;
+  /** Admin text edits (bank_teks) and their history (bank_teks_riwayat, oldest first). */
+  textEdits: TextEdit[];
+  textHistory: TextEditHistoryItem[];
 }
+
+/** Current text version: the newest history id, 0 when nothing was edited (bank_teks_versi). */
+export const textVersion = (s: MockStore) => s.textHistory.at(-1)?.id ?? 0;
 
 /** Coach messages returned to the owner (same as umkm_coach_riwayat in Supabase). */
 export const COACH_HISTORY_SHOWN = 40;
@@ -311,6 +318,8 @@ function seed(): MockStore {
     coachRefusals: [],
     contactNotes: [],
     nextContactId: 1,
+    textEdits: [],
+    textHistory: [],
   };
   const today = todayIso();
 

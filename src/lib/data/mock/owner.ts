@@ -7,7 +7,15 @@ import { addDays, todayIso } from "@/lib/format";
 
 import type { OwnerStore } from "../source";
 import type { Diagnosis, OwnerState, Pack } from "../types";
-import { COACH_HISTORY_SHOWN, newId, nextCode, pushCoach, pushEvent, store } from "./store";
+import {
+  COACH_HISTORY_SHOWN,
+  newId,
+  nextCode,
+  pushCoach,
+  pushEvent,
+  store,
+  textVersion,
+} from "./store";
 
 const MS_PER_SECOND = 1000;
 const TOKEN_BYTES = 16;
@@ -36,7 +44,7 @@ export const mockOwnerStore: OwnerStore = {
     };
   },
 
-  async saveAnswer(token, questionId, answer) {
+  async saveAnswers(token, answers) {
     const s = store();
     const businessId = businessIdOf(token);
     if (s.packs.has(businessId)) throw new Error("paket_sudah_dibuat");
@@ -49,12 +57,13 @@ export const mockOwnerStore: OwnerStore = {
         hardestSection: null,
         startedAt: new Date().toISOString(),
         completedAt: null,
+        textVersion: textVersion(s),
       } satisfies Diagnosis;
       s.diagnoses.set(businessId, diagnosis);
     }
-    const first = Object.keys(diagnosis.answers).length === 0;
-    diagnosis.answers = { ...diagnosis.answers, [questionId]: answer };
-    return { first };
+    const first = Object.keys(diagnosis.answers).length === 0 && Object.keys(answers).length > 0;
+    diagnosis.answers = { ...diagnosis.answers, ...answers };
+    return { first, answers: diagnosis.answers };
   },
 
   async startPack(token, input) {

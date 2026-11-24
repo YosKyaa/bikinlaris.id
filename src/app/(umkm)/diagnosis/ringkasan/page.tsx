@@ -11,7 +11,8 @@ import type { StoredAnswer } from "@/content/diagnosis.types";
 import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { requireOwnerState } from "@/lib/data/owner-session";
-import { questionsOf, sections } from "@/lib/diagnosis/bank";
+import { wordingFor } from "@/lib/data/text-edits";
+import { getSection, questionsOf, sections } from "@/lib/diagnosis/bank";
 import { computeMap, hardestCandidates, isSectionComplete } from "@/lib/diagnosis/scoring";
 
 export const metadata: Metadata = { title: id.summary.title };
@@ -24,8 +25,10 @@ function answerLabel(answer: StoredAnswer | undefined, reversed: boolean): strin
 }
 
 export default async function SummaryPage() {
-  const { diagnosis, pack } = await requireOwnerState();
+  const { business, diagnosis, pack } = await requireOwnerState();
   if (pack) redirect(ROUTES.pack);
+  const wording = await wordingFor(business.sector);
+  const shown = sections.map((section) => getSection(section.id, wording));
 
   const answers = diagnosis?.answers ?? {};
   const map = computeMap(answers);
@@ -39,19 +42,19 @@ export default async function SummaryPage() {
         <p className="text-muted-foreground">{id.summary.subtitle}</p>
       </BentoTile>
       <DiagnosisSummary
-        sections={sections.map((section) => ({
+        sections={shown.map((section) => ({
           id: section.id,
           label: section.label,
           color: map[section.id].color,
           complete: isSectionComplete(section.id, answers),
           editHref: ROUTES.diagnosisArea(section.id),
-          questions: questionsOf(section.id).map((q) => ({
+          questions: questionsOf(section.id, wording).map((q) => ({
             id: q.id,
             text: q.text,
             answerLabel: answerLabel(answers[q.id as QuestionId], q.reversed),
           })),
         }))}
-        hardestOptions={sections
+        hardestOptions={shown
           .filter((section) => candidates.has(section.id))
           .map((section) => ({
             id: section.id,

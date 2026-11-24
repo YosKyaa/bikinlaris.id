@@ -21,6 +21,7 @@ import {
   toInvite,
   toPack,
   toStaff,
+  toTextHistory,
 } from "./mappers";
 
 /**
@@ -33,6 +34,8 @@ const INVITE_REJECTIONS = ["undangan_tidak_cocok", "Database error saving new us
 const PAGE_SIZE = 1000;
 /** Newest entries shown on the Sistem page. */
 const ERRORS_SHOWN = 50;
+/** Text edits shown in the history (newest first). */
+const TEXT_HISTORY_SHOWN = 200;
 /**
  * Pack columns the panel reads. `llm_raw` (the AI's raw answer, kept for the audit trail) is
  * left out: it is the largest column and no page shows it.
@@ -418,5 +421,29 @@ export const supabaseStaffStore: StaffStore = {
       .select("email");
     if (error) throw error;
     return data.length > 0;
+  },
+
+  async saveTextEdit(target, value) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_ubah_teks", {
+      p_jenis: target.kind,
+      p_kunci: target.key,
+      p_kolom: target.field,
+      p_varian: target.variant,
+      p_nilai: value,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async listTextHistory() {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("bank_teks_riwayat")
+      .select("*")
+      .order("id", { ascending: false })
+      .limit(TEXT_HISTORY_SHOWN);
+    if (error) throw error;
+    return data.map(toTextHistory);
   },
 };

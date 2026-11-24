@@ -7,27 +7,33 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { InlineError } from "@/components/molecules/inline-error";
 import * as id from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
-import { getProblem, getSop, rules } from "@/lib/diagnosis/bank";
+import { getSop, problemsIn, rules, type Wording } from "@/lib/diagnosis/bank";
 import { dayNumber, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 import { BusinessMap } from "./business-map";
 import { CoachWidget } from "./coach-widget";
 import { PackActions, PackStickyActions, PackViewTracker } from "./pack-actions";
-import { FirstStepCard, LaterSops, PackStatusCard, PackTips, ProblemList } from "./pack-details";
+import { FirstStepCard, LaterSops, PackStatusCard, ProblemList } from "./pack-details";
 import { SopDocument } from "./sop-document";
+import { SopGuide } from "./sop-guide";
 import { SopPackList } from "./sop-pack-list";
 
 interface PackViewProps {
   business: Business;
   pack: Pack;
   locationLabel: string;
+  /** Texts for this business: service wording and admin edits (lib/data/text-edits.ts). */
+  wording: Wording;
   whatsAppUrl: string;
   /** "Tanya coach", or null when the coach is off. */
   coach: ComponentProps<typeof CoachWidget> | null;
   /** The PDF download failed (the route sent the owner back here). */
   pdfFailed?: boolean;
 }
+
+/** The usage guide stays open for the first week, then folds away. */
+const GUIDE_OPEN_DAYS = 7;
 
 /**
  * The peak of the journey, as a bento: the title, the first step (--brand-deep) beside the
@@ -37,15 +43,16 @@ export function PackView({
   business,
   pack,
   locationLabel,
+  wording,
   whatsAppUrl,
   coach,
   pdfFailed = false,
 }: PackViewProps) {
   const documents = pack.sops.map((packSop, index) => {
-    const sop = getSop(packSop.sopId);
+    const sop = getSop(packSop.sopId, wording);
     const props = {
       sop,
-      problems: packSop.problemIds.map(getProblem),
+      problems: packSop.problemIds.map(problemsIn(wording)),
       businessName: business.name,
       whyText: packSop.whyText,
       taskTexts: packSop.taskTexts,
@@ -53,6 +60,7 @@ export function PackView({
     return { sop, index, props };
   });
   const hasSops = pack.sops.length > 0;
+  const day = dayNumber(pack.createdOn);
 
   return (
     // Room at the bottom for the phone action bar, and for the floating coach button when on.
@@ -67,20 +75,20 @@ export function PackView({
             {id.pack.title(business.name)}
           </h1>
         </BentoTile>
-        {hasSops ? <FirstStepCard sopId={pack.sops[0].sopId} /> : null}
+        {hasSops ? <FirstStepCard sopId={pack.sops[0].sopId} wording={wording} /> : null}
         <PackStatusCard
-          day={dayNumber(pack.createdOn)}
+          day={day}
           totalDays={rules.followUpDays}
           followUpDate={formatDate(pack.followUpOn)}
           code={business.code}
           className={hasSops ? undefined : "sm:col-span-2"}
         />
         {hasSops ? (
-          <BentoTile className="space-y-4 sm:col-span-2">
+          <BentoTile className="sm:col-span-2">
             <PackActions whatsAppUrl={whatsAppUrl} />
-            <PackTips />
           </BentoTile>
         ) : null}
+        {hasSops ? <SopGuide open={day <= GUIDE_OPEN_DAYS} className="sm:col-span-2" /> : null}
       </BentoGrid>
 
       <div className="hidden print:block">
@@ -88,6 +96,16 @@ export function PackView({
         <p className="text-sm">
           {id.pack.printMeta(business.product, locationLabel, formatDate(pack.createdOn))}
         </p>
+        {hasSops ? (
+          <div className="mt-3 break-inside-avoid border p-3">
+            <p className="font-semibold">{id.pack.guide.title}</p>
+            <ol className="mt-1 list-decimal pl-5 text-sm">
+              {id.pack.guide.steps.map((step) => (
+                <li key={step.title}>{step.title}</li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
       </div>
 
       {!hasSops ? (
@@ -123,11 +141,11 @@ export function PackView({
       {coach && hasSops ? <CoachWidget {...coach} /> : null}
 
       <div className="print:hidden">
-        <BusinessMap map={pack.map} hardest={pack.hardestSection} compact>
-          <ProblemList problems={pack.problems} />
+        <BusinessMap map={pack.map} hardest={pack.hardestSection} wording={wording} compact>
+          <ProblemList problems={pack.problems} wording={wording} />
         </BusinessMap>
       </div>
-      <LaterSops sopIds={pack.laterSopIds} />
+      <LaterSops sopIds={pack.laterSopIds} wording={wording} />
       {hasSops ? <PackStickyActions whatsAppUrl={whatsAppUrl} /> : null}
     </div>
   );

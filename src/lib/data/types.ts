@@ -47,6 +47,11 @@ export interface Diagnosis {
   hardestSection: SectionId | null;
   startedAt: string;
   completedAt: string | null;
+  /**
+   * Version of the admin text edits when the check started (bank_teks_riwayat id, 0 = bank.json
+   * as is). Absent for checks started before 24 November 2026.
+   */
+  textVersion?: number | null;
 }
 
 export interface SectionScore {

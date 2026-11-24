@@ -2,7 +2,7 @@ import { Document, Page, renderToBuffer, Text, View } from "@react-pdf/renderer"
 
 import * as id from "@/content/id";
 import type { Business, Pack } from "@/lib/data/types";
-import { getProblem, getSop } from "@/lib/diagnosis/bank";
+import { getSop, problemsIn, type Wording } from "@/lib/diagnosis/bank";
 import { formatDate } from "@/lib/format";
 
 import { registerPdfFonts } from "./fonts";
@@ -14,6 +14,8 @@ export interface PackPdfInput {
   pack: Pack;
   /** Regency name, resolved by the caller. */
   locationLabel: string;
+  /** Texts for this business (service wording, admin edits), resolved by the caller. */
+  wording: Wording;
 }
 
 function Footer({ businessName }: { businessName: string }) {
@@ -29,7 +31,7 @@ function Footer({ businessName }: { businessName: string }) {
 function CoverPage({ input, sops }: { input: PackPdfInput; sops: PdfSop[] }) {
   const { business, pack, locationLabel } = input;
   const copy = id.pack.pdf;
-  const later = pack.laterSopIds.map(getSop);
+  const later = pack.laterSopIds.map((sopId) => getSop(sopId, input.wording));
   return (
     <Page size="A4" style={styles.page}>
       <View style={styles.cover}>
@@ -43,10 +45,13 @@ function CoverPage({ input, sops }: { input: PackPdfInput; sops: PdfSop[] }) {
 
       <View style={styles.tile}>
         <Text style={styles.h2}>{copy.howToTitle}</Text>
-        {copy.howTo.map((line, index) => (
-          <View key={line} style={styles.row}>
+        {copy.howTo.map((step, index) => (
+          <View key={step.title} style={styles.row} wrap={false}>
             <Text style={styles.number}>{index + 1}.</Text>
-            <Text style={styles.grow}>{line}</Text>
+            <View style={styles.grow}>
+              <Text style={{ fontWeight: 600 }}>{step.title}</Text>
+              <Text style={styles.small}>{step.body}</Text>
+            </View>
           </View>
         ))}
       </View>
@@ -91,8 +96,8 @@ function CoverPage({ input, sops }: { input: PackPdfInput; sops: PdfSop[] }) {
 export function PackPdfDocument({ input }: { input: PackPdfInput }) {
   const { business, pack } = input;
   const sops: PdfSop[] = pack.sops.map((packSop) => ({
-    sop: getSop(packSop.sopId),
-    problems: packSop.problemIds.map(getProblem),
+    sop: getSop(packSop.sopId, input.wording),
+    problems: packSop.problemIds.map(problemsIn(input.wording)),
     whyText: packSop.whyText,
     taskTexts: packSop.taskTexts,
   }));

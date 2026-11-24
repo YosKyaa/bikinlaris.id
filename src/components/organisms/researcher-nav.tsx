@@ -2,6 +2,7 @@
 
 import {
   BarChart3Icon,
+  BookOpenTextIcon,
   LayoutDashboardIcon,
   ListChecksIcon,
   LogOutIcon,
@@ -71,6 +72,12 @@ function navItems(isAdmin: boolean): NavItem[] {
       href: ROUTES.monitoring,
       icon: BarChart3Icon,
       isActive: startsWith(ROUTES.monitoring),
+    },
+    {
+      label: menu.bank,
+      href: ROUTES.bank,
+      icon: BookOpenTextIcon,
+      isActive: startsWith(ROUTES.bank),
     },
   ];
   if (isAdmin) {

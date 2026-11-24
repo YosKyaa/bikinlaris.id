@@ -94,6 +94,29 @@ export interface DiagnosisRules<SectionId extends string = string> {
   followUpDays: number;
 }
 
+/**
+ * Wording variants. "jasa" rewords the check and the SOPs for service businesses (salon,
+ * laundry, bengkel, …). Only texts change: ids, answer keys, scoring, and which problem or SOP
+ * an answer triggers stay exactly the same, so the research data stays comparable.
+ */
+export const TEXT_VARIANTS = ["jasa"] as const;
+export type TextVariant = (typeof TEXT_VARIANTS)[number];
+
+/** Texts a variant replaces, keyed by id. Anything not listed keeps the general text. */
+export interface TextVariantOverrides {
+  note: string;
+  sections: Record<string, { label?: string; description?: string }>;
+  questions: Record<string, { text?: string; skipWhen?: string }>;
+  problems: Record<string, { title?: string; rootCause?: string; impact?: string }>;
+  sops: Record<
+    string,
+    { title?: string; goal?: string; tasks?: Record<string, { text?: string; unit?: string }> }
+  >;
+}
+
+/** One layer of replacement texts: a bank variant, or the admin edits for one wording. */
+export type TextLayer = Omit<TextVariantOverrides, "note">;
+
 export interface DiagnosisBankShape<
   SectionId extends string = string,
   QuestionId extends string = string,
@@ -106,4 +129,5 @@ export interface DiagnosisBankShape<
   questions: Question<SectionId, QuestionId, ProblemId>[];
   problems: Problem<SectionId, ProblemId, SopId>[];
   sops: Sop<SectionId, SopId>[];
+  variants: Partial<Record<TextVariant, TextVariantOverrides>>;
 }

@@ -2,6 +2,7 @@ import { diagnosisBank } from "@/content/diagnosis";
 import { SECTOR_KBLI } from "@/content/kbli";
 import { sections } from "@/lib/diagnosis/bank";
 import { answeredCount } from "@/lib/diagnosis/scoring";
+import { textVariantFor } from "@/lib/diagnosis/variant";
 import { addDays, dayNumber } from "@/lib/format";
 import { provinceName, regencyName } from "@/lib/wilayah";
 
@@ -267,6 +268,11 @@ export function summaryTable(
     "kontak_jumlah",
     "kontak_terakhir_hasil",
     "kontak_terakhir",
+    // Added at the end so the SmartPLS column positions stay the same (24 November 2026).
+    // Wording of the check and pack: "jasa" or "umum" (lib/diagnosis/variant.ts).
+    "teks_untuk",
+    // Admin text edits in force when the check started (Bank pertanyaan > Riwayat); 0 = none.
+    "teks_versi",
   ];
   const rows = participants.map((participant) => {
     const { business: b, diagnosis } = participant;
@@ -318,6 +324,8 @@ export function summaryTable(
       contacts.length,
       contacts[0]?.outcome ?? null,
       contacts[0]?.createdAt ?? null,
+      textVariantFor(b.sector) ?? "umum",
+      diagnosis?.textVersion ?? null,
     ];
   });
   return { header, rows };

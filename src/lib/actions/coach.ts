@@ -15,6 +15,7 @@ import {
 } from "@/lib/coach/rules";
 import { guardQuestion, isOffTopicAnswer } from "@/lib/coach/guard";
 import { coachInstructions, quoteQuestion } from "@/lib/coach/prompt";
+import { wordingFor } from "@/lib/data/text-edits";
 import { data } from "@/lib/data";
 import { getOwnerState } from "@/lib/data/owner-session";
 import type { CoachQuotaStatus } from "@/lib/data/source";
@@ -129,7 +130,11 @@ export async function askCoachAction(
   let reply: AiTextResult;
   try {
     reply = await provider.generateText({
-      instructions: coachInstructions(state.business, pack),
+      instructions: coachInstructions(
+        state.business,
+        pack,
+        await wordingFor(state.business.sector),
+      ),
       messages: [
         ...history.turns
           .slice(-CONTEXT_MESSAGES)

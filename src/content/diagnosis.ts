@@ -10,7 +10,7 @@ export type SopId = "satu_pintu_pesanan" | "cek_ulang_pesanan" | "antrean_jelas"
 export type DiagnosisBank = DiagnosisBankShape<SectionId, QuestionId, ProblemId, SopId>;
 
 export const diagnosisBank: DiagnosisBank = {
-  "version": "0.3",
+  "version": "0.4",
   "rules": {
     "maxSopPerPack": 5,
     "redPoints": 2,
@@ -916,5 +916,318 @@ export const diagnosisBank: DiagnosisBank = {
         }
       ]
     }
-  ]
+  ],
+  "variants": {
+    "jasa": {
+      "note": "Redaksi untuk usaha jasa (salon, laundry, bengkel, servis, percetakan, kursus, jasa lain). Hanya teks yang berubah: id, kunci jawaban, skor, masalah, dan SOP yang dipicu sama persis dengan teks umum, jadi data riset tetap sebanding. Teks yang tidak disebut di sini memakai teks umum.",
+      "sections": {
+        "pesanan": {
+          "label": "Pesanan & pelanggan",
+          "description": "Cara pesanan atau janji masuk dan dicatat"
+        },
+        "produksi": {
+          "label": "Pengerjaan layanan",
+          "description": "Cara pekerjaan dikerjakan waktu ramai"
+        },
+        "stok": {
+          "label": "Bahan & alat kerja",
+          "description": "Cara belanja dan jaga bahan kerja"
+        },
+        "promosi": {
+          "label": "Promosi & pelanggan",
+          "description": "Cara pelanggan tahu dan balik lagi"
+        },
+        "antar": {
+          "label": "Selesai & layanan",
+          "description": "Cara pekerjaan selesai tepat janji dan komplain ditangani"
+        }
+      },
+      "questions": {
+        "q_pesanan_1": {
+          "text": "Pesanan atau janji (booking) masuk lewat satu jalur saja? (misal satu nomor WA)"
+        },
+        "q_pesanan_2": {
+          "text": "Tiap pesanan atau janji ditulis di satu tempat (buku atau HP), bukan cuma diingat?"
+        },
+        "q_pesanan_3": {
+          "text": "Sebelum dikerjakan, rincian pekerjaan dan harganya dikirim ulang ke pelanggan buat dicek?"
+        },
+        "q_pesanan_4": {
+          "text": "Sebulan terakhir, ada pelanggan yang dapat hasil kerja nggak sesuai permintaan?"
+        },
+        "q_pesanan_5": {
+          "text": "Waktu ramai, pernah ada pesanan atau janji yang kelewat atau lupa dikerjakan?"
+        },
+        "q_produksi_1": {
+          "text": "Waktu ramai, semua orang tahu pekerjaan mana yang dikerjakan duluan?"
+        },
+        "q_produksi_3": {
+          "text": "Hasil kerja sama rapinya, siapa pun yang mengerjakan?"
+        },
+        "q_produksi_4": {
+          "text": "Ada langkah kerja atau standar tertulis yang dipakai tiap kali mengerjakan?"
+        },
+        "q_produksi_5": {
+          "text": "Sebulan terakhir, pernah pekerjaan telat selesai karena orang atau alat keteteran?"
+        },
+        "q_stok_1": {
+          "text": "Sebelum belanja, sisa bahan kerja (misal sampo, deterjen, oli, kertas) dicek dulu, bukan kira-kira?"
+        },
+        "q_stok_2": {
+          "text": "Sebulan terakhir, pernah bahan kerja habis waktu lagi melayani pelanggan?"
+        },
+        "q_stok_3": {
+          "text": "Pernah bahan kerja kebuang karena kedaluwarsa atau kebanyakan beli?"
+        },
+        "q_stok_4": {
+          "text": "Tahu bahan kerja mana yang paling sering habis duluan?"
+        },
+        "q_stok_5": {
+          "text": "Bahan kerja utama dibeli langganan dengan harga tetap, bukan eceran tiap kali butuh?"
+        },
+        "q_uang_1": {
+          "text": "Uang usaha dan uang rumah dipisah?"
+        },
+        "q_uang_4": {
+          "text": "Tahu berapa modal untuk sekali layanan (bahan, listrik, alat)?"
+        },
+        "q_uang_5": {
+          "text": "Ada pelanggan yang ngutang dan dicatat siapa saja?"
+        },
+        "q_promosi_1": {
+          "text": "Seminggu terakhir, posting promosi usaha (story WA, IG, atau lainnya) lebih dari 3 kali?"
+        },
+        "q_promosi_2": {
+          "text": "Punya foto hasil kerja (misal sebelum dan sesudah) yang jelas dan terang buat promosi?"
+        },
+        "q_promosi_3": {
+          "text": "Ada daftar pelanggan langganan yang bisa dihubungi kalau ada layanan atau promo baru?"
+        },
+        "q_promosi_4": {
+          "text": "Tahu layanan mana yang paling sering dipesan dan paling untung?"
+        },
+        "q_promosi_5": {
+          "text": "Pelanggan lama sering balik lagi?"
+        },
+        "q_antar_1": {
+          "text": "Pekerjaan biasanya selesai sesuai jam atau tanggal yang dijanjikan?"
+        },
+        "q_antar_2": {
+          "text": "Ada batas jumlah pesanan atau jam terakhir terima, biar nggak keteteran?"
+        },
+        "q_antar_4": {
+          "text": "Kalau datang ke tempat pelanggan, alamatnya diminta share lokasi, bukan cuma ketik?",
+          "skipWhen": "tidak pernah datang ke tempat pelanggan"
+        },
+        "q_antar_5": {
+          "text": "Sebulan terakhir, ada pelanggan yang komplain soal hasil atau layanan?"
+        }
+      },
+      "problems": {
+        "pesanan_banyak_jalur": {
+          "rootCause": "Pesanan dan janji datang lewat WA pribadi, DM, telepon, dan yang datang langsung. Nggak ada satu tempat yang dilihat semua orang, jadi gampang kelewat.",
+          "impact": "Pesanan hilang, pelanggan kecewa diam-diam."
+        },
+        "pesanan_diingat": {
+          "impact": "Salah jadwal, salah permintaan, lupa."
+        },
+        "pesanan_tidak_dicek": {
+          "title": "Pesanan nggak dicek ulang ke pelanggan",
+          "rootCause": "Langsung dikerjakan dari chat atau omongan. Kalau ada yang salah paham, ketahuannya pas pekerjaan sudah selesai.",
+          "impact": "Hasil nggak sesuai, bahan dan waktu terbuang, harus kerja ulang."
+        },
+        "pesanan_kelewat": {
+          "rootCause": "Nggak ada yang khusus jaga pesanan masuk pas jam sibuk. Semua sibuk mengerjakan.",
+          "impact": "Pelanggan nunggu tanpa kabar, akhirnya pergi."
+        },
+        "hasil_tidak_konsisten": {
+          "title": "Hasil beda-beda tergantung siapa yang mengerjakan",
+          "rootCause": "Nggak ada langkah atau standar tertulis, jadi tiap orang pakai feeling sendiri.",
+          "impact": "Pelanggan langganan kecewa waktu dapat hasil yang beda."
+        },
+        "belanja_kira_kira": {
+          "impact": "Bahan habis waktu melayani, atau kelebihan sampai kebuang."
+        },
+        "bahan_habis": {
+          "title": "Bahan habis waktu melayani",
+          "impact": "Pelanggan ditolak atau disuruh nunggu, pemasukan hilang di jam paling ramai."
+        },
+        "bahan_terbuang": {
+          "rootCause": "Beli terlalu banyak untuk bahan yang ada tanggal kedaluwarsanya, atau yang lama nggak dipakai duluan."
+        },
+        "beli_eceran": {
+          "rootCause": "Belum punya langganan untuk bahan kerja utama, jadi tiap kali butuh beli sedikit dengan harga eceran.",
+          "impact": "Modal sekali layanan lebih mahal dari yang seharusnya."
+        },
+        "uang_campur": {
+          "title": "Uang usaha dan uang rumah campur"
+        },
+        "tidak_tahu_untung": {
+          "rootCause": "Uang masuk dan keluar nggak dicatat tiap hari, dan modal sekali layanan belum pernah dihitung."
+        },
+        "utang_tidak_tercatat": {
+          "title": "Utang pelanggan nggak tercatat"
+        },
+        "jarang_posting": {
+          "title": "Jarang kelihatan pelanggan",
+          "impact": "Sepi bukan karena layanan jelek, tapi karena nggak kelihatan."
+        },
+        "foto_jelek": {
+          "title": "Foto hasil kerja kurang meyakinkan",
+          "rootCause": "Foto gelap, buram, atau nggak ada. Orang memilih pakai mata dulu."
+        },
+        "tidak_ada_daftar_pembeli": {
+          "title": "Pelanggan lama nggak dihubungi lagi",
+          "rootCause": "Nomor pelanggan nggak disimpan rapi, jadi nggak bisa dikabari kalau ada yang baru.",
+          "impact": "Cari pelanggan baru terus, yang lama lupa."
+        },
+        "tidak_tahu_andalan": {
+          "title": "Nggak tahu layanan andalan",
+          "rootCause": "Semua layanan dianggap sama, padahal biasanya ada 2–3 yang bawa untung paling besar.",
+          "impact": "Promosi nggak fokus, belanja bahan nggak pas."
+        },
+        "sering_telat": {
+          "rootCause": "Nggak ada batas pesanan per hari dan urutan pengerjaan. Semua diterima, semua dikejar sekaligus.",
+          "impact": "Pelanggan kecewa, kamu stres tiap hari."
+        },
+        "komplain_lama": {
+          "impact": "Pelanggan kecewa dua kali: salah, dan dicuekin."
+        },
+        "kurir_nyasar": {
+          "title": "Bingung alamat pelanggan",
+          "impact": "Telat, bolak-balik telepon, ongkos jalan bengkak."
+        }
+      },
+      "sops": {
+        "satu_pintu_pesanan": {
+          "tasks": {
+            "t2": {
+              "text": "Pasang tulisan atau story: \"Pesan dan booking lewat nomor ini ya\""
+            },
+            "t4": {
+              "text": "Jam ramai, satu orang pegang HP pesanan, nggak ikut mengerjakan"
+            }
+          }
+        },
+        "cek_ulang_pesanan": {
+          "tasks": {
+            "t1": {
+              "text": "Simpan template balasan: \"Saya ulang ya: [layanan] [jumlah] [jam/tanggal] [harga]. Betul?\""
+            },
+            "t2": {
+              "text": "Tiap pesanan, kirim ulang ke pelanggan dan tunggu dia bilang OK"
+            }
+          }
+        },
+        "antrean_jelas": {
+          "goal": "Semua orang tahu pekerjaan mana yang dikerjakan duluan."
+        },
+        "tulis_cara_kerja": {
+          "goal": "Karyawan bisa jalan tanpa nanya, hasil sama walau bukan kamu yang mengerjakan.",
+          "tasks": {
+            "t1": {
+              "text": "Pilih 1 layanan paling sering dipesan, tulis urutan mengerjakannya di 5–7 langkah"
+            },
+            "t2": {
+              "text": "Tulis bahan dan alat yang dipakai untuk sekali layanan itu"
+            },
+            "t3": {
+              "text": "Tempel di tempat kerja, minta karyawan mengerjakan sambil baca"
+            },
+            "t4": {
+              "text": "Tambah 1 layanan lagi yang ditulis langkahnya",
+              "unit": "layanan"
+            }
+          }
+        },
+        "cek_sisa_sebelum_belanja": {
+          "goal": "Nggak ada bahan yang habis waktu melayani, nggak ada yang kebuang.",
+          "tasks": {
+            "t1": {
+              "text": "Tulis 5 bahan kerja yang paling cepat habis"
+            },
+            "t2": {
+              "text": "Untuk tiap bahan itu, tentukan batas minimal (misal: sampo sisa 1 botol = harus beli)"
+            }
+          }
+        },
+        "langganan_bahan_utama": {
+          "goal": "Modal sekali layanan turun karena beli lebih banyak dengan harga tetap.",
+          "tasks": {
+            "t1": {
+              "text": "Pilih 2 bahan kerja yang paling banyak dipakai"
+            }
+          }
+        },
+        "pisah_dompet": {
+          "title": "Pisah dompet usaha dan rumah",
+          "tasks": {
+            "t1": {
+              "text": "Siapkan satu dompet atau rekening khusus usaha"
+            },
+            "t2": {
+              "text": "Tentukan \"gaji\" kamu dari usaha, ambil seminggu sekali dengan jumlah tetap"
+            },
+            "t3": {
+              "text": "Semua uang dari pelanggan masuk dompet usaha, belanja rumah dari gaji"
+            }
+          }
+        },
+        "catat_tiap_hari": {
+          "goal": "Tahu tiap hari berapa masuk, berapa keluar, layanan mana yang paling untung.",
+          "tasks": {
+            "t2": {
+              "text": "Sebelum tutup, catat total pemasukan hari ini"
+            },
+            "t3": {
+              "text": "Hitung modal sekali layanan yang paling sering dipesan (bahan + listrik + alat)"
+            },
+            "t4": {
+              "text": "Lihat catatan seminggu, hitung layanan mana yang paling sering dipesan dan paling untung"
+            }
+          }
+        },
+        "posting_tiap_hari": {
+          "goal": "Pelanggan ingat kamu ada, dan ada yang nanya tiap hari.",
+          "tasks": {
+            "t1": {
+              "text": "Foto 3 hasil kerja terbaik (kalau bisa sebelum dan sesudah) di tempat terang, latar rapi"
+            },
+            "t2": {
+              "text": "Posting 1 story WA (foto + harga + cara booking)"
+            }
+          }
+        },
+        "daftar_pembeli": {
+          "title": "Simpan pelanggan, kabari lagi",
+          "goal": "Pelanggan lama balik lagi tanpa harus cari yang baru terus.",
+          "tasks": {
+            "t1": {
+              "text": "Buat satu grup atau daftar siaran WA khusus pelanggan"
+            },
+            "t2": {
+              "text": "Tiap pelanggan baru, simpan nomornya dengan nama + layanan yang dipakai"
+            },
+            "t3": {
+              "text": "Kirim 1 kabar ke daftar itu (layanan baru, promo, atau jadwal yang masih kosong)"
+            }
+          }
+        },
+        "jam_potong_pesanan": {
+          "title": "Batas pesanan per hari",
+          "tasks": {
+            "t1": {
+              "text": "Tentukan berapa pekerjaan yang sanggup selesai sehari, dan jam terakhir terima pesanan"
+            },
+            "t3": {
+              "text": "Kalau sudah penuh, tawarkan jadwal besok, jangan terima untuk hari ini"
+            },
+            "t4": {
+              "text": "Kalau datang ke tempat pelanggan, minta share lokasi sebelum berangkat"
+            }
+          }
+        }
+      }
+    }
+  }
 };

@@ -35,6 +35,8 @@ export const ROUTES = {
   /** Full participant list with the stage filter (the dashboard shows the most urgent few). */
   participants: "/tim/umkm",
   monitoring: "/tim/pantauan",
+  /** Questions, problems and SOPs: how the check is scored; admins fix texts here. */
+  bank: "/tim/bank",
   newParticipant: "/tim/umkm/baru",
   researcherBusiness: (businessId: string) => `/tim/umkm/${businessId}`,
   editParticipant: (businessId: string) => `/tim/umkm/${businessId}/ubah`,

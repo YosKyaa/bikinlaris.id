@@ -72,6 +72,7 @@ export const researcher = {
     overview: "Ringkasan",
     participants: "Daftar UMKM",
     monitoring: "Pantauan",
+    bank: "Bank pertanyaan",
     newParticipant: "Tambah UMKM",
     team: "Anggota tim",
     system: "Sistem",

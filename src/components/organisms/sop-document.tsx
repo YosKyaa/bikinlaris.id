@@ -76,9 +76,24 @@ export function SopDocument({
         </div>
       ) : null}
 
-      <TaskList title={id.pack.sop.setup} tasks={setup} texts={taskTexts} />
-      <TaskList title={id.pack.sop.daily} tasks={daily} texts={taskTexts} />
-      <TaskList title={id.pack.sop.weekly} tasks={weekly} texts={taskTexts} />
+      <TaskList
+        title={id.pack.sop.setup}
+        hint={id.pack.sop.hints.siapkan}
+        tasks={setup}
+        texts={taskTexts}
+      />
+      <TaskList
+        title={id.pack.sop.daily}
+        hint={id.pack.sop.hints.harian}
+        tasks={daily}
+        texts={taskTexts}
+      />
+      <TaskList
+        title={id.pack.sop.weekly}
+        hint={id.pack.sop.hints.mingguan}
+        tasks={weekly}
+        texts={taskTexts}
+      />
 
       {screen ? (
         <>

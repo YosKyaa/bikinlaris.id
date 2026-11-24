@@ -7,6 +7,7 @@ import { FocusLayout } from "@/components/templates/focus-layout";
 import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { requireOwnerState } from "@/lib/data/owner-session";
+import { wordingFor } from "@/lib/data/text-edits";
 import {
   getSection,
   isSectionId,
@@ -26,13 +27,14 @@ export default async function DiagnosisAreaPage({ params }: PageProps<"/diagnosi
   const { area } = await params;
   if (!isSectionId(area)) notFound();
 
-  const { diagnosis, pack } = await requireOwnerState();
+  const { business, diagnosis, pack } = await requireOwnerState();
   if (pack) redirect(ROUTES.pack);
+  const wording = await wordingFor(business.sector);
 
   const answers = diagnosis?.answers ?? {};
   const index = sections.findIndex((s) => s.id === area);
-  const section = getSection(area);
-  const questions = questionsOf(area);
+  const section = getSection(area, wording);
+  const questions = questionsOf(area, wording);
   const ownIds = new Set<string>(questions.map((q) => q.id));
   const answeredElsewhere = Object.keys(answers).filter((qid) => !ownIds.has(qid)).length;
   const isLast = index === sections.length - 1;

@@ -18,6 +18,13 @@ import {
   storedSectionIdSchema,
 } from "@/lib/validations/stored";
 import { STAFF_ROLES } from "@/lib/validations/auth";
+import {
+  EDIT_FIELDS,
+  EDIT_KINDS,
+  EDIT_VARIANTS,
+  type TextEdit,
+  type TextEditHistoryItem,
+} from "@/lib/diagnosis/edits";
 import { toJson } from "@/lib/json";
 import { LEGACY_LOCATIONS } from "@/lib/wilayah";
 import type { Json, TableRow } from "@/types/database";
@@ -112,6 +119,7 @@ const diagnosisRowSchema = z.object({
   repot: storedSectionIdSchema.nullable(),
   started_at: z.string(),
   completed_at: z.string().nullable(),
+  versi_teks: z.number().nullable().optional(),
 });
 
 export function toDiagnosis(row: unknown): Diagnosis {
@@ -123,6 +131,58 @@ export function toDiagnosis(row: unknown): Diagnosis {
     hardestSection: r.repot,
     startedAt: r.started_at,
     completedAt: r.completed_at,
+    textVersion: r.versi_teks ?? null,
+  };
+}
+
+const editTargetSchema = {
+  jenis: z.enum(EDIT_KINDS),
+  kunci: z.string(),
+  kolom: z.enum(EDIT_FIELDS),
+  varian: z.enum(EDIT_VARIANTS),
+};
+
+const textEditRowSchema = z.object({
+  ...editTargetSchema,
+  nilai: z.string(),
+  diubah_at: z.string(),
+});
+
+/** One admin text edit (bank_teks). */
+export function toTextEdit(row: unknown): TextEdit {
+  const r = textEditRowSchema.parse(row);
+  return {
+    kind: r.jenis,
+    key: r.kunci,
+    field: r.kolom,
+    variant: r.varian,
+    value: r.nilai,
+    updatedAt: r.diubah_at,
+  };
+}
+
+const textHistoryRowSchema = z.object({
+  ...editTargetSchema,
+  id: z.number(),
+  nilai_lama: z.string().nullable(),
+  nilai_baru: z.string().nullable(),
+  oleh_nama: z.string().nullable(),
+  created_at: z.string(),
+});
+
+/** One line of bank_teks_riwayat. */
+export function toTextHistory(row: unknown): TextEditHistoryItem {
+  const r = textHistoryRowSchema.parse(row);
+  return {
+    id: r.id,
+    kind: r.jenis,
+    key: r.kunci,
+    field: r.kolom,
+    variant: r.varian,
+    oldValue: r.nilai_lama,
+    newValue: r.nilai_baru,
+    byName: r.oleh_nama,
+    at: r.created_at,
   };
 }
 

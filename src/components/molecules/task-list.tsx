@@ -4,10 +4,13 @@ import * as id from "@/content/id";
 /** A titled group of SOP tasks with printable tick boxes. */
 export function TaskList({
   title,
+  hint,
   tasks,
   texts,
 }: {
   title: string;
+  /** One line on how to do this group (e.g. "pick a fixed day"). */
+  hint?: string;
   tasks: Task[];
   /** Personalised task texts by task id (LLM); falls back to the bank text. */
   texts?: Record<string, string> | null;
@@ -15,7 +18,10 @@ export function TaskList({
   if (tasks.length === 0) return null;
   return (
     <div>
-      <h4 className="mb-2 text-sm font-semibold text-muted-foreground">{title}</h4>
+      <div className="mb-2">
+        <h4 className="text-sm font-semibold text-muted-foreground">{title}</h4>
+        {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
+      </div>
       <ul className="space-y-2">
         {tasks.map((task) => (
           <li key={task.id} className="flex items-start gap-3">

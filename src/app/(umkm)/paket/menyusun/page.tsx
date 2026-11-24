@@ -8,6 +8,7 @@ import * as id from "@/content/id";
 import { ROUTES } from "@/lib/auth/constants";
 import { resolveOwnerStep } from "@/lib/data/flow";
 import { requireOwnerState } from "@/lib/data/owner-session";
+import { wordingFor } from "@/lib/data/text-edits";
 import { getSop } from "@/lib/diagnosis/bank";
 
 export const metadata: Metadata = { title: id.pack.eyebrow };
@@ -20,6 +21,7 @@ export default async function GeneratingPage() {
   const { business, pack } = state;
   if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
   if (pack.status === "siap") redirect(ROUTES.pack);
+  const wording = await wordingFor(business.sector);
 
   return (
     <FocusLayout>
@@ -28,7 +30,10 @@ export default async function GeneratingPage() {
         <p className="text-muted-foreground">{id.generating.subtitle}</p>
       </BentoTile>
       <PackGenerationProgress
-        sops={pack.sops.map((sop) => ({ id: sop.sopId, title: getSop(sop.sopId).title }))}
+        sops={pack.sops.map((sop) => ({
+          id: sop.sopId,
+          title: getSop(sop.sopId, wording).title,
+        }))}
       />
     </FocusLayout>
   );

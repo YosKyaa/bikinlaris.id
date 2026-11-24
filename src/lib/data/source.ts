@@ -1,10 +1,11 @@
-import type { QuestionId, SectionId, SopId } from "@/content/diagnosis";
-import type { StoredAnswer } from "@/content/diagnosis.types";
+import type { SectionId, SopId } from "@/content/diagnosis";
 import type { AiUsage } from "@/lib/ai/types";
+import type { EditTarget, TextEdit, TextEditHistoryItem } from "@/lib/diagnosis/edits";
 import type { ErrorReport } from "@/lib/monitoring/types";
 import type { Json } from "@/types/database";
 
 import type {
+  Answers,
   BusinessMap,
   CoachHistory,
   CoachMessage,
@@ -50,12 +51,11 @@ export interface PackResult {
 /** Owner side: everything is keyed by the private link token. */
 export interface OwnerStore {
   getState(token: string): Promise<OwnerState | null>;
-  /** Returns `first: true` for the first answer of a diagnosis (event `diagnosa_mulai`). */
-  saveAnswer(
-    token: string,
-    questionId: QuestionId,
-    answer: StoredAnswer,
-  ): Promise<{ first: boolean }>;
+  /**
+   * Stores one or more answers in a single round trip and returns every answer stored so far.
+   * `first: true` when these are the first answers of the diagnosis (event `diagnosa_mulai`).
+   */
+  saveAnswers(token: string, answers: Answers): Promise<{ first: boolean; answers: Answers }>;
   /** Closes the diagnosis and creates the pack (status "menyusun"). Idempotent. */
   startPack(token: string, input: PackStart): Promise<Pack>;
   /** Stores the final SOP texts and marks the pack "siap". Idempotent. */
@@ -174,9 +174,23 @@ export interface StaffStore {
   setRole(userId: string, role: TeamMember["role"]): Promise<boolean>;
   /** Admin only, never oneself (RLS "admin mengeluarkan anggota"). The login account stays. */
   removeMember(userId: string): Promise<boolean>;
+
+  /**
+   * Admin only: replaces one text of the check or the SOPs (null = back to bank.json).
+   * Logged in the text history. Returns the new text version.
+   */
+  saveTextEdit(target: EditTarget, value: string | null): Promise<number>;
+  /** Text edits, newest first. */
+  listTextHistory(): Promise<TextEditHistoryItem[]>;
+}
+
+/** Admin text edits, read by every page that shows the check or an SOP (public, like the texts). */
+export interface TextStore {
+  listEdits(): Promise<TextEdit[]>;
 }
 
 export interface DataSource {
   owner: OwnerStore;
   staff: StaffStore;
+  texts: TextStore;
 }

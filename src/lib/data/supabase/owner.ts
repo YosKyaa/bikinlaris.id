@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 import { toJson } from "@/lib/json";
+import { answersSchema } from "@/lib/validations/stored";
 import { createSecretClient } from "@/lib/supabase/secret";
 import { createAnonClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,11 @@ const stateSchema = z.object({
 });
 
 const registeredSchema = z.object({ kode: z.string(), token: z.string() });
+
+const savedAnswersSchema = z.object({ pertama: z.boolean(), jawaban: z.unknown() });
+
+/** PostgREST answers PGRST202 for a function it does not know (migration not applied yet). */
+const isMissingFunction = (error: { code?: string }) => error.code === "PGRST202";
 
 const coachQuotaSchema = z.object({
   status: z.enum(["ok", "terlalu_cepat", "batas_harian", "batas_semua"]),
@@ -42,14 +48,32 @@ export const supabaseOwnerStore: OwnerStore = {
     };
   },
 
-  async saveAnswer(token, questionId, answer) {
-    const { data, error } = await createAnonClient().rpc("umkm_simpan_jawaban", {
+  async saveAnswers(token, answers) {
+    const client = createAnonClient();
+    const { data, error } = await client.rpc("umkm_simpan_jawaban_banyak", {
       p_token: token,
-      p_pertanyaan: questionId,
-      p_jawaban: answer,
+      p_jawaban: toJson(answers),
     });
-    if (error) throw error;
-    return { first: data };
+    if (!error) {
+      const saved = savedAnswersSchema.parse(data);
+      return { first: saved.pertama, answers: answersSchema.parse(saved.jawaban) };
+    }
+    if (!isMissingFunction(error)) throw error;
+
+    // Database without migration 20261124000000 yet: one call per answer, one after another
+    // (they update the same row), then read the answers back.
+    let first = false;
+    for (const [questionId, answer] of Object.entries(answers)) {
+      const single = await client.rpc("umkm_simpan_jawaban", {
+        p_token: token,
+        p_pertanyaan: questionId,
+        p_jawaban: answer,
+      });
+      if (single.error) throw single.error;
+      first ||= single.data;
+    }
+    const state = await supabaseOwnerStore.getState(token);
+    return { first, answers: state?.diagnosis?.answers ?? {} };
   },
 
   async startPack(token, input) {

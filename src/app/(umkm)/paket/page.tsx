@@ -13,6 +13,7 @@ import { COACH_DAILY_LIMIT, QUESTION_MAX_LENGTH } from "@/lib/coach/rules";
 import { data } from "@/lib/data";
 import { resolveOwnerStep } from "@/lib/data/flow";
 import { getOwnerToken, requireOwnerState } from "@/lib/data/owner-session";
+import { wordingFor } from "@/lib/data/text-edits";
 import { buildWhatsAppText, whatsAppUrl } from "@/lib/diagnosis/whatsapp";
 import { regencyName } from "@/lib/wilayah";
 
@@ -45,6 +46,7 @@ export default async function PackPage({ searchParams }: PageProps<"/paket">) {
   const { business, pack } = state;
   if (!pack) redirect(resolveOwnerStep(state) ?? ROUTES.start);
   if (pack.status !== "siap") redirect(ROUTES.generating);
+  const wording = await wordingFor(business.sector);
 
   const options = id.profile.options;
   const fields = id.profile.fields;
@@ -66,7 +68,7 @@ export default async function PackPage({ searchParams }: PageProps<"/paket">) {
         <AccountMenu
           label={business.name}
           profile={profile}
-          allowRedo
+          allowRedo={!pack.questionnaireSentAt}
           logoutLabel={id.pack.menu.logout}
           logout={ownerLogoutAction}
         />
@@ -76,7 +78,8 @@ export default async function PackPage({ searchParams }: PageProps<"/paket">) {
         business={business}
         pack={pack}
         locationLabel={regencyName(business.location)}
-        whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack))}
+        wording={wording}
+        whatsAppUrl={whatsAppUrl(buildWhatsAppText(business.name, pack, wording))}
         coach={coach}
         pdfFailed={pdfFailed}
       />

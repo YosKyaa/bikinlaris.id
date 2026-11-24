@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
 import { Eyebrow } from "@/components/atoms/eyebrow";
@@ -14,7 +14,8 @@ import { StepActionBar } from "@/components/molecules/step-action-bar";
 import { Progress } from "@/components/ui/progress";
 import type { StoredAnswer } from "@/content/diagnosis.types";
 import * as id from "@/content/id";
-import { completeSectionAction, saveAnswerAction } from "@/lib/actions/owner";
+import { completeSectionAction, saveAnswersAction } from "@/lib/actions/owner";
+import { createAutosave } from "@/lib/diagnosis/autosave";
 
 export interface StepperQuestion {
   id: string;
@@ -37,16 +38,21 @@ interface DiagnosisStepperProps {
   isLast: boolean;
 }
 
-/** One section per screen with autosave per answer (optimistic) and a sticky action bar. */
+/**
+ * One section per screen with autosave per answer (optimistic) and a sticky action bar.
+ * Answers tapped close together are saved in one request (lib/diagnosis/autosave.ts), and
+ * "Lanjut" saves the whole section again in the same request that checks it, so a weak
+ * signal can delay a save but never lose an answer or leave the screen stuck.
+ */
 export function DiagnosisStepper(props: DiagnosisStepperProps) {
   const { section, questions, prevHref, nextHref, isLast } = props;
   const router = useRouter();
   const [answers, setAnswers] = useState(props.initialAnswers);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [autosave] = useState(() => createAutosave(saveAnswersAction, setSaveStatus));
   const [showMissing, setShowMissing] = useState(false);
   const [advanceError, setAdvanceError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const latestSave = useRef(0);
   const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const answeredHere = questions.filter((q) => answers[q.id]).length;
@@ -54,12 +60,39 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
   const missing = questions.filter((q) => !answers[q.id]);
   const isFresh = props.index === 0 && answeredTotal === 0;
 
-  async function handleAnswer(questionId: string, value: StoredAnswer) {
+  // Send waiting answers when the phone is back online or the owner switches apps, and once
+  // more when this screen closes (back button, "Keluar, lanjut nanti").
+  useEffect(() => {
+    autosave.resume();
+    const flush = () => void autosave.flush();
+    const onHidden = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("online", flush);
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onHidden);
+    return () => {
+      window.removeEventListener("online", flush);
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onHidden);
+      autosave.dispose();
+    };
+  }, [autosave]);
+
+  // The next section starts loading while this one is being answered.
+  useEffect(() => {
+    router.prefetch(nextHref);
+  }, [router, nextHref]);
+
+  function handleAnswer(questionId: string, value: StoredAnswer) {
     setAnswers((current) => ({ ...current, [questionId]: value }));
-    setSaveStatus("saving");
-    const ticket = ++latestSave.current;
-    const result = await saveAnswerAction(questionId, value);
-    if (ticket === latestSave.current) setSaveStatus(result.ok ? "saved" : "error");
+    autosave.add({ [questionId]: value });
+  }
+
+  function sectionAnswers(): Record<string, StoredAnswer> {
+    return Object.fromEntries(
+      questions.flatMap((q) => (answers[q.id] ? [[q.id, answers[q.id]] as const] : [])),
+    );
   }
 
   function handleNext() {
@@ -71,12 +104,25 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
       first?.querySelector<HTMLInputElement>("input[type=radio]")?.focus({ preventScroll: true });
       return;
     }
+    const toSave = sectionAnswers();
+    // "Lanjut" carries every answer of this section itself.
+    autosave.clear();
     startTransition(async () => {
-      const result = await completeSectionAction(section.id);
-      if (!result.ok) {
-        setAdvanceError(result.error);
+      let ok = false;
+      let error: string = id.diagnosis.errors.advanceFailed;
+      try {
+        const result = await completeSectionAction(section.id, toSave);
+        ok = result.ok;
+        if (!result.ok) error = result.error;
+      } catch {
+        // No connection: keep the default message.
+      }
+      if (!ok) {
+        autosave.add(toSave);
+        setAdvanceError(error);
         return;
       }
+      setSaveStatus("saved");
       router.push(nextHref);
     });
   }
@@ -87,7 +133,7 @@ export function DiagnosisStepper(props: DiagnosisStepperProps) {
       <div className="sticky top-16 z-20 rounded-2xl border bg-card/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:px-5">
         <div className="flex items-center justify-between gap-4">
           <StepCounter current={props.index + 1} total={props.totalSections} />
-          <SaveIndicator status={saveStatus} />
+          <SaveIndicator status={saveStatus} onRetry={() => void autosave.flush()} />
         </div>
         <Progress
           value={(answeredTotal / props.totalQuestions) * 100}

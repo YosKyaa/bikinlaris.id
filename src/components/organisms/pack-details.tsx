@@ -1,11 +1,4 @@
-import {
-  ChevronDownIcon,
-  ClipboardCheckIcon,
-  Clock3Icon,
-  TargetIcon,
-  UsersIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronDownIcon, Clock3Icon } from "lucide-react";
 
 import { BentoTile } from "@/components/atoms/bento-tile";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +8,12 @@ import type { SopId } from "@/content/diagnosis";
 import * as id from "@/content/id";
 import { sopAnchor } from "@/lib/anchors";
 import type { PackProblem } from "@/lib/data/types";
-import { getProblem, getSection, getSop, rules } from "@/lib/diagnosis/bank";
+import { getProblem, getSection, getSop, rules, type Wording } from "@/lib/diagnosis/bank";
 import { cn } from "@/lib/utils";
 
 /** Fogg: one small, concrete step for this week (high ability, clear prompt). */
-export function FirstStepCard({ sopId }: { sopId: SopId }) {
-  const sop = getSop(sopId);
+export function FirstStepCard({ sopId, wording }: { sopId: SopId; wording: Wording }) {
+  const sop = getSop(sopId, wording);
   const setupMinutes = sop.tasks.reduce(
     (sum, t) => sum + (t.kind === "siapkan" ? t.minutes : 0),
     0,
@@ -45,30 +38,7 @@ export function FirstStepCard({ sopId }: { sopId: SopId }) {
   );
 }
 
-const TIPS: { key: keyof Omit<typeof id.pack.tips, "label">; icon: LucideIcon }[] = [
-  { key: "oneAtATime", icon: TargetIcon },
-  { key: "tickDaily", icon: ClipboardCheckIcon },
-  { key: "share", icon: UsersIcon },
-];
-
-/** How to use the pack, as three icons with two or three words each. */
-export function PackTips() {
-  return (
-    <ul aria-label={id.pack.tips.label} className="grid grid-cols-3 gap-2 print:hidden">
-      {TIPS.map(({ key, icon: Icon }) => (
-        <li
-          key={key}
-          className="flex flex-col items-center gap-2 rounded-xl bg-muted px-2 py-3 text-center text-sm font-medium"
-        >
-          <Icon aria-hidden className="size-6 text-primary" />
-          {id.pack.tips[key]}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-export function LaterSops({ sopIds }: { sopIds: SopId[] }) {
+export function LaterSops({ sopIds, wording }: { sopIds: SopId[]; wording: Wording }) {
   if (sopIds.length === 0) return null;
   return (
     <BentoTile as="section" className="print:hidden">
@@ -78,7 +48,7 @@ export function LaterSops({ sopIds }: { sopIds: SopId[] }) {
         {sopIds.map((sopId) => (
           <li key={sopId}>
             <Badge variant="outline" className="h-auto bg-canvas py-1">
-              {getSop(sopId).title}
+              {getSop(sopId, wording).title}
             </Badge>
           </li>
         ))}
@@ -90,7 +60,7 @@ export function LaterSops({ sopIds }: { sopIds: SopId[] }) {
 const MANY_POINTS = rules.redPoints + rules.yellowPoints;
 
 /** What the check found, folded away: available when wanted, not in the way (construct M1). */
-export function ProblemList({ problems }: { problems: PackProblem[] }) {
+export function ProblemList({ problems, wording }: { problems: PackProblem[]; wording: Wording }) {
   if (problems.length === 0) return null;
   return (
     <details className="group rounded-2xl border bg-card print:hidden">
@@ -103,14 +73,14 @@ export function ProblemList({ problems }: { problems: PackProblem[] }) {
       </summary>
       <ul className="divide-y border-t px-5">
         {problems.map((item) => {
-          const problem = getProblem(item.id);
+          const problem = getProblem(item.id, wording);
           return (
             <li key={item.id} className="flex items-start gap-3 py-3">
               <Badge
                 variant={item.score >= MANY_POINTS ? "danger" : "warning"}
                 className="mt-0.5 w-20 shrink-0"
               >
-                {getSection(item.sectionId).label.split(" ")[0]}
+                {getSection(item.sectionId, wording).label.split(" ")[0]}
               </Badge>
               <div className="min-w-0">
                 <p className="font-semibold">{problem.title}</p>

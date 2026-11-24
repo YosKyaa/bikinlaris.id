@@ -1,3 +1,34 @@
+/**
+ * How to run the pack, said once and used everywhere: the guide on the pack page, the printed
+ * version, the PDF cover and the WhatsApp text (24 November 2026, owners asked how to start).
+ */
+const GUIDE_STEPS = [
+  {
+    title: "Mulai dari SOP 1 saja",
+    body: "Jangan semua sekaligus. Jalankan satu SOP dulu sampai jadi kebiasaan, biasanya sekitar 2 minggu.",
+  },
+  {
+    title: "Kerjakan bagian “Siapkan dulu” sekali",
+    body: "Ini persiapan sekali jalan, misalnya menyiapkan buku catatan atau papan. Perkiraan waktunya ada di tiap tugas.",
+  },
+  {
+    title: "Jalankan tugas “Tiap hari”, lalu coret",
+    body: "Unduh PDF atau cetak paketnya, tempel di dekat tempat kerja. Coret satu kotak di tabel tiap tugas selesai.",
+  },
+  {
+    title: "Pilih satu hari untuk tugas “Seminggu sekali”",
+    body: "Misalnya tiap Senin pagi. Hari yang tetap membuat tugas ini tidak terlupa.",
+  },
+  {
+    title: "Ajak karyawan",
+    body: "Kirim paket ini ke WhatsApp karyawan, lalu jelaskan SOP yang sedang dijalankan minggu ini.",
+  },
+  {
+    title: "Lanjut ke SOP berikutnya",
+    body: "Kalau SOP 1 sudah jalan tanpa perlu diingatkan, mulai SOP 2.",
+  },
+] as const;
+
 export const pack = {
   eyebrow: "Paket SOP siap",
   title: (business: string) => `Paket SOP untuk ${business}`,
@@ -17,12 +48,7 @@ export const pack = {
       `${product} · ${location} · dibuat ${date}`,
     code: (code: string) => `Kode peserta: ${code}`,
     howToTitle: "Cara pakai paket ini",
-    howTo: [
-      "Mulai dari SOP 1. Kerjakan satu dulu sampai jadi kebiasaan.",
-      "Kerjakan bagian Siapkan dulu sekali saja.",
-      "Coret tabel 14 hari setiap tugas harian selesai.",
-      "Bagikan ke karyawan yang ikut menjalankan.",
-    ],
+    howTo: GUIDE_STEPS,
     contents: "Isi paket",
     followUp: (date: string) =>
       `Sekitar ${date} tim bikinlaris mengirim kuesioner singkat lewat WhatsApp.`,
@@ -38,11 +64,32 @@ export const pack = {
     noSetup: "Mulai tugas hariannya besok pagi",
     open: "Buka SOP 1",
   },
-  tips: {
-    label: "Cara pakai paket",
-    oneAtATime: "Satu SOP dulu",
-    tickDaily: "Coret tiap hari",
-    share: "Bagikan ke karyawan",
+  guide: {
+    title: "Cara pakai paket ini",
+    intro:
+      "SOP adalah cara kerja yang ditulis langkah demi langkah. Tujuannya supaya semua orang di usaha Anda bekerja dengan cara yang sama.",
+    steps: GUIDE_STEPS,
+    faqTitle: "Kalau ada kendala",
+    faq: [
+      {
+        question: "Terlewat satu hari?",
+        answer: "Tidak apa-apa. Lanjutkan besok, kotak yang terlewat biarkan kosong.",
+      },
+      {
+        question: "Ada tugas yang kurang cocok dengan usaha Anda?",
+        answer:
+          "Ubah sedikit caranya, asal tujuannya tetap tercapai. Kalau ragu, tanya pendamping Anda.",
+      },
+      {
+        question: "Paketnya hilang dari HP?",
+        answer: "Buka lagi tautan pribadi dari WhatsApp. Paket Anda tetap tersimpan.",
+      },
+      {
+        question: "Apa yang terjadi di hari ke-30?",
+        answer:
+          "Tim mengirim kuesioner singkat lewat WhatsApp. Jawab apa adanya, termasuk kalau ada SOP yang belum jalan.",
+      },
+    ],
   },
   map: {
     title: "Peta usaha Anda",
@@ -60,6 +107,11 @@ export const pack = {
     setup: "Siapkan dulu, sekali saja",
     daily: "Tiap hari",
     weekly: "Seminggu sekali",
+    hints: {
+      siapkan: "Kerjakan sekali di awal. Centang kalau sudah.",
+      harian: "Kerjakan tiap hari buka, lalu coret di tabel.",
+      mingguan: "Pilih satu hari tetap, misalnya tiap Senin.",
+    },
     onlyWhenPresent: "Kalau ada",
     checklistTitle: "Coret di sini tiap hari, 2 minggu",
     checklistTask: "Tugas",
@@ -100,6 +152,7 @@ export const pack = {
     confirm: "Ya, ulang dari awal",
     cancel: "Batal",
     failed: "Belum bisa mengulang. Periksa internet Anda, lalu coba lagi.",
+    locked: "Cek usaha tidak bisa diulang lagi karena kuesioner hari ke-30 sudah dikirim.",
   },
   profileSheet: {
     title: "Profil usaha",

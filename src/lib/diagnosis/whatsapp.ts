@@ -3,7 +3,7 @@ import * as id from "@/content/id";
 import type { Pack } from "@/lib/data/types";
 import { formatDate } from "@/lib/format";
 
-import { getSop } from "./bank";
+import { getSop, type Wording } from "./bank";
 
 const WHATSAPP_BASE_URL = "https://wa.me/";
 
@@ -11,12 +11,22 @@ const WHATSAPP_BASE_URL = "https://wa.me/";
  * Plain-text pack for WhatsApp, ported from prototype `teksWA`. Owners forward it to their
  * staff, so it never contains the private link (which also allows "Ulang cek usaha").
  */
-export function buildWhatsAppText(businessName: string, pack: Pack): string {
+export function buildWhatsAppText(
+  businessName: string,
+  pack: Pack,
+  wording: Wording | null = null,
+): string {
   const copy = id.whatsapp;
-  const lines: string[] = [copy.header(businessName), copy.created(formatDate(pack.createdOn)), ""];
+  const lines: string[] = [
+    copy.header(businessName),
+    copy.created(formatDate(pack.createdOn)),
+    "",
+    copy.howTo,
+    "",
+  ];
 
   pack.sops.forEach((packSop, index) => {
-    const sop = getSop(packSop.sopId);
+    const sop = getSop(packSop.sopId, wording);
     lines.push(`*${index + 1}. ${sop.title}*`, `_${sop.goal}_`);
     for (const kind of TASK_KINDS) {
       const tasks = sop.tasks.filter((task) => task.kind === kind);

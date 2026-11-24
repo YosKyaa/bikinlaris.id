@@ -15,8 +15,13 @@ import {
   diagnosisBankSchema,
   sourceBankSchema,
   type SourceBank,
+  type SourceVariant,
 } from "../src/lib/validations/bank";
-import type { DiagnosisBankShape, Task } from "../src/content/diagnosis.types";
+import type {
+  DiagnosisBankShape,
+  Task,
+  TextVariantOverrides,
+} from "../src/content/diagnosis.types";
 
 const ROOT = path.resolve(__dirname, "..");
 const DEFAULT_SOURCE = path.resolve(
@@ -54,6 +59,29 @@ function parseSectionOrder(order: string[]): string[] {
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean);
+}
+
+/** Maps a record of overrides, keeping only the fields that are set (stable JSON output). */
+function mapRecord<T, U>(record: Record<string, T> | undefined, fn: (value: T) => U) {
+  return Object.fromEntries(Object.entries(record ?? {}).map(([id, value]) => [id, fn(value)]));
+}
+
+function convertVariant(variant: SourceVariant): TextVariantOverrides {
+  return {
+    note: variant.keterangan,
+    sections: mapRecord(variant.bagian, (b) => ({ label: b.label, description: b.deskripsi })),
+    questions: mapRecord(variant.diagnosa, (q) => ({ text: q.teks, skipWhen: q.lewati_bila })),
+    problems: mapRecord(variant.masalah, (m) => ({
+      title: m.judul,
+      rootCause: m.akar,
+      impact: m.dampak,
+    })),
+    sops: mapRecord(variant.sop, (s) => ({
+      title: s.judul,
+      goal: s.tujuan,
+      tasks: s.tugas ? mapRecord(s.tugas, (t) => ({ text: t.teks, unit: t.satuan })) : undefined,
+    })),
+  };
 }
 
 function convert(source: SourceBank): DiagnosisBankShape {
@@ -115,6 +143,7 @@ function convert(source: SourceBank): DiagnosisBankShape {
             },
       ),
     })),
+    variants: source.varian?.jasa ? { jasa: convertVariant(source.varian.jasa) } : {},
   };
 }
 

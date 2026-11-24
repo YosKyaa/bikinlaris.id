@@ -42,5 +42,6 @@ export * from "./copy/system";
 export * from "./copy/coach";
 export * from "./copy/monitoring";
 export * from "./copy/team";
+export * from "./copy/bank";
 export * from "./copy/states";
 export * from "./copy/design";

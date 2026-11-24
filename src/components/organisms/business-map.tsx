@@ -4,7 +4,7 @@ import { AreaScoreBar } from "@/components/molecules/area-score-bar";
 import type { SectionId } from "@/content/diagnosis";
 import * as id from "@/content/id";
 import type { BusinessMap as BusinessMapData } from "@/lib/data/types";
-import { getSection, questionsOf, rules, sections } from "@/lib/diagnosis/bank";
+import { getSection, questionsOf, rules, sections, type Wording } from "@/lib/diagnosis/bank";
 import { compareSections } from "@/lib/diagnosis/scoring";
 
 /**
@@ -14,11 +14,14 @@ import { compareSections } from "@/lib/diagnosis/scoring";
 export function BusinessMap({
   map,
   hardest,
+  wording = null,
   compact = false,
   children,
 }: {
   map: BusinessMapData;
   hardest: SectionId;
+  /** Section names as this owner sees them; the team panel uses the general ones. */
+  wording?: Wording | null;
   compact?: boolean;
   children?: ReactNode;
 }) {
@@ -34,7 +37,7 @@ export function BusinessMap({
           {ordered.map((sectionId) => (
             <li key={sectionId}>
               <AreaScoreBar
-                label={getSection(sectionId).label}
+                label={getSection(sectionId, wording).label}
                 score={map[sectionId].score}
                 max={questionsOf(sectionId).length * rules.redPoints}
                 color={map[sectionId].color}

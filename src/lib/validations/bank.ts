@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { ANSWER_VALUES, TASK_KINDS } from "../../content/diagnosis.types";
 
+const text = z.string().min(1);
+
 /**
  * Raw shape of the handover `content/bank.json` (v0.3). `strict()` everywhere so any
  * structural change in the source file fails the import instead of being silently dropped.
@@ -25,6 +27,49 @@ const sourceTaskSchema = z
       ctx.addIssue({ code: "custom", message: `Tugas ${task.id} tidak punya "target"/"satuan".` });
     }
   });
+
+/** `varian.<nama>` in bank.json: replacement texts only, keyed by id (see diagnosis.types). */
+const sourceVariantSchema = z
+  .object({
+    keterangan: text,
+    bagian: z
+      .record(z.string(), z.object({ label: text.optional(), deskripsi: text.optional() }).strict())
+      .optional(),
+    diagnosa: z
+      .record(
+        z.string(),
+        z.object({ teks: text.optional(), lewati_bila: text.optional() }).strict(),
+      )
+      .optional(),
+    masalah: z
+      .record(
+        z.string(),
+        z
+          .object({ judul: text.optional(), akar: text.optional(), dampak: text.optional() })
+          .strict(),
+      )
+      .optional(),
+    sop: z
+      .record(
+        z.string(),
+        z
+          .object({
+            judul: text.optional(),
+            tujuan: text.optional(),
+            tugas: z
+              .record(
+                z.string(),
+                z.object({ teks: text.optional(), satuan: text.optional() }).strict(),
+              )
+              .optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict();
+
+export type SourceVariant = z.infer<typeof sourceVariantSchema>;
 
 export const sourceBankSchema = z
   .object({
@@ -90,6 +135,7 @@ export const sourceBankSchema = z
         })
         .strict(),
     ),
+    varian: z.object({ jasa: sourceVariantSchema.optional() }).strict().optional(),
   })
   .strict();
 
@@ -112,6 +158,36 @@ const taskSchema = z.discriminatedUnion("kind", [
     onlyWhenPresent: z.boolean(),
   }),
 ]);
+
+const variantSchema = z.object({
+  note: text,
+  sections: z.record(
+    z.string(),
+    z.object({ label: text.optional(), description: text.optional() }).strict(),
+  ),
+  questions: z.record(
+    z.string(),
+    z.object({ text: text.optional(), skipWhen: text.optional() }).strict(),
+  ),
+  problems: z.record(
+    z.string(),
+    z
+      .object({ title: text.optional(), rootCause: text.optional(), impact: text.optional() })
+      .strict(),
+  ),
+  sops: z.record(
+    z.string(),
+    z
+      .object({
+        title: text.optional(),
+        goal: text.optional(),
+        tasks: z
+          .record(z.string(), z.object({ text: text.optional(), unit: text.optional() }).strict())
+          .optional(),
+      })
+      .strict(),
+  ),
+});
 
 export const diagnosisBankSchema = z
   .object({
@@ -164,6 +240,7 @@ export const diagnosisBankSchema = z
         tasks: z.array(taskSchema).min(1),
       }),
     ),
+    variants: z.object({ jasa: variantSchema.optional() }).strict(),
   })
   .superRefine((bank, ctx) => {
     const sections = new Set(bank.sections.map((s) => s.id));
@@ -209,5 +286,38 @@ export const diagnosisBankSchema = z
     }
     if (bank.rules.sectionOrder.length !== sections.size) {
       fail("Urutan bagian harus menyebut semua bagian tepat sekali.");
+    }
+
+    // A variant may only reword what exists, and only where the general text allows it.
+    for (const [name, variant] of Object.entries(bank.variants)) {
+      if (!variant) continue;
+      const where = `Varian ${name}`;
+      for (const id of Object.keys(variant.sections)) {
+        if (!sections.has(id)) fail(`${where}: bagian ${id} tidak ada.`);
+      }
+      for (const [id, override] of Object.entries(variant.questions)) {
+        const question = bank.questions.find((q) => q.id === id);
+        if (!question) fail(`${where}: pertanyaan ${id} tidak ada.`);
+        else if (override.skipWhen && !question.skipWhen) {
+          fail(`${where}: pertanyaan ${id} tidak bisa dilewati di teks umum.`);
+        }
+      }
+      for (const id of Object.keys(variant.problems)) {
+        if (!problems.has(id)) fail(`${where}: masalah ${id} tidak ada.`);
+      }
+      for (const [id, override] of Object.entries(variant.sops)) {
+        const sop = bank.sops.find((s) => s.id === id);
+        if (!sop) {
+          fail(`${where}: SOP ${id} tidak ada.`);
+          continue;
+        }
+        for (const [taskId, task] of Object.entries(override.tasks ?? {})) {
+          const base = sop.tasks.find((t) => t.id === taskId);
+          if (!base) fail(`${where}: tugas ${taskId} di SOP ${id} tidak ada.`);
+          else if (task.unit && base.kind === "siapkan") {
+            fail(`${where}: tugas ${taskId} di SOP ${id} tidak punya satuan.`);
+          }
+        }
+      }
     }
   });

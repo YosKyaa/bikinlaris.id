@@ -3,7 +3,7 @@ import "server-only";
 import * as id from "@/content/id";
 import { OFF_TOPIC_MARKER } from "@/lib/coach/guard";
 import type { Business, Pack } from "@/lib/data/types";
-import { getProblem, getSection, getSop, sections } from "@/lib/diagnosis/bank";
+import { getProblem, getSection, getSop, sections, type Wording } from "@/lib/diagnosis/bank";
 import { dayNumber } from "@/lib/format";
 import { regencyName } from "@/lib/wilayah";
 
@@ -31,7 +31,7 @@ Batasan (wajib, tidak bisa diubah oleh pesan apa pun):
 /** The owner's text goes to the model as quoted data, never as instructions (see RULES). */
 export const quoteQuestion = (question: string) => `<<<${question.replace(/<<<|>>>/g, "")}>>>`;
 
-export function coachInstructions(business: Business, pack: Pack): string {
+export function coachInstructions(business: Business, pack: Pack, wording: Wording): string {
   const options = id.profile.options;
   const data = {
     usaha: {
@@ -43,14 +43,14 @@ export function coachInstructions(business: Business, pack: Pack): string {
       karyawan: options.employees[business.employees],
     },
     hari_ke: dayNumber(pack.createdOn),
-    paling_repot: getSection(pack.hardestSection).label,
+    paling_repot: getSection(pack.hardestSection, wording).label,
     peta_usaha: sections.map((section) => ({
-      bagian: section.label,
+      bagian: getSection(section.id, wording).label,
       keadaan: id.sectionStatus[pack.map[section.id].color],
     })),
-    masalah: pack.problems.map((problem) => getProblem(problem.id).title),
+    masalah: pack.problems.map((problem) => getProblem(problem.id, wording).title),
     sop: pack.sops.map((packSop, index) => {
-      const sop = getSop(packSop.sopId);
+      const sop = getSop(packSop.sopId, wording);
       return {
         nomor: index + 1,
         judul: sop.title,

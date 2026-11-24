@@ -2,13 +2,14 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
+import { targetId } from "@/lib/diagnosis/edits";
 import { mockErrorLog } from "@/lib/monitoring/report";
 import { addDays, todayIso } from "@/lib/format";
 
 import type { StaffStore } from "../source";
 import type { CoachUsageDay, Participant, StaffUser } from "../types";
 import { clearMockSession, readMockSession, setMockSession } from "./session";
-import { newId, nextCode, pushEvent, store, tokenOf, type MockStaff } from "./store";
+import { newId, nextCode, pushEvent, store, textVersion, tokenOf, type MockStaff } from "./store";
 
 /** Same as umkm_coach_simpan: a slot older than this without an answer counts as failed. */
 const SLOT_SAVE_WINDOW_MS = 2 * 60 * 1000;
@@ -281,5 +282,34 @@ export const mockStaffStore: StaffStore = {
     if (!member) return false;
     member.role = role;
     return true;
+  },
+
+  /** Same rules as admin_ubah_teks (migration 20261124010000). */
+  async saveTextEdit(target, value) {
+    const admin = await signedIn();
+    if (admin?.role !== "admin") throw new Error("bukan_admin");
+    const s = store();
+    const id = targetId(target);
+    const index = s.textEdits.findIndex((edit) => targetId(edit) === id);
+    const oldValue = index === -1 ? null : s.textEdits[index].value;
+    const newValue = value?.trim() || null;
+    if (oldValue === newValue) return textVersion(s);
+    if (index !== -1) s.textEdits.splice(index, 1);
+    const at = new Date().toISOString();
+    if (newValue !== null) s.textEdits.push({ ...target, value: newValue, updatedAt: at });
+    const entry = {
+      ...target,
+      id: textVersion(s) + 1,
+      oldValue,
+      newValue,
+      byName: admin.name,
+      at,
+    };
+    s.textHistory.push(entry);
+    return entry.id;
+  },
+
+  async listTextHistory() {
+    return [...store().textHistory].reverse();
   },
 };
